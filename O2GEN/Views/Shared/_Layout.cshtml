@@ -27,7 +27,7 @@
 <body>
     
 
-        <div class="wrapper">
+        <div>
             <!-- Sidebar  -->
             <nav id="sidebar">
                 <div id="dismiss">
@@ -122,9 +122,13 @@
                             <a class="navbar-brand">O2GEN</a>
                         </form>
 
+
                     </div>
                 </nav>
 
+                <div>
+                    @RenderBody()
+                </div>
             </div>
         </div>
 
@@ -156,9 +160,9 @@
             });
         </script>
    
+       
 
-
-    @RenderBody()
+    
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
