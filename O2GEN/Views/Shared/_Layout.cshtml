@@ -1,4 +1,10 @@
-﻿<!DOCTYPE html>
+﻿@*<style>
+    body, html {
+        height: 100%
+    }
+</style>*@
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
 
@@ -19,150 +25,154 @@
     <link href="~/css/style3.css" rel="stylesheet" />
     <link href="~/css/jquery.mCustomScrollbar.min.css" rel="stylesheet" />
     <!-- Font Awesome JS -->
-    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js" integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ" crossorigin="anonymous"></script>
-    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js" integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY" crossorigin="anonymous"></script>
-
-
+  
+<script src="~/js/solid.min.js"></script>
+<script src="~/js/fontawesome.min.js"></script>
 </head>
-<body>
-    
+<body style="background-color: steelblue">
 
-        <div>
-            <!-- Sidebar  -->
-            <nav id="sidebar">
-                <div id="dismiss">
-                    <i class="fas fa-arrow-left"></i>
+
+    <div>
+        <!-- Sidebar  -->
+        <nav id="sidebar" style="background-color: steelblue">
+            <div id="dismiss">
+                <i class="fas fa-arrow-left"></i>
+            </div>
+
+            <div class="sidebar-header">
+
+            </div>
+
+            <ul class="list-unstyled components">
+                <p>@User.Identity.Name</p>
+                <li class="active">
+                    <a href="#">Главная страница</a>
+                </li>
+                <li>
+                    <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Отчеты</a>
+                    <ul class="collapse list-unstyled" id="homeSubmenu">
+                        <li>
+                            <a href="#">Значения контролей</a>
+                        </li>
+                        <li>
+                            <a href="#">Количество осмотренных тех. позиций</a>
+                        </li>
+                        <li>
+                            <a href="#">Количество тех. позиций</a>
+                        </li>
+                        <li>
+                            <a href="#">Дефекты</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Пользователи</a>
+                    <ul class="collapse list-unstyled" id="pageSubmenu">
+                        <li>
+                            <a href="#">Работники</a>
+                        </li>
+                        <li>
+                            <a href="#">Роли</a>
+                        </li>
+                        <li>
+                            <a href="#">Рабочие календари</a>
+                        </li>
+                        <li>
+                            <a href="#">Бригады</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#page2Submenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Справочники</a>
+                    <ul class="collapse list-unstyled" id="page2Submenu">
+                        <li>
+                            <a href="#">Участки</a>
+                        </li>
+                        <li>
+                            <a href="#">Объекты</a>
+                        </li>
+                        <li>
+                            <a href="#">Категории персонала</a>
+                        </li>
+                        <li>
+                            <a href="#">Должность</a>
+                        </li>
+                        <li>
+                            <a href="#">Классы объектов</a>
+                        </li>
+                        <li>
+                            <a href="#">Маршруты</a>
+                        </li>
+                        <li>
+                            <a href="#">Контроли</a>
+                        </li>
+                        <li>
+                            <a href="#">Типы ТО</a>
+                        </li>
+                    </ul>
+                </li>
+
+            </ul>
+        </nav>
+
+        <!-- Page Content  -->
+        <div id="content">
+
+            <nav class="navbar">
+                <div class="container-fluid">
+
+                    <button type="button" id="sidebarCollapse" class="btn btn-info" style="background-color: steelblue">
+                        <i class="fas fa-align-justify"></i>
+                    </button>
+                    <form class="d-flex">
+                        <a class="navbar-brand">O2GEN</a>
+                    </form>
+
+
                 </div>
-
-                <div class="sidebar-header">
-
-                </div>
-
-                <ul class="list-unstyled components">
-                    <p>@User.Identity.Name</p>
-                    <li class="active">
-                        <a href="#">Главная страница</a>
-                    </li>
-                    <li>
-                        <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Отчеты</a>
-                        <ul class="collapse list-unstyled" id="homeSubmenu">
-                            <li>
-                                <a href="#">Значения контролей</a>
-                            </li>
-                            <li>
-                                <a href="#">Количество осмотренных тех. позиций</a>
-                            </li>
-                            <li>
-                                <a href="#">Количество тех. позиций</a>
-                            </li>
-                            <li>
-                                <a href="#">Дефекты</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Пользователи</a>
-                        <ul class="collapse list-unstyled" id="pageSubmenu">
-                            <li>
-                                <a href="#">Работники</a>
-                            </li>
-                            <li>
-                                <a href="#">Роли</a>
-                            </li>
-                            <li>
-                                <a href="#">Рабочие календари</a>
-                            </li>
-                            <li>
-                                <a href="#">Бригады</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="#page2Submenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Справочники</a>
-                        <ul class="collapse list-unstyled" id="page2Submenu">
-                            <li>
-                                <a href="#">Участки</a>
-                            </li>
-                            <li>
-                                <a href="#">Объекты</a>
-                            </li>
-                            <li>
-                                <a href="#">Категории персонала</a>
-                            </li>
-                            <li>
-                                <a href="#">Должность</a>
-                            </li>
-                            <li>
-                                <a href="#">Классы объектов</a>
-                            </li>
-                            <li>
-                                <a href="#">Маршруты</a>
-                            </li>
-                            <li>
-                                <a href="#">Контроли</a>
-                            </li>
-                            <li>
-                                <a href="#">Типы ТО</a>
-                            </li>
-                        </ul>
-                    </li>
-
-                </ul>
             </nav>
 
-            <!-- Page Content  -->
-            <div id="content">
 
-                <nav class="navbar">
-                    <div class="container-fluid">
-
-                        <button type="button" id="sidebarCollapse" class="btn btn-info">
-                            <i class="fas fa-align-justify"></i>
-                        </button>
-                        <form class="d-flex">
-                            <a class="navbar-brand">O2GEN</a>
-                        </form>
+ 
+                @RenderBody()
 
 
-                    </div>
-                </nav>
-
-                <div>
-                    @RenderBody()
-                </div>
-            </div>
         </div>
 
-        <div class="overlay"></div>
-        <script src="~/lib/jquery/dist/jquery.min.js"></script>
-        <!-- Popper.JS -->
-        <script src="~/popper.min.js"></script>
-        <script src="~/js/jquery.mCustomScrollbar.concat.min.js"></script>
+    </div>
+
+    <div class="overlay">
+
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <!-- Popper.JS -->
+    <script src="~/popper.min.js"></script>
+    <script src="~/js/jquery.mCustomScrollbar.concat.min.js"></script>
 
 
-        <script type="text/javascript">
-            $(document).ready(function () {
-                $("#sidebar").mCustomScrollbar({
-                    theme: "minimal"
-                });
-
-                $('#dismiss, .overlay').on('click', function () {
-                    $('#sidebar').removeClass('active');
-                    $('.overlay').removeClass('active');
-                });
-
-                $('#sidebarCollapse').on('click', function () {
-                    $('#sidebar').addClass('active');
-                    $('.overlay').addClass('active');
-                    $('.collapse.in').toggleClass('in');
-                    $('a[aria-expanded=true]').attr('aria-expanded', 'false');
-                });
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#sidebar").mCustomScrollbar({
+                theme: "minimal"
             });
-        </script>
-   
-       
 
-    
+            $('#dismiss, .overlay').on('click', function () {
+                $('#sidebar').removeClass('active');
+                $('.overlay').removeClass('active');
+            });
+
+            $('#sidebarCollapse').on('click', function () {
+                $('#sidebar').addClass('active');
+                $('.overlay').addClass('active');
+                $('.collapse.in').toggleClass('in');
+                $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+            });
+        });
+    </script>
+
+
+
+
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
