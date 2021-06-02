@@ -1,25 +1,40 @@
 ﻿@model O2GEN.ViewModels.LoginViewModel
 
-<h2>Вход в приложение</h2>
+@{
+    Layout = "_Layout_NULL";
+}
 
-<form method="post" asp-controller="Account" asp-action="Login"
-      asp-route-returnUrl="@Model.ReturnUrl">
-    <div asp-validation-summary="ModelOnly"></div>
+
+
+<div class="d-flex align-items-center flex-column justify-content-center h-100" id="header">
+
+
     <div>
-        <label asp-for="Email"></label><br />
-        <input asp-for="Email" />
-        <span asp-validation-for="Email"></span>
+
+        <img src="~/O2gen-Page-2.png" class="img-fluid" />
+        <div>
+            <h2>Вход в приложение</h2>
+            <form method="post" asp-controller="Account" asp-action="Login"
+                  asp-route-returnUrl="@Model.ReturnUrl">
+                <div asp-validation-summary="ModelOnly"></div>
+                <div>
+                    <label asp-for="Email"> Логин</label><br />
+                    <input asp-for="Email" class="form-control"  />
+                    <span asp-validation-for="Email"></span>
+                </div>
+                <div>
+                    <label asp-for="Password"> Пароль</label><br />
+                    <input asp-for="Password" class="form-control"  />
+                    <span asp-validation-for="Password"></span>
+                </div>
+                <div>
+                    <label asp-for="RememberMe"></label><br />
+                    <input asp-for="RememberMe"  />
+                </div>
+                <div>
+                    <input type="submit" value="Войти" class="btn btn-secondary btn-lg btn-block" />
+                </div>
+            </form>
+        </div>
     </div>
-    <div>
-        <label asp-for="Password"></label><br />
-        <input asp-for="Password" />
-        <span asp-validation-for="Password"></span>
-    </div>
-    <div>
-        <label asp-for="RememberMe"></label><br />
-        <input asp-for="RememberMe" />
-    </div>
-    <div>
-        <input type="submit" value="Войти" />
-    </div>
-</form>
+</div>

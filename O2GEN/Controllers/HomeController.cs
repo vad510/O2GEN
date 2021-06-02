@@ -20,7 +20,15 @@ namespace O2GEN.Controllers
 
         public IActionResult Index()
         {
-            return View();
+
+            if (User.Identity.IsAuthenticated)
+            {
+                return View();
+            }
+            else
+            {
+                return Redirect("/Account/login");
+            }
         }
 
         public IActionResult Privacy()
