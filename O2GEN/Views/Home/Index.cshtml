@@ -1,30 +1,331 @@
-﻿@{
-    ViewData["Title"] = "Главное";
-}
+﻿@model IEnumerable<O2GEN.TestClass>
 
-<script src="~/lib/bsttdtp/js/jquery.min.js"></script>
-<script src="~/lib/bsttdtp/js/popper.min.js"></script>
-<script src="~/lib/bsttdtp/js/moment-with-locales.min.js"></script>
-<script src="~/lib/bsttdtp/js/base.js"></script>
-<script src="~/lib/bsttdtp/js/tempusdominus-bootstrap-4.js"></script>
-<link href="~/lib/bsttdtp/css/tempusdominus-bootstrap-4.css" rel="stylesheet" />
-<style>
-    .bootstrap-datetimepicker-widget.dropdown-menu {
-        width: auto;
+
+    @{
+        ViewData["Title"] = "Главное";
     }
 
-    .timepicker-picker table td a span,
-    .timepicker-picker table td,
-    .timepicker-picker table td span {
-        height: 20px !important;
-        line-height: 20px !important;
-        vertical-align: middle;
-        width: 30px !important;
-        padding: 0px !important;
-    }
-</style>
+    <script src="~/lib/bsttdtp/js/jquery.min.js"></script>
+    <script src="~/lib/bsttdtp/js/popper.min.js"></script>
+    <script src="~/lib/bsttdtp/js/moment-with-locales.min.js"></script>
+    <script src="~/lib/bsttdtp/js/base.js"></script>
+    <script src="~/lib/bsttdtp/js/tempusdominus-bootstrap-4.js"></script>
+    <link href="~/lib/bsttdtp/css/tempusdominus-bootstrap-4.css" rel="stylesheet" />
+    <style>
+        .bootstrap-datetimepicker-widget.dropdown-menu {
+            width: auto;
+        }
 
-<nav class="navbar" style="top:-48px">
+        .timepicker-picker table td a span,
+        .timepicker-picker table td,
+        .timepicker-picker table td span {
+            height: 20px !important;
+            line-height: 20px !important;
+            vertical-align: middle;
+            width: 30px !important;
+            padding: 0px !important;
+        }
+    </style>
+    <nav>
+        <ul class="ul-list-left-aligned bg-blue">
+            <li class="li-text-white">
+                <button class="transparent-btn">
+                    <em class="fa fa-bars"></em>
+                </button>
+            </li>
+
+            <li class="li-text-white">
+                <p>
+                    Главная
+                </p>
+            </li>
+        </ul>
+    </nav>
+
+
+    <section class="component-section">
+        <div class="row-container-left bg-blue">
+            <ul class="ul-list-left-aligned">
+                <li>
+                    <em class="fa fa-globe"></em>
+                </li>
+                <li>
+                    <em class="fa fa-refresh"></em>
+                </li>
+
+                <li class="li-text-white">
+                    <p>
+                        Сегодня
+                    </p>
+                </li>
+                <li class="li-text-white">
+                    <em class="fa fa-calendar"></em>
+                    <p>@DateTime.Now.ToString("dd'.'MM'.'yyyy")</p>
+                </li>
+            </ul>
+        </div>
+
+        <ul class="nav nav-tabs top-margin">
+            <li class="nav-item active">
+                <a class="nav-link" href="#first-tab" data-toggle="tab" aria-expanded="true">ЗПР выданные</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#second-tab" data-toggle="tab">ЗПР в работе</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#third-tab" data-toggle="tab">ЗПР закрытые</a>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+
+            <div id="first-tab" class="tab-pane fade in active">
+                <div class="row-container-left bg-blue">
+                    <ul class="ul-list-left-aligned">
+                        <li class="li-text-white">
+                            <button class="transparent-btn">
+                                <em class="fa fa-plus"></em>
+                                <p>Создать</p>
+                            </button>
+                        </li>
+
+                        <li class="li-text-white">
+                            <button class="transparent-btn">
+                                <em class="fa fa-filter"></em>
+                                <p>Фильтры (0)</p>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <section>
+                    <table class="table table-bordered table-hover table-responsive">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <p>@Html.DisplayNameFor(x => x.EquipmentType)</p>
+                                </th>
+                                <th>
+                                    <p>@Html.DisplayNameFor(x => x.Status)</p>
+                                </th>
+                                <th>
+                                    <p>@Html.DisplayNameFor(x => x.Type)</p>
+                                </th>
+                                <th>
+                                    <p>@Html.DisplayNameFor(x => x.Bypass)</p>
+                                </th>
+                                <th>
+                                    <p>@Html.DisplayNameFor(x => x.Bypasser)</p>
+                                </th>
+                                <th>
+                                    <p>@Html.DisplayNameFor(x => x.Start)</p>
+                                </th>
+                                <th>
+                                    <p>@Html.DisplayNameFor(x => x.End)</p>
+                                </th>
+                                <th>
+                                    <p>@Html.DisplayNameFor(x => x.Defect)</p>
+                                </th>
+                                <th>
+                                    <p>@Html.DisplayNameFor(x => x.Edit)</p>
+                                </th>
+                            </tr>
+                        </thead>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(x => item.EquipmentType)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(x => item.Status)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(x => item.Type)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(x => item.Bypass)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(x => item.Bypasser)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(x => item.Start)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(x => item.End)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(x => item.Defect)
+                                </td>
+                                <td>
+                                    <div class="fa-container-links-centered">
+                                        <a href="#">
+                                            <em class="fa fa-pencil"></em>
+                                        </a>
+                                        <a href="#">
+                                            <em class="fa fa-trash"></em>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </section>
+            </div>
+
+            <div id="second-tab" class="tab-pane fade">
+                <div class="row-container-left bg-blue">
+                    <ul class="ul-list-left-aligned">
+                        <li class="li-text-white">
+                            <button class="transparent-btn">
+                                <em class="fa fa-plus"></em>
+                                <p>Создать</p>
+                            </button>
+                        </li>
+
+                        <li class="li-text-white">
+                            <button class="transparent-btn">
+                                <em class="fa fa-filter"></em>
+                                <p>Фильтры (0)</p>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <section>
+                    <table>
+                        2
+                        @* foreach loop here *@
+                    </table>
+                </section>
+            </div>
+
+            <div id="third-tab" class="tab-pane fade">
+                <div class="row-container-left bg-blue">
+                    <ul class="ul-list-left-aligned">
+                        <li class="li-text-white">
+                            <button class="transparent-btn">
+                                <em class="fa fa-plus"></em>
+                                <p>Создать</p>
+                            </button>
+                        </li>
+
+                        <li class="li-text-white">
+                            <button class="transparent-btn">
+                                <em class="fa fa-filter"></em>
+                                <p>Фильтры (0)</p>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <section>
+                    <table>
+                        3
+                        @* foreach loop here *@
+                    </table>
+                </section>
+            </div>
+        </div>
+    </section>
+
+
+
+    <style>
+
+        .ul-list-left-aligned {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 7px;
+        }
+
+            .ul-list-left-aligned li {
+                margin: 0 10px;
+                display: inline-flex;
+            }
+
+                .ul-list-left-aligned li .fa {
+                    align-self: center;
+                    color: white;
+                    margin: 0 5px;
+                }
+
+        .li-text-white {
+            color: white;
+        }
+
+        .row-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+        }
+
+        .row-container-left {
+            display: flex;
+            flex-direction: row;
+            justify-content: left;
+        }
+
+        .row-div-two {
+            float: left;
+            width: 48%;
+            padding: 5px;
+            flex-grow: 1;
+        }
+
+
+        .component-section {
+            padding: 0;
+        }
+
+        .bg-blue {
+            background: #0074D9;
+        }
+
+        .transparent-btn {
+            background: transparent;
+            border: 0px;
+            margin: 0px;
+            padding: 0px;
+            display: inline-flex;
+        }
+
+            .transparent-btn:hover {
+                color: #b9dce0;
+            }
+
+                .transparent-btn:hover .fa {
+                    color: #b9dce0;
+                }
+
+        .fa-container-links-centered {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .top-margin {
+            margin: 5px 0 0 0;
+        }
+
+        @@media screen and (max-width: 800px) {
+            .row-container {
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .content-img {
+                width: 100%;
+                height: 100%;
+            }
+        }
+    </style>
+    <@*nav class="navbar" style="top:-48px">
 
     <div class="container-fluid">
         <div class="row">
@@ -146,4 +447,4 @@ else
 
     <a asp-controller="Account" asp-action="Login">Вход</a>
     <a asp-controller="Account" asp-action="Register">Регистрация</a>
-}
+}*@
