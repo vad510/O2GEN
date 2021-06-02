@@ -1,0 +1,250 @@
+﻿input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 50px white inset;
+    /* Change the color to your own background color */
+    -webkit-text-fill-color: #333;
+}
+
+input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 50px white inset;
+    /*your box-shadow*/
+    -webkit-text-fill-color: #333;
+}
+
+.fa {
+    color: white;
+}
+
+.ul-list {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.ul-list li {
+    margin: 0 5px;
+}
+
+.ul-list li a {
+    color: white;
+}
+
+.ul-list > li.logout-form {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 0 5px;
+}
+
+.ul-list > li.logout-form p {
+    color: white;
+    text-align: center;
+    margin: 0px;
+}
+
+.ul-list-left-aligned {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    margin: 0px;
+    color: white;
+    padding: 7px;
+    list-style:none;
+}
+
+.ul-list-left-aligned li {
+    margin: 0 10px;
+    display: inline-flex;
+}
+
+.ul-list-left-aligned li .fa {
+    align-self: center;
+    color: white;
+    margin: 0 5px;
+}
+
+.ul-list-right-aligned {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    margin: 0px;
+    color: white;
+    padding: 7px;
+    list-style: none;
+
+    li {
+        margin: 0 10px;
+        display: inline-flex;
+
+        .fa {
+            align-self: center;
+            color: white;
+            margin: 0 5px;
+        }
+    }
+}
+
+.li-text-white {
+    color: white;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.li-text-white p {
+    color: white;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1em;
+    font-weight: 100;
+    line-height: 1em;
+    margin: 0px;
+    padding: 7px;
+}
+
+.li-text-white i {
+    align-self: center;
+}
+
+.section {
+    padding-top: 20px;
+}
+
+.row-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.row-container-left {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    align-items: center;
+}
+
+.row-div-two {
+    float: left;
+    width: 48%;
+    padding: 5px;
+    flex-grow: 1;
+}
+
+.content-div {
+    padding: 40px;
+}
+
+.content-div > h1, .content-div h2, .content-div h3, .content-div h4, .content-div h5, .content-div h6, .content-div h7 {
+    color: black;
+    text-align: center;
+}
+
+.content-div p {
+    font-size: 18px;
+    color: black;
+}
+
+.component-section {
+    padding: 0;
+}
+
+.bg-blue {
+    background: #0074D9;
+}
+
+.transparent-btn {
+    background: transparent;
+    border: 0px;
+    margin: 0px;
+    padding: 0px;
+    display: inline-flex;
+    align-items: center;
+    color: white;
+}
+
+.transparent-btn:hover {
+    color: #b9dce0;
+}
+
+.fa-container-links-centered {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.top-margin {
+    margin: 5px 0 0 0;
+}
+
+.bg-light {
+    color: white;
+}
+
+.nav-link {
+    background-color: lightgrey;
+}
+
+.nav-link.active {
+    background-color: white;
+}
+
+p {
+    color: white;
+}
+
+.color-white {
+    color: white;
+}
+
+.navbar {
+    margin-bottom:0px;
+}
+
+.no-margin {
+    margin:0px;
+}
+
+.no-padding {
+    padding: 0px;
+}
+
+@media screen and (max-width: 1200px) {
+    .row-container {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .row-div-two {
+        width: 100%;
+        .ul-list-left-aligned {
+            justify-content:center;
+        }
+        .ul-list-right-aligned {
+            justify-content:center;
+        }
+    }
+
+    .content-img {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+@media screen and (max-width: 510px)
+{
+    .row-div-two {
+        flex-direction: column;
+
+        .ul-list-left-aligned {
+            flex-direction:column;
+
+            li {
+                margin: 5px 0;
+            }
+        }
+    }
+}

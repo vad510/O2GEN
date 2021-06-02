@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using O2GEN.Models;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace O2GEN.Controllers
@@ -17,9 +19,7 @@ namespace O2GEN.Controllers
 
         public IActionResult Index()
         {
-<<<<<<< HEAD
             return View();
-=======
 
             _test = new List<TestClass>();
 
@@ -33,7 +33,7 @@ namespace O2GEN.Controllers
                 Start = DateTime.Now,
                 End = DateTime.Now
             });
->>>>>>> 5e9eb3f23678bd0cf1a7caa4bfc01ff5b6d34e74
+
             if (User.Identity.IsAuthenticated)
             {
                 return View(_test);
