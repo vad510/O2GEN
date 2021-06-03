@@ -4,8 +4,6 @@ using O2GEN.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace O2GEN.Controllers
 {
@@ -21,6 +19,7 @@ namespace O2GEN.Controllers
 
         public IActionResult Index()
         {
+            return View();
 
             _test = new List<TestClass>();
 
@@ -34,6 +33,7 @@ namespace O2GEN.Controllers
                 Start = DateTime.Now,
                 End = DateTime.Now
             });
+
             if (User.Identity.IsAuthenticated)
             {
                 return View(_test);

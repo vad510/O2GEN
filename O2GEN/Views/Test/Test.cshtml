@@ -1,0 +1,172 @@
+﻿@model IEnumerable<O2GEN.Controllers.TestClass>
+
+<section class="component-section">
+    @*<div class="row-container-left">
+        <ul class="ul-list-left-aligned">
+            <li>
+                <i class="fa fa-globe"></i>
+            </li>
+            <li>
+                <i class="fa fa-redo"></i>
+            </li>
+
+            <li class="li-text-white">
+                <p>
+                    Сегодня
+                </p>
+            </li>
+            <li class="li-text-white">
+                <i class="fa fa-calendar"></i>
+                <p>@DateTime.Now.ToString("dd'.'MM'.'yyyy")</p>
+            </li>
+        </ul>
+    </div>*@
+
+    <ul class="nav nav-tabs top-margin">
+        <li class="nav-item active">
+            <a class="nav-link text-black-50 active" href="#first-tab" data-toggle="tab">ЗПР выданные</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-black-50" href="#second-tab" data-toggle="tab">ЗПР в работе</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-black-50" href="#third-tab" data-toggle="tab">ЗПР закрытые</a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+
+        <div id="first-tab" class="tab-pane active">
+            <div class="row-container-left">
+                <ul class="ul-list-left-aligned">
+                    <li class="li-text-white">
+                        <button class="transparent-btn">
+                            <i class="fa fa-plus"></i>
+                            <p>Создать</p>
+                        </button>
+                    </li>
+
+                    <li class="li-text-white">
+                        <button class="transparent-btn">
+                            <i class="fa fa-filter"></i>
+                            <p>Фильтры (0)</p>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <section>
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.EquipmentType)</p>
+                            </th>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.Status)</p>
+                            </th>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.Type)</p>
+                            </th>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.Bypass)</p>
+                            </th>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.Bypasser)</p>
+                            </th>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.Start)</p>
+                            </th>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.End)</p>
+                            </th>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.Defect)</p>
+                            </th>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.Edit)</p>
+                            </th>
+                        </tr>
+                    </thead>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><p>@Html.DisplayFor(x => item.EquipmentType)</p></td>
+                            <td><p>@Html.DisplayFor(x => item.Status)</p></td>
+                            <td><p>@Html.DisplayFor(x => item.Type)</p></td>
+                            <td><p>@Html.DisplayFor(x => item.Bypass)</p></td>
+                            <td><p>@Html.DisplayFor(x => item.Bypasser)</p></td>
+                            <td><p>@Html.DisplayFor(x => item.Start)</p></td>
+                            <td><p>@Html.DisplayFor(x => item.End)</p></td>
+                            <td><p>@Html.DisplayFor(x => item.Defect)</p></td>
+                            <td>
+                                <div class="fa-container-links-centered">
+                                    <a href="#">
+                                        <i class="fa fa-pen color-white"></i>
+                                    </a>
+                                    <a href="#">
+                                        <i class="fa fa-trash color-white"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </section>
+        </div>
+
+        <div id="second-tab" class="tab-pane fade">
+            <div class="row-container-left">
+                <ul class="ul-list-left-aligned">
+                    <li class="li-text-white">
+                        <button class="transparent-btn">
+                            <i class="fa fa-plus"></i>
+                            <p>Создать</p>
+                        </button>
+                    </li>
+
+                    <li class="li-text-white">
+                        <button class="transparent-btn">
+                            <i class="fa fa-filter"></i>
+                            <p>Фильтры (0)</p>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <section>
+                <table>
+                    2
+                    @* foreach loop here *@
+                </table>
+            </section>
+        </div>
+
+        <div id="third-tab" class="tab-pane fade">
+            <div class="row-container-left">
+                <ul class="ul-list-left-aligned">
+                    <li class="li-text-white">
+                        <button class="transparent-btn">
+                            <i class="fa fa-plus"></i>
+                            <p>Создать</p>
+                        </button>
+                    </li>
+
+                    <li class="li-text-white">
+                        <button class="transparent-btn">
+                            <i class="fa fa-filter"></i>
+                            <p>Фильтры (0)</p>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <section>
+                <table>
+                    3
+                    @* foreach loop here *@
+                </table>
+            </section>
+        </div>
+    </div>
+</section>

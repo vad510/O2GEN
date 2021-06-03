@@ -163,6 +163,8 @@
   -webkit-filter: none;
           filter: none; }
 
+
+
 .fa-stack {
   display: inline-block;
   height: 2em;
@@ -189,6 +191,10 @@
 
 /* Font Awesome uses the Unicode Private Use Area (PUA) to ensure screen
 readers do not read off random characters that represent icons */
+.fa-refresh:before {
+    content: "\f021"
+}
+
 .fa-500px:before {
   content: "\f26e"; }
 
@@ -4617,3 +4623,7 @@ readers do not read off random characters that represent icons */
 .fas {
   font-family: 'Font Awesome 5 Free';
   font-weight: 900; }
+
+
+
+

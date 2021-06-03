@@ -24,7 +24,7 @@
     }
 </style>
 
-<nav class="navbar" style="top:-48px">
+<nav class="navbar">
 
     <div class="container-fluid">
         <div class="row">
@@ -37,13 +37,15 @@
                 <button type="button" id="reload" class="btn btn-info" style="background-color: steelblue">
                     <i class="fas fa-redo-alt"></i>
                 </button>
-                <div class="d-inline">&nbsp;</div>
                 <label for="datetimepicker2">СЕГОДНЯ</label>
                 <div class="input-group date col-auto" id="datetimepicker2" data-target-input="nearest">
                     <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker2" id="itdtp2" style="width:150px;" />
                     <div class="input-group-append" data-target="#datetimepicker2" data-toggle="datetimepicker">
                         <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                     </div>
+                </div>
+                <div>
+                    <a asp-action="Test" asp-controller="Test">Test page</a>
                 </div>
             </div>
         </div>
@@ -53,7 +55,7 @@
 
 </nav>
 
-<nav class="navbar" style="top:-96px">
+<nav class="navbar">
 
     <div class="container-fluid">
         <div class="row">
@@ -71,7 +73,7 @@
 
 
 </nav>
-<nav class="navbar" style="top:-144px">
+<nav class="navbar">
 
     <div class="container-fluid">
         <div class="row">
@@ -85,8 +87,8 @@
         </div>
     </div>
 </nav>
-<nav class="navbar" style="top:-192px">
-<div class="container-fluid" style="max-width: 1500px; background-color: whitesmoke">
+<nav class="navbar">
+@*<div class="container-fluid" style="max-width: 1500px; background-color: whitesmoke">
     <div class="row" style="max-width:1500px">
 
         <div class="col-sm">
@@ -107,7 +109,7 @@
             </table>
         </div>
     </div>
-</div>
+</div>*@
 </nav>
 
 
