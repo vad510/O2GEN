@@ -1,0 +1,99 @@
+﻿@model O2GEN.Models.DeskModels.ObjectListModel
+@{
+    ViewData["Title"] = "Объекты";
+}
+<section class="component-section">
+
+    <div class="row-container-left bg-blue with-padding">
+        <button class="transparent-btn">
+            <i class="fa fa-plus color-white"></i>
+            <p class="color-white">Создать</p>
+        </button>
+    </div>
+
+    <div class="margin-between-above">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        <p>
+                            @Html.DisplayNameFor(x => x.ObjectHeadModels.FirstOrDefault().ObjectName)
+                        </p>
+                    </th>
+
+                    <th>
+                        <p>
+                            @Html.DisplayNameFor(x => x.ObjectHeadModels.FirstOrDefault().IndexMaximo)
+                        </p>
+                    </th>
+
+                    <th>
+                        <p>
+                            @Html.DisplayNameFor(x => x.ObjectHeadModels.FirstOrDefault().Status)
+                        </p>
+                    </th>
+
+                    <th>
+                        <p>
+                            @Html.DisplayNameFor(x => x.ObjectHeadModels.FirstOrDefault().Description)
+                        </p>
+                    </th>
+
+                    <th>
+                        <p>
+                            @Html.DisplayNameFor(x => x.ObjectHeadModels.FirstOrDefault().Edit)
+                        </p>
+                    </th>
+
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.ObjectHeadModels)
+                {
+                    <tr>
+                        <td>
+                            <ul class="ul-list-left-aligned-colum color-black">
+                                <li>
+                                    <span class="caret">@item.ObjectName</span>
+                                    <ul class="nested">
+                                        @foreach (var md in item.ObjectModels)
+                                        {
+                                            <li>@md.Name</li>
+                                        }
+                                    </ul>
+                                </li>
+                            </ul>
+                        </td>
+
+                        <td>
+                            <p>@item.IndexMaximo</p>
+                        </td>
+
+                        <td>
+                            <p>@item.Status</p>
+                        </td>
+
+                        <td>
+                            <p>@item.Description</p>
+                        </td>
+
+                        <td>
+                            <div class="fa-container-links-centered">
+                                <a href="#">
+                                    <i class="fa fa-pen"></i>
+                                </a>
+                                <a href="#">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</section>

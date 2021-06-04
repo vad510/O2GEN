@@ -2,5 +2,9 @@
   {
     "outputFile": "wwwroot/css/custom.style.css",
     "inputFile": "wwwroot/css/custom.style.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/Mixins.css",
+    "inputFile": "wwwroot/css/Mixins.scss"
   }
 ]

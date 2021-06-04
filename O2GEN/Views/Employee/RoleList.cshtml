@@ -1,0 +1,135 @@
+﻿@model O2GEN.Models.HomeModels.RoleListModels
+@{
+    ViewData["Title"] = "Роли";
+}
+<section class="component-section">
+
+    <div class="row-container-left">
+        <button class="transparent-btn">
+            <i class="fa fa-plus color-white"></i>
+            <p class="color-white">Создать</p>
+        </button>
+    </div>
+
+    <div class="tab-content bg-light">
+
+        <div id="first-tab" class="tab-pane active">
+            <div class="row-container-left bg-blue">
+                <ul class="ul-list-left-aligned">
+                    <li class="li-text-white">
+                        <button class="transparent-btn">
+                            <i class="fa fa-plus color-white"></i>
+                            <p class="color-white">Создать</p>
+                        </button>
+                    </li>
+
+                    <li class="li-text-white">
+                        <button class="transparent-btn">
+                            <i class="fa fa-filter color-white"></i>
+                            <p class="color-white">Фильтры (0)</p>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <section>
+                <table class="table table-bordered table-hover">
+                    <thead class="color-black">
+                        <tr>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.RoleModels.FirstOrDefault().RoleName)</p>
+                            </th>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.RoleModels.FirstOrDefault().VisibleRoleName)</p>
+                            </th>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.RoleModels.FirstOrDefault().Edit)</p>
+                            </th>
+                        </tr>
+                    </thead>
+                    @foreach (var item in Model.RoleModels)
+                    {
+                        <tr>
+                            <td>
+                                <p>
+                                    @item.RoleName
+                                </p>
+                            </td>
+
+                            <td>
+                                <p>
+                                    @item.VisibleRoleName
+                                </p>
+                            </td>
+
+                            <td>
+                                <div class="fa-container-links-centered">
+                                    <a href="#">
+                                        <i class="fa fa-pen"></i>
+                                    </a>
+                                    <a href="#">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </section>
+        </div>
+
+        <div id="second-tab" class="tab-pane fade">
+            <div class="row-container-left bg-blue">
+                <ul class="ul-list-left-aligned">
+                    <li class="li-text-white">
+                        <button class="transparent-btn">
+                            <i class="fa fa-plus"></i>
+                            <p>Создать</p>
+                        </button>
+                    </li>
+
+                    <li class="li-text-white">
+                        <button class="transparent-btn">
+                            <i class="fa fa-filter"></i>
+                            <p>Фильтры (0)</p>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <section>
+                <table>
+                    2
+                </table>
+            </section>
+        </div>
+
+        <div id="third-tab" class="tab-pane fade">
+
+            <div class="row-container-left bg-blue">
+                <ul class="ul-list-left-aligned">
+                    <li class="li-text-white">
+                        <button class="transparent-btn">
+                            <i class="fa fa-plus"></i>
+                            <p>Создать</p>
+                        </button>
+                    </li>
+
+                    <li class="li-text-white">
+                        <button class="transparent-btn">
+                            <i class="fa fa-filter"></i>
+                            <p>Фильтры (0)</p>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <section>
+                <table>
+                    3
+                </table>
+            </section>
+        </div>
+    </div>
+
+</section>

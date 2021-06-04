@@ -1,0 +1,77 @@
+﻿@model O2GEN.Models.DeskModels.ControlListModel
+@{
+    ViewData["Title"] = "Контроли";
+}
+<section class="component-section">
+
+    <div class="row-container-left bg-blue with-padding">
+        <button class="transparent-btn">
+            <i class="fa fa-plus color-white"></i>
+            <p class="color-white">Создать</p>
+        </button>
+    </div>
+
+    <div class="margin-between-above">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        <p>
+                            @Html.DisplayNameFor(x => x.ControlModels.FirstOrDefault().Name)
+
+                        </p>
+                    </th>
+
+                    <th>
+                        <p>
+                            @Html.DisplayNameFor(x => x.ControlModels.FirstOrDefault().Type)
+
+                        </p>
+                    </th>
+
+                    <th>
+                        <p>
+                            @Html.DisplayNameFor(x => x.ControlModels.FirstOrDefault().Edit)
+
+                        </p>
+                    </th>
+
+                </tr>
+
+            </thead>
+            <tbody>
+                @foreach (var item in Model.ControlModels)
+                {
+                    <tr>
+
+                        <td>
+                            <p>
+                                @item.Name
+                            </p>
+                        </td>
+
+                        <td>
+                            <p>
+                                @item.Type
+                            </p>
+                        </td>
+
+                        <td>
+                            <div class="fa-container-links-centered">
+                                <a href="#">
+                                    <i class="fa fa-pen"></i>
+                                </a>
+                                <a href="#">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+
+</section>

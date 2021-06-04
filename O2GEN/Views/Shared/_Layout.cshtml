@@ -1,8 +1,4 @@
-﻿@*<style>
-    body, html {
-        height: 100%
-    }
-</style>*@
+﻿@using O2GEN.Helpers.Static;
 
 <!DOCTYPE html>
 <html lang="en">
@@ -21,7 +17,9 @@
     <link href="~/css/style3.css" rel="stylesheet" />
     <link href="~/css/jquery.mCustomScrollbar.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/fontawesome-free-5.15.1-web/css/all.css" />
-    <link rel="stylesheet" href="~/css/custom.style.min.css" />
+    <link href="~/lib/bsttdtp/css/tempusdominus-bootstrap-4.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/custom.style.css" />
+
     <!-- Font Awesome JS -->
 
     <script src="~/js/solid.min.js"></script>
@@ -33,14 +31,29 @@
     <script src="~/js/jquery.mCustomScrollbar.concat.min.js"></script>
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-</head>
-<body style="background-color: steelblue">
 
+    <style>
+        .bootstrap-datetimepicker-widget.dropdown-menu {
+            width: auto;
+        }
+
+        .timepicker-picker table td a span,
+        .timepicker-picker table td,
+        .timepicker-picker table td span {
+            height: 20px !important;
+            line-height: 20px !important;
+            vertical-align: middle;
+            width: 30px !important;
+            padding: 0px !important;
+        }
+    </style>
+
+</head>
+<body>
 
     <div>
         <!-- Sidebar  -->
-        <nav id="sidebar" style="background-color: steelblue">
+        <nav id="sidebar" class="bg-blue">
             <div id="dismiss">
                 <i class="fas fa-arrow-left"></i>
             </div>
@@ -52,22 +65,22 @@
             <ul class="list-unstyled components">
                 <p>@User.Identity.Name</p>
                 <li class="active">
-                    <a href="#">Главная страница</a>
+                    <a asp-action="Index" asp-controller="Home">Главная страница</a>
                 </li>
                 <li>
                     <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Отчеты</a>
                     <ul class="collapse list-unstyled" id="homeSubmenu">
                         <li>
-                            <a href="#">Значения контролей</a>
+                            <a asp-controller="Home" asp-action="ControlValueReports">Отчёт по значениям контролей</a>
                         </li>
                         <li>
-                            <a href="#">Количество осмотренных тех. позиций</a>
+                            <a asp-controller="Home" asp-action="ReportsOnViewedTechPositions">Количество осмотренных тех. позиций</a>
                         </li>
                         <li>
-                            <a href="#">Количество тех. позиций</a>
+                            <a asp-controller="Home" asp-action="NumberOfTechPosReports">Количество тех. позиций</a>
                         </li>
                         <li>
-                            <a href="#">Дефекты</a>
+                            <a asp-controller="Home" asp-action="DefectsReport">Дефекты</a>
                         </li>
                     </ul>
                 </li>
@@ -75,16 +88,19 @@
                     <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Пользователи</a>
                     <ul class="collapse list-unstyled" id="pageSubmenu">
                         <li>
-                            <a href="#">Работники</a>
+                            <a asp-controller="Employee" asp-action="Index">Работники</a>
                         </li>
                         <li>
-                            <a href="#">Роли</a>
+                            <a asp-controller="Employee" asp-action="RoleList">Роли</a>
+                        </li>
+                        <li>
+                            <a asp-controller="Employee" asp-action="Resources">Ресурсы</a>
                         </li>
                         <li>
                             <a href="#">Рабочие календари</a>
                         </li>
                         <li>
-                            <a href="#">Бригады</a>
+                            <a asp-controller="Employee" asp-action="Department">Бригады</a>
                         </li>
                     </ul>
                 </li>
@@ -95,25 +111,25 @@
                             <a href="#">Участки</a>
                         </li>
                         <li>
-                            <a href="#">Объекты</a>
+                            <a asp-controller="Desk" asp-action="Objects">Объекты</a>
                         </li>
                         <li>
-                            <a href="#">Категории персонала</a>
+                            <a asp-controller="Desk" asp-action="EmployeeCategory">Категории персонала</a>
                         </li>
                         <li>
-                            <a href="#">Должность</a>
+                            <a asp-controller="Desk" asp-action="EmployeePosition">Должность</a>
                         </li>
                         <li>
-                            <a href="#">Классы объектов</a>
+                            <a asp-controller="Desk" asp-action="ObjectClass">Классы объектов</a>
                         </li>
                         <li>
-                            <a href="#">Маршруты</a>
+                            <a asp-controller="Desk" asp-action="Route">Маршруты</a>
                         </li>
                         <li>
-                            <a href="#">Контроли</a>
+                            <a asp-controller="Desk" asp-action="Controls">Контроли</a>
                         </li>
                         <li>
-                            <a href="#">Типы ТО</a>
+                            <a asp-controller="Desk" asp-action="TOTypes">Типы ТО</a>
                         </li>
                     </ul>
                 </li>
@@ -124,9 +140,10 @@
         <!-- Page Content  -->
         <div id="content">
 
-            <nav>
+            <nav class="bg-blue">
                 <div class="row-container">
-                    <div class="row-div-two">
+
+                    <div class="row-col-70">
                         <ul class="ul-list-left-aligned">
                             <li>
                                 <button type="button" id="sidebarCollapse" class="btn btn-info" style="background-color: steelblue">
@@ -134,11 +151,19 @@
                                 </button>
                             </li>
 
+                            <li class="no-left-margin">
+                                <a asp-controller="Home" asp-action="Index">Главная</a>
+                            </li>
+
                             <li>
-                                <i class="fa fa-globe"></i>
+                                @Html.DynamicNavigationLink("link")
+                            </li>
+
+                            <li>
+                                <i class="fa fa-globe color-white"></i>
                             </li>
                             <li>
-                                <i class="fa fa-redo"></i>
+                                <i class="fa fa-redo color-white"></i>
                             </li>
 
                             <li class="li-text-white">
@@ -157,22 +182,22 @@
                             </li>
 
                         </ul>
-
                     </div>
-                    <div class="row-div-two">
+
+                    <div class="row-col-40">
 
                         <ul class="ul-list-right-aligned">
                             <li class="text-white">
-                                    <a class="navbar-brand">O2GEN</a>
+                                <a class="navbar-brand">O2GEN</a>
                             </li>
                         </ul>
                     </div>
                 </div>
             </nav>
 
-
- 
+            <div class="margin-between-aside">
                 @RenderBody()
+            </div>
 
 
         </div>
@@ -186,7 +211,28 @@
 
 
     <script type="text/javascript">
-        $(document).ready(function () {
+
+        function Initializer() {
+            InitializeDatePicker();
+            $.noConflict();
+            InitializeMenu();
+        }
+
+        function InitializeDatePicker() {
+            $('#datetimepicker2').datetimepicker({
+                defaultDate: moment().subtract(2, 'days'),
+                locale: 'ru',
+                icons: {
+                    time: "fa fa-clock",
+                    date: "fa fa-calendar-alt",
+                    up: "fa fa-arrow-up",
+                    down: "fa fa-arrow-down"
+                },
+                maxDate: moment()
+            });
+        }
+
+        function InitializeMenu() {
             $("#sidebar").mCustomScrollbar({
                 theme: "minimal"
             });
@@ -202,8 +248,51 @@
                 $('.collapse.in').toggleClass('in');
                 $('a[aria-expanded=true]').attr('aria-expanded', 'false');
             });
-        });
+        }
+
+        $(document).ready(Initializer);
+
+            //$(document).ready(function () {
+            //    $("#sidebar").mCustomScrollbar({
+            //        theme: "minimal"
+            //    });
+
+            //    $('#dismiss, .overlay').on('click', function () {
+            //        $('#sidebar').removeClass('active');
+            //        $('.overlay').removeClass('active');
+            //    });
+
+            //    $('#sidebarCollapse').on('click', function () {
+            //        $('#sidebar').addClass('active');
+            //        $('.overlay').addClass('active');
+            //        $('.collapse.in').toggleClass('in');
+            //        $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+            //    });
+            //});
+
+            //$.noConflict();
+            //jQuery(document).ready(function ($) {
+            //    $('#datetimepicker2').datetimepicker({
+            //        defaultDate: moment().subtract(2, 'days'),
+            //        locale: 'ru',
+            //        icons: {
+            //            time: "fa fa-clock",
+            //            date: "fa fa-calendar-alt",
+            //            up: "fa fa-arrow-up",
+            //            down: "fa fa-arrow-down"
+            //        },
+            //        maxDate: moment()
+            //    });
+            //});
     </script>
+
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/lib/bsttdtp/js/jquery.min.js"></script>
+    <script src="~/lib/bsttdtp/js/popper.min.js"></script>
+    <script src="~/lib/bsttdtp/js/moment-with-locales.min.js"></script>
+    <script src="~/lib/bsttdtp/js/base.js"></script>
+    <script src="~/lib/bsttdtp/js/tempusdominus-bootstrap-4.js"></script>
 
     @RenderSection("Scripts", required: false)
 </body>

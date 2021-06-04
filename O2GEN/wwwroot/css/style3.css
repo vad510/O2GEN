@@ -8,13 +8,13 @@ body {
     background: #fafafa;
 }
 
-p {
+/*p {
     font-family: 'Poppins', sans-serif;
     font-size: 1.1em;
     font-weight: 300;
     line-height: 1.7em;
     color: #999;
-}
+}*/
 
 a,
 a:hover,
@@ -147,11 +147,11 @@ a[data-toggle="collapse"] {
     transform: translateY(-50%);
 }
 
-ul ul a {
+/*ul ul a {
     font-size: 0.9em !important;
     padding-left: 30px !important;
     background: #4682b4;
-}
+}*/
 
 ul.CTAs {
     padding: 20px;
@@ -182,7 +182,7 @@ a.article:hover {
 
 #content {
     width: 100%;
-    padding: 20px;
+    padding: 0px;
     min-height: 100vh;
     transition: all 0.3s;
     position: absolute;

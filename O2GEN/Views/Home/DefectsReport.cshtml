@@ -1,0 +1,186 @@
+﻿@* DEFECTS REPORT  *@
+
+@model O2GEN.Models.HomeModels.DefectReportListModel
+@{
+    ViewData["Title"] = "Дефекты";
+}
+<section>
+    <div class="column-container">
+
+        <div class="margin-between-above">
+            <label for="divisions" class="control-label">Подразделения</label>
+            <select class="form-control form-control-lg" id="divisions">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+            </select>
+        </div>
+
+        <div class="margin-between-above">
+            <label for="techposition">Тех. позиция</label>
+            <select class="form-control form-control-lg" id="techposition">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+            </select>
+        </div>
+
+        <div class="margin-between-above">
+            <label for="route">Статус</label>
+            <select class="form-control form-control-lg" id="route">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+            </select>
+        </div>
+
+        <div class="row-container">
+            <p>Сформировать</p>
+            <button class="transparent-btn">
+                <i class="fa fa-file-excel color-black"></i>
+                <p>
+                    Выгрузить в excel
+                </p>
+            </button>
+        </div>
+
+    </div>
+
+    <div class="margin-between-above">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        <p>
+                            @Html.DisplayNameFor(x => x.DefectReportModels.FirstOrDefault().TechPos)
+                        </p>
+                    </th>
+
+                    <th>
+                        <p>
+                            @Html.DisplayNameFor(x => x.DefectReportModels.FirstOrDefault().Node)
+                        </p>
+                    </th>
+
+                    <th>
+                        <p>
+                            @Html.DisplayNameFor(x => x.DefectReportModels.FirstOrDefault().Status)
+                        </p>
+                    </th>
+
+                    <th>
+                        <p>
+                            @Html.DisplayNameFor(x => x.DefectReportModels.FirstOrDefault().DefectType)
+                        </p>
+                    </th>
+
+                    <th>
+                        <p>
+                            @Html.DisplayNameFor(x => x.DefectReportModels.FirstOrDefault().Control)
+                        </p>
+                    </th>
+
+                    <th>
+                        <p>
+                            @Html.DisplayNameFor(x => x.DefectReportModels.FirstOrDefault().Value)
+                        </p>
+                    </th>
+
+                    <th>
+                        <p>
+                            @Html.DisplayNameFor(x => x.DefectReportModels.FirstOrDefault().DefectFoundedBy)
+                        </p>
+                    </th>
+
+                    <th>
+                        <p>
+                            @Html.DisplayNameFor(x => x.DefectReportModels.FirstOrDefault().DefectProceededBy)
+                        </p>
+                    </th>
+
+                    <th>
+                        <p>
+                            @Html.DisplayNameFor(x => x.DefectReportModels.FirstOrDefault().DateDetected)
+                        </p>
+                    </th>
+
+                    <th>
+                        <p>
+                            @Html.DisplayNameFor(x => x.DefectReportModels.FirstOrDefault().Description)
+                        </p>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.DefectReportModels)
+                {
+                    <tr>
+                        <td>
+                            <p>
+                                @item.TechPos
+                            </p>
+                        </td>
+
+                        <td>
+                            <p>
+                                @item.Node
+                            </p>
+                        </td>
+
+                        <td>
+                            <p>
+                                @item.Status
+                            </p>
+                        </td>
+
+                        <td>
+                            <p>
+                                @item.DefectType
+                            </p>
+                        </td>
+
+                        <td>
+                            <p>
+                                @item.Control
+                            </p>
+                        </td>
+
+                        <td>
+                            <p>
+                                @item.Value
+                            </p>
+                        </td>
+
+                        <td>
+                            <p>
+                                @item.DefectFoundedBy
+                            </p>
+                        </td>
+
+                        <td>
+                            <p>
+                                @item.DefectProceededBy
+                            </p>
+                        </td>
+
+                        <td>
+                            <p>
+                                @item.DateDetected
+                            </p>
+                        </td>
+
+                        <td>
+                            <p>
+                                @item.Description
+                            </p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</section>

@@ -1,0 +1,7 @@
+﻿@mixin flex-list($prop) {
+    display:flex;
+    margin:0px;
+    padding:0px;
+    list-style:none;
+    flex-direction: $prop;
+}

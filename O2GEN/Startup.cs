@@ -26,6 +26,8 @@ namespace O2GEN
                     .AddEntityFrameworkStores<ApplicationContext>();
 
                 services.AddControllersWithViews();
+
+            // todo cookies for default login path
             }
 
             public void Configure(IApplicationBuilder app)

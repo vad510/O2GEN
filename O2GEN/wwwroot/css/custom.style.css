@@ -1,4 +1,8 @@
-﻿input:-webkit-autofill {
+﻿p {
+  margin: 0px;
+  padding: 0px; }
+
+input:-webkit-autofill {
   -webkit-box-shadow: 0 0 0 50px white inset;
   /* Change the color to your own background color */
   -webkit-text-fill-color: #333; }
@@ -10,6 +14,14 @@ input:-webkit-autofill:focus {
 
 .fa {
   color: white; }
+
+.fa-container-links-centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; }
+  .fa-container-links-centered a {
+    color: #999; }
 
 .ul-list {
   display: flex;
@@ -36,13 +48,35 @@ input:-webkit-autofill:focus {
 
 .ul-list-left-aligned {
   display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
   margin: 0px;
-  color: white;
+  padding: 0px;
+  list-style: none;
+  flex-direction: row;
+  align-items: center;
   padding: 7px;
-  list-style: none; }
+  color: white;
+  /*    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin: 0px;
+    padding: 7px;
+    list-style:none;*/ }
+
+.ul-list-left-aligned-colum {
+  display: flex;
+  margin: 0px;
+  padding: 0px;
+  list-style: none;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 7px;
+  color: white; }
+  .ul-list-left-aligned-colum li {
+    margin: 0px;
+    padding: 0px; }
+    .ul-list-left-aligned-colum li p {
+      margin: 0px;
+      padding: 0px; }
 
 .ul-list-left-aligned li {
   margin: 0 10px;
@@ -50,7 +84,6 @@ input:-webkit-autofill:focus {
 
 .ul-list-left-aligned li .fa {
   align-self: center;
-  color: white;
   margin: 0 5px; }
 
 .ul-list-right-aligned {
@@ -67,7 +100,6 @@ input:-webkit-autofill:focus {
     display: inline-flex; }
     .ul-list-right-aligned li .fa {
       align-self: center;
-      color: white;
       margin: 0 5px; }
 
 .li-text-white {
@@ -76,19 +108,6 @@ input:-webkit-autofill:focus {
   flex-direction: row;
   align-items: center; }
 
-.li-text-white p {
-  color: white;
-  text-align: center;
-  font-family: 'Poppins', sans-serif;
-  font-size: 1em;
-  font-weight: 100;
-  line-height: 1em;
-  margin: 0px;
-  padding: 7px; }
-
-.li-text-white i {
-  align-self: center; }
-
 .section {
   padding-top: 20px; }
 
@@ -96,6 +115,11 @@ input:-webkit-autofill:focus {
   display: flex;
   flex-direction: row;
   justify-content: space-around; }
+
+.column-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; }
 
 .row-container-left {
   display: flex;
@@ -106,8 +130,17 @@ input:-webkit-autofill:focus {
 .row-div-two {
   float: left;
   width: 48%;
-  padding: 5px;
-  flex-grow: 1; }
+  padding: 5px; }
+
+.row-col-70 {
+  float: left;
+  width: 69%;
+  padding: 5px; }
+
+.row-col-40 {
+  float: left;
+  width: 39%;
+  padding: 5px; }
 
 .content-div {
   padding: 40px; }
@@ -121,28 +154,31 @@ input:-webkit-autofill:focus {
   color: black; }
 
 .component-section {
-  padding: 0; }
+  padding: 2px 0; }
 
 .bg-blue {
-  background: #0074D9; }
+  background: steelblue; }
 
 .transparent-btn {
+  display: flex;
+  flex-direction: row;
   background: transparent;
   border: 0px;
   margin: 0px;
   padding: 0px;
-  display: inline-flex;
   align-items: center;
-  color: white; }
-
-.transparent-btn:hover {
-  color: #b9dce0; }
-
-.fa-container-links-centered {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center; }
+  outline: none;
+  border: none; }
+  .transparent-btn p {
+    text-align: center;
+    margin: 0px 2px; }
+  .transparent-btn:hover p {
+    color: #b9dce0; }
+  .transparent-btn:hover .fa {
+    color: #b9dce0; }
+  .transparent-btn:focus {
+    outline: none;
+    border: none; }
 
 .top-margin {
   margin: 5px 0 0 0; }
@@ -150,14 +186,14 @@ input:-webkit-autofill:focus {
 .bg-light {
   color: white; }
 
+.color-black {
+  color: black; }
+
 .nav-link {
   background-color: lightgrey; }
 
 .nav-link.active {
   background-color: white; }
-
-p {
-  color: white; }
 
 .color-white {
   color: white; }
@@ -171,25 +207,82 @@ p {
 .no-padding {
   padding: 0px; }
 
+.margin-between-above {
+  margin: 10px 0; }
+
+.margin-between-aside {
+  margin: 0 10px; }
+
+.margin-around {
+  margin: 10px; }
+
+.caret {
+  cursor: pointer;
+  -webkit-user-select: none;
+  /* Safari 3.1+ */
+  -moz-user-select: none;
+  /* Firefox 2+ */
+  -ms-user-select: none;
+  /* IE 10+ */
+  user-select: none; }
+
+.caret::before {
+  content: "\25B6";
+  color: black;
+  display: inline-block;
+  margin-right: 6px; }
+
+.caret-down::before {
+  -ms-transform: rotate(90deg);
+  /* IE 9 */
+  -webkit-transform: rotate(90deg);
+  /* Safari */
+  transform: rotate(45deg); }
+
+.nested {
+  display: none;
+  list-style: none; }
+
+.active {
+  display: block; }
+
+.with-padding {
+  padding: 7px; }
+
+.nav-link-with-arrow {
+  cursor: pointer; }
+
+.nav-link-with-arrow::before {
+  content: "\003e";
+  margin: 0 10px 0 0; }
+
+.no-left-margin {
+  margin-left: 0px; }
+
 @media screen and (max-width: 1200px) {
   .row-container {
     flex-direction: column;
     justify-content: center;
     align-items: center; }
-  .row-div-two {
+  .row-div-two, .row-col-70, .row-col-40 {
     width: 100%; }
-    .row-div-two .ul-list-left-aligned {
+    .row-div-two .ul-list-left-aligned, .row-col-70 .ul-list-left-aligned, .row-col-40 .ul-list-left-aligned {
       justify-content: center; }
-    .row-div-two .ul-list-right-aligned {
+    .row-div-two .ul-list-right-aligned, .row-col-70 .ul-list-right-aligned, .row-col-40 .ul-list-right-aligned {
       justify-content: center; }
+  .ul-list-left-aligned-colum {
+    align-items: center; }
   .content-img {
     width: 100%;
     height: 100%; } }
 
-@media screen and (max-width: 510px) {
-  .row-div-two {
-    flex-direction: column; }
-    .row-div-two .ul-list-left-aligned {
+@media screen and (max-width: 527px) {
+  .row-div-two, .row-col-70, .row-col-40 {
+    flex-direction: column;
+    width: 100%; }
+    .row-div-two .ul-list-left-aligned, .row-col-70 .ul-list-left-aligned, .row-col-40 .ul-list-left-aligned {
       flex-direction: column; }
-      .row-div-two .ul-list-left-aligned li {
-        margin: 5px 0; } }
+      .row-div-two .ul-list-left-aligned li, .row-col-70 .ul-list-left-aligned li, .row-col-40 .ul-list-left-aligned li {
+        margin: 5px 0; }
+    .row-div-two .ul-list-left-aligned-colum, .row-col-70 .ul-list-left-aligned-colum, .row-col-40 .ul-list-left-aligned-colum {
+      align-items: center; } }

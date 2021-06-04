@@ -1,0 +1,191 @@
+﻿@model O2GEN.Models.HomeModels.ZprTakenModel
+
+<div class="modal fade" id="editZpr" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs top-margin">
+                    <li class="nav-item active">
+                        <a class="nav-link text-black-50 active" href="#major-tab" data-toggle="tab">Основные</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-black-50" href="#techpos-tab" data-toggle="tab">Тех. позиции</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-black-50" href="#defect-tab" data-toggle="tab">Дефекты</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-black-50" href="#attachment-tab" data-toggle="tab">Вложения</a>
+                    </li>
+                </ul>
+
+                <div class="tab-content bg-light">
+
+                    <div id="major-tab" class="tab-pane active">
+                        <div class="row-container color-black">
+
+                            <div class="row-div-two">
+                                <form action="CreateZpr">
+                                    <div class="form-group">
+
+                                        <div class="margin-between-above">
+                                            <label asp-for="Bypass"></label>
+                                            <input asp-for="Bypass" class="form-control" />
+                                            <span asp-validation-for="Bypass" class="text-danger"></span>
+                                        </div>
+
+                                        <div class="margin-between-above">
+                                            <label asp-for="Type"></label>
+                                            <select class="form-control">
+                                                <option>1</option>
+                                                <option>2</option>
+                                                <option>3</option>
+                                                <option>4</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="margin-between-above">
+                                            <label asp-for="Start"></label>
+                                            <input asp-for="Start" class="form-control" />
+                                        </div>
+
+                                        <div class="margin-between-above">
+                                            <label asp-for="Bypasser"></label>
+                                            <input asp-for="Bypasser" class="form-control" />
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div class="row-div-two">
+                                <div class="margin-between-above">
+                                    <label asp-for="Status"></label>
+                                    <input asp-for="Status" class="form-control" />
+                                </div>
+
+                                <div class="margin-between-above">
+                                    <label asp-for="Department"></label>
+                                    <input asp-for="Department" class="form-control" />
+                                </div>
+
+                                <div class="margin-between-above">
+                                    <label asp-for="End"></label>
+                                    <input asp-for="End" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div id="techpos-tab" class="tab-pane">
+                        <div class="row-container-left">
+                            <button class="btn btn-outline-primary margin-around">Добавить</button>
+                            <button class="btn btn-outline-primary margin-around">Развернуть всё</button>
+                            <button class="btn btn-outline-primary margin-around">Свернуть всё</button>
+                        </div>
+                        <div class="margin-between-above">
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <p>
+                                                Тех.позиция
+                                            </p>
+                                        </th>
+
+                                        <th>
+                                            <p>
+                                                
+                                            </p>
+                                        </th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+
+                    </div>
+
+                    <div id="defect-tab" class="tab-pane">
+
+                        <div class="margin-between-above">
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <p>Тех.Позиция</p>
+                                        </th>
+
+                                        <th>
+                                            <p>Узел</p>
+                                        </th>
+
+                                        <th>
+                                            <p>Контроль</p>
+                                        </th>
+
+                                        <th>
+                                            <p>Значение</p>
+                                        </th>
+
+                                        <th>
+                                            <p>Дефект обнаружил</p>
+                                        </th>
+
+                                        <th>
+                                            <p>Дефект обработал</p>
+                                        </th>
+
+                                        <th>
+                                            <p>Время обнаружения</p>
+                                        </th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+
+                    </div>
+
+                    <div id="attachment-tab" class="tab-pane">
+
+                        <div class="margin-between-above">
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <p>Тех.Позиция</p>
+                                        </th>
+
+                                        <th>
+                                            <p>Узел</p>
+                                        </th>
+
+                                        <th>
+                                            <p>Контроль</p>
+                                        </th>
+
+                                        <th>
+                                            <p>Время создания вложения</p>
+                                        </th>
+
+                                        <th>
+                                            <p>Вложение</p>
+                                        </th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-outline-primary">Применить</button>
+            </div>
+        </div>
+    </div>
+</div>

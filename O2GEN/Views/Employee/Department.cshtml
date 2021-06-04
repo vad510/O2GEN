@@ -1,0 +1,75 @@
+﻿@model O2GEN.Models.EmployeeModels.DepartmentListModel
+@{
+    ViewData["Title"] = "Бригады";
+}
+<div id="placeholder"></div>
+
+<section class="component-section">
+
+    <div class="row-container-left">
+        <button class="transparent-btn">
+            <i class="fa fa-plus color-white">
+
+            </i>
+            <p class="color-white">Создать</p>
+
+        </button>
+    </div>
+
+    <div class="margin-between-above">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        <p>
+                            @Html.DisplayNameFor(x => x.DepartmentHeadModels.FirstOrDefault().DisplayName)
+                        </p>
+                    </th>
+
+                    <th>
+                        <p>
+                            @Html.DisplayNameFor(x => x.DepartmentHeadModels.FirstOrDefault().Edit)
+                        </p>
+                    </th>
+
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.DepartmentHeadModels)
+                {
+                    <tr>
+                        <td>
+                            <ul class="ul-list-left-aligned-colum color-black">
+                                <li>
+                                    <span class="caret">@item.Name</span>
+                                    <ul class="nested">
+                                        @foreach (var md in item.DepartmentModels)
+                                        {
+                                            <li>@md.DepartmentName</li>
+                                        }
+                                    </ul>
+                                </li>
+                            </ul>
+                        </td>
+
+                        <td>
+                            <div class="fa-container-links-centered">
+                                <button class="transparent-btn" data-toggle="modal-toggler" data-target="#departmentEdit" data-url="@Url.Action("EditDepartment", new { id = item.Id })">
+                                    <i class="fa fa-pen"></i>
+                                </button>
+                                <a href="#">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+
+</section>

@@ -1,0 +1,102 @@
+﻿@model O2GEN.Models.HomeModels.ReportOnViewedTechPositionList
+@{
+    ViewData["Title"] = "Количество осмотренных тех. позиций";
+}
+<section class="component-section">
+    <div class="row-container bg-blue">
+
+        <div class="row-div-two">
+            <ul class="ul-list-left-aligned-colum">
+                <li>
+                    <p>
+                        Интервал 1:
+                    </p>
+                </li>
+
+                <li>
+                    <p>
+                        Интервал 2:
+                    </p>
+                </li>
+            </ul>
+        </div>
+
+        <div class="row-div-two">
+            <ul class="ul-list-right-aligned">
+                <li>
+                    <button class="transparent-btn">
+                        <p class="color-white">Сформировать</p>
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+
+    <div class="margin-between-above">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        <p>
+                            @Html.DisplayNameFor(x => x.ReportOnViewedTechPositions.FirstOrDefault().StationName)
+
+                        </p>
+                    </th>
+
+                    <th>
+                        <p>
+                            @Html.DisplayNameFor(x => x.ReportOnViewedTechPositions.FirstOrDefault().FirstInterval)
+
+                        </p>
+                    </th>
+
+                    <th>
+                        <p>
+                            @Html.DisplayNameFor(x => x.ReportOnViewedTechPositions.FirstOrDefault().SecondInterval)
+
+                        </p>
+                    </th>
+
+                    <th>
+                        <p>
+                            @Html.DisplayNameFor(x => x.ReportOnViewedTechPositions.FirstOrDefault().Changes)
+
+                        </p>
+                    </th>
+                </tr>
+
+            </thead>
+            <tbody>
+                @foreach (var item in Model.ReportOnViewedTechPositions)
+            {
+                <tr>
+                    <td>
+                        <p>
+                            @item.StationName
+                        </p>
+                    </td>
+
+                    <td>
+                        <p>
+                            @item.FirstInterval
+                        </p>
+                    </td>
+
+                    <td>
+                        <p>
+                            @item.SecondInterval
+                        </p>
+                    </td>
+
+                    <td>
+                        <p>
+                            @item.Changes
+                        </p>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</section>

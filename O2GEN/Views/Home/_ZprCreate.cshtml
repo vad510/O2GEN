@@ -1,0 +1,78 @@
+﻿@model  O2GEN.Models.HomeModels.ZprTakenModel
+
+<div class="modal fade" id="addZpr">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5>title</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>x</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row-container">
+
+                    <div class="row-div-two">
+                        <form action="CreateZpr">
+                            <div class="form-group">
+
+                                <div class="margin-between-above">
+                                    <label asp-for="Bypass"></label>
+                                    <input asp-for="Bypass" class="form-control" />
+                                    <span asp-validation-for="Bypass" class="text-danger"></span>
+                                </div>
+
+                                <div class="margin-between-above">
+                                    <label asp-for="Type"></label>
+                                    <select class="form-control">
+                                        <option>1</option>
+                                        <option>2</option>
+                                        <option>3</option>
+                                        <option>4</option>
+                                    </select>
+                                </div>
+
+                                <div class="margin-between-above">
+                                    <label asp-for="Start"></label>
+                                    <input asp-for="Start" class="form-control" />
+                                </div>
+
+                                <div class="margin-between-above">
+                                    <label asp-for="Bypasser"></label>
+                                    <input asp-for="Bypasser" class="form-control" />
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="row-div-two">
+
+                        <div class="margin-between-above">
+                            <label asp-for="Status"></label>
+                            <input asp-for="Status" class="form-control" />
+                        </div>
+
+                        <div class="margin-between-above">
+                            <label asp-for="Department"></label>
+                            <input asp-for="Department" class="form-control" />
+                        </div>
+
+                        <div class="margin-between-above">
+                            <label asp-for="End"></label>
+                            <input asp-for="End" class="form-control" />
+                            </div>
+                        </div>
+
+                    </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn" type="button" data-dismiss="modal">Отмена</button>
+                <button class="btn" type="button" data-save="modal">Применить</button>
+            </div>
+
+        </div>
+    </div>
+</div>

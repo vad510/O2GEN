@@ -1,151 +1,359 @@
-﻿@{
-    ViewData["Title"] = "Главное";
-}
+﻿@model O2GEN.Models.ReportModel
+@* Home *@
 
-<script src="~/lib/bsttdtp/js/jquery.min.js"></script>
-<script src="~/lib/bsttdtp/js/popper.min.js"></script>
-<script src="~/lib/bsttdtp/js/moment-with-locales.min.js"></script>
-<script src="~/lib/bsttdtp/js/base.js"></script>
-<script src="~/lib/bsttdtp/js/tempusdominus-bootstrap-4.js"></script>
-<link href="~/lib/bsttdtp/css/tempusdominus-bootstrap-4.css" rel="stylesheet" />
-<style>
-    .bootstrap-datetimepicker-widget.dropdown-menu {
-        width: auto;
-    }
+<section class="component-section">
+    @*<div class="row-container-left">
+            <ul class="ul-list-left-aligned">
+                <li>
+                    <i class="fa fa-globe"></i>
+                </li>
+                <li>
+                    <i class="fa fa-redo"></i>
+                </li>
 
-    .timepicker-picker table td a span,
-    .timepicker-picker table td,
-    .timepicker-picker table td span {
-        height: 20px !important;
-        line-height: 20px !important;
-        vertical-align: middle;
-        width: 30px !important;
-        padding: 0px !important;
-    }
-</style>
+                <li class="li-text-white">
+                    <p>
+                        Сегодня
+                    </p>
+                </li>
+                <li class="li-text-white">
+                    <i class="fa fa-calendar"></i>
+                    <p>@DateTime.Now.ToString("dd'.'MM'.'yyyy")</p>
+                </li>
+            </ul>
+        </div>*@
 
-<nav class="navbar">
+    @* strange stuff *@
+    <div id="placeholder"></div>
 
-    <div class="container-fluid">
-        <div class="row">
+    <ul class="nav nav-tabs top-margin">
+        <li class="nav-item active">
+            <a class="nav-link text-black-50 active" href="#first-tab" data-toggle="tab">ЗПР выданные</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-black-50" href="#second-tab" data-toggle="tab">ЗПР в работе</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-black-50" href="#third-tab" data-toggle="tab">ЗПР закрытые</a>
+        </li>
+    </ul>
 
-            <div class="form-inline">
-                <button type="button" id="earth" class="btn btn-info" style="background-color: steelblue">
-                    <i class="fas fa-globe-americas"></i>
-                </button>
-                <div class="d-inline">&nbsp;</div>
-                <button type="button" id="reload" class="btn btn-info" style="background-color: steelblue">
-                    <i class="fas fa-redo-alt"></i>
-                </button>
-                <label for="datetimepicker2">СЕГОДНЯ</label>
-                <div class="input-group date col-auto" id="datetimepicker2" data-target-input="nearest">
-                    <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker2" id="itdtp2" style="width:150px;" />
-                    <div class="input-group-append" data-target="#datetimepicker2" data-toggle="datetimepicker">
-                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+    <div class="tab-content bg-light">
+
+        <div id="first-tab" class="tab-pane active">
+            <div class="row-container-left bg-blue">
+                <ul class="ul-list-left-aligned">
+                    <li class="li-text-white">
+                        <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#addZpr" data-url="@Url.Action("CreateZpr")">
+                            <i class="fa fa-plus color-white"></i>
+                            <p class="color-white">Создать</p>
+                        </button>
+                    </li>
+
+                    <li class="li-text-white">
+                        <button class="transparent-btn">
+                            <i class="fa fa-filter color-white"></i>
+                            <p class="color-white">Фильтры (0)</p>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <section>
+                <table class="table table-bordered table-hover">
+                    <thead class="color-black">
+                        <tr>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().EquipmentType)</p>
+                            </th>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().Status)</p>
+                            </th>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().Type)</p>
+                            </th>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().Bypass)</p>
+                            </th>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().Bypasser)</p>
+                            </th>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().Start)</p>
+                            </th>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().End)</p>
+                            </th>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().Defect)</p>
+                            </th>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().Edit)</p>
+                            </th>
+                        </tr>
+                    </thead>
+                    @foreach (var item in Model.ZprTakenModels.ZprTakenModelList)
+                    {
+                        <tr>
+                            <td><p>@Html.DisplayFor(x => item.EquipmentType)</p></td>
+                            <td><p>@Html.DisplayFor(x => item.Status)</p></td>
+                            <td><p>@Html.DisplayFor(x => item.Type)</p></td>
+                            <td><p>@Html.DisplayFor(x => item.Bypass)</p></td>
+                            <td><p>@Html.DisplayFor(x => item.Bypasser)</p></td>
+                            <td><p>@Html.DisplayFor(x => item.Start)</p></td>
+                            <td><p>@Html.DisplayFor(x => item.End)</p></td>
+                            <td><p>@Html.DisplayFor(x => item.Defect)</p></td>
+                            <td>
+                                <div class="row-container">
+                                    <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#editZpr" data-url="@Url.Action("EditZpr", new { id = item.Id })">
+                                        <i class="fa fa-pen"></i>
+                                    </button>
+                                    <button class="transparent-btn">
+
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </div>
+                                @*<div class="fa-container-links-centered">
+                                        <a href="#">
+                                            <i class="fa fa-pen"></i>
+                                        </a>
+                                        <a href="#">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    </div>*@
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </section>
+        </div>
+
+        <div id="second-tab" class="tab-pane fade">
+
+            <div class="row-container-left bg-blue">
+                <ul class="ul-list-left-aligned">
+                    <li class="li-text-white">
+                        <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#addZpr" data-url="@Url.Action("CreateZpr")">
+                            <i class="fa fa-plus color-white"></i>
+                            <p class="color-white">Создать</p>
+                        </button>
+                    </li>
+
+                    <li class="li-text-white">
+                        <button class="transparent-btn">
+                            <i class="fa fa-filter color-white"></i>
+                            <p class="color-white">Фильтры (0)</p>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <section>
+                <table class="table table-bordered table-hover">
+                    <thead class="color-black">
+                        <tr>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().EquipmentType)</p>
+                            </th>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().Status)</p>
+                            </th>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().Type)</p>
+                            </th>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().Bypass)</p>
+                            </th>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().Bypasser)</p>
+                            </th>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().Start)</p>
+                            </th>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().End)</p>
+                            </th>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().Defect)</p>
+                            </th>
+                            <th>
+                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().Edit)</p>
+                            </th>
+                        </tr>
+                    </thead>
+                    @foreach (var item in Model.ZprTakenModels.ZprTakenModelList)
+                    {
+                        <tr>
+                            <td><p>@Html.DisplayFor(x => item.EquipmentType)</p></td>
+                            <td><p>@Html.DisplayFor(x => item.Status)</p></td>
+                            <td><p>@Html.DisplayFor(x => item.Type)</p></td>
+                            <td><p>@Html.DisplayFor(x => item.Bypass)</p></td>
+                            <td><p>@Html.DisplayFor(x => item.Bypasser)</p></td>
+                            <td><p>@Html.DisplayFor(x => item.Start)</p></td>
+                            <td><p>@Html.DisplayFor(x => item.End)</p></td>
+                            <td><p>@Html.DisplayFor(x => item.Defect)</p></td>
+                            <td>
+                                <div class="row-container">
+                                    <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#editZpr" data-url="@Url.Action("EditZpr", new { id = item.Id })">
+                                        <i class="fa fa-pen"></i>
+                                    </button>
+                                    <button class="transparent-btn">
+
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </div>
+                                @*<div class="fa-container-links-centered">
+                                <a href="#">
+                                    <i class="fa fa-pen"></i>
+                                </a>
+                                <a href="#">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </div>*@
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </section>
+
+        </div>
+
+        <div id="third-tab" class="tab-pane fade">
+
+            <div class="row-container-left bg-blue">
+                <ul class="ul-list-left-aligned">
+                    <li class="li-text-white">
+                        <button class="transparent-btn color-white">
+                            <i class="fa fa-plus"></i>
+                            <p>Создать</p>
+                        </button>
+                    </li>
+
+                    <li class="li-text-white">
+                        <button class="transparent-btn color-white">
+                            <i class="fa fa-filter"></i>
+                            <p>Фильтры (0)</p>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <section>
+                <table>
+                    3
+                </table>
+            </section>
+        </div>
+    </div>
+
+</section>
+
+
+@*<style>
+
+    </style>
+
+    <nav class="navbar">
+
+        <div class="container-fluid">
+            <div class="row">
+
+                <div class="form-inline">
+                    <button type="button" id="earth" class="btn btn-info" style="background-color: steelblue">
+                        <i class="fas fa-globe-americas"></i>
+                    </button>
+                    <div class="d-inline">&nbsp;</div>
+                    <button type="button" id="reload" class="btn btn-info" style="background-color: steelblue">
+                        <i class="fas fa-redo-alt"></i>
+                    </button>
+                    <label for="datetimepicker2">СЕГОДНЯ</label>
+                    <div class="input-group date col-auto" id="datetimepicker2" data-target-input="nearest">
+                        <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker2" id="itdtp2" style="width:150px;" />
+                        <div class="input-group-append" data-target="#datetimepicker2" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                        </div>
+                    </div>
+                    <div>
+                        <a asp-action="Test" asp-controller="Test">Test page</a>
                     </div>
                 </div>
-                <div>
-                    <a asp-action="Test" asp-controller="Test">Test page</a>
+            </div>
+        </div>
+
+
+
+    </nav>
+
+    <nav class="navbar">
+
+        <div class="container-fluid">
+            <div class="row">
+
+                <div class="d-flex justify-content-start">
+                    <button type="button" class="btn btn-secondary">ЗПР в работе</button>
+                    <div class="d-inline">&nbsp;</div>
+                    <button type="button" class="btn btn-secondary">ЗПР выданные</button>
+                    <div class="d-inline">&nbsp;</div>
+                    <button type="button" class="btn btn-secondary">ЗПР закрытые</button>
                 </div>
             </div>
         </div>
-    </div>
 
 
 
-</nav>
+    </nav>
+    <nav class="navbar">
 
-<nav class="navbar">
+        <div class="container-fluid">
+            <div class="row">
 
-    <div class="container-fluid">
-        <div class="row">
+                <div class="d-flex justify-content-start">
+                    <button type="button" class="btn btn-secondary"><i class="fas fa-plus"></i>Создать</button>
 
-            <div class="d-flex justify-content-start">
-                <button type="button" class="btn btn-secondary">ЗПР в работе</button>
-                <div class="d-inline">&nbsp;</div>
-                <button type="button" class="btn btn-secondary">ЗПР выданные</button>
-                <div class="d-inline">&nbsp;</div>
-                <button type="button" class="btn btn-secondary">ЗПР закрытые</button>
+                    <div class="d-inline">&nbsp;</div>
+                    <button type="button" class="btn btn-secondary"><i class="fas fa-filter"></i>Фильтры</button>
+                </div>
             </div>
         </div>
-    </div>
-
-
-
-</nav>
-<nav class="navbar">
-
-    <div class="container-fluid">
-        <div class="row">
-
-            <div class="d-flex justify-content-start">
-                <button type="button" class="btn btn-secondary"><i class="fas fa-plus"></i>Создать</button>
-
-                <div class="d-inline">&nbsp;</div>
-                <button type="button" class="btn btn-secondary"><i class="fas fa-filter"></i>Фильтры</button>
-            </div>
-        </div>
-    </div>
-</nav>
-<nav class="navbar">
+    </nav>
+    <nav class="navbar">*@
 @*<div class="container-fluid" style="max-width: 1500px; background-color: whitesmoke">
-    <div class="row" style="max-width:1500px">
+        <div class="row" style="max-width:1500px">
 
-        <div class="col-sm">
-            <table class="table table-bordered table-sm table-striped" style="background-color: whitesmoke">
-                <thead>
-                    <tr>
-                        <th scope="col">Тип оборудования</th>
-                        <th scope="col">Статус обхода</th>
-                        <th scope="col">Тип обхода</th>
-                        <th scope="col">Обход</th>
-                        <th scope="col">Обходчик</th>
-                        <th scope="col">Дата начала(план)</th>
-                        <th scope="col">Дата окончания(план)</th>
-                        <th scope="col">Дефект</th>
-                        <th scope="col">Редактирование</th>
-                    </tr>
-                </thead>
-            </table>
+            <div class="col-sm">
+                <table class="table table-bordered table-sm table-striped" style="background-color: whitesmoke">
+                    <thead>
+                        <tr>
+                            <th scope="col">Тип оборудования</th>
+                            <th scope="col">Статус обхода</th>
+                            <th scope="col">Тип обхода</th>
+                            <th scope="col">Обход</th>
+                            <th scope="col">Обходчик</th>
+                            <th scope="col">Дата начала(план)</th>
+                            <th scope="col">Дата окончания(план)</th>
+                            <th scope="col">Дефект</th>
+                            <th scope="col">Редактирование</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
         </div>
-    </div>
-</div>*@
-</nav>
+    </div>*@
+@*</nav>*@
 
 
 
-<script type="text/javascript">
-    $.noConflict();
-    jQuery(document).ready(function ($) {
-        $('#datetimepicker2').datetimepicker({
-            defaultDate: moment().subtract(2, 'days'),
-            locale: 'ru',
-            icons: {
-                time: "fa fa-clock",
-                date: "fa fa-calendar-alt",
-                up: "fa fa-arrow-up",
-                down: "fa fa-arrow-down"
-            },
-            maxDate: moment()
-        });
+@*@if (User.Identity.IsAuthenticated)
+    {
+        <p>@User.Identity.Name</p>
 
+        <form method="post" asp-controller="Account" asp-action="Logout">
+            <input type="submit" value="Выход" />
+        </form>
+    }
+    else
+    {
 
-    });
-</script>
-
-
-
-@if (User.Identity.IsAuthenticated)
-{
-    <p>@User.Identity.Name</p>
-
-    <form method="post" asp-controller="Account" asp-action="Logout">
-        <input type="submit" value="Выход" />
-    </form>
-}
-else
-{
-
-    <a asp-controller="Account" asp-action="Login">Вход</a>
-    <a asp-controller="Account" asp-action="Register">Регистрация</a>
-}
+        <a asp-controller="Account" asp-action="Login">Вход</a>
+        <a asp-controller="Account" asp-action="Register">Регистрация</a>
+    }*@

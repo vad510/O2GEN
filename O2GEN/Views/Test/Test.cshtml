@@ -1,4 +1,4 @@
-﻿@model IEnumerable<O2GEN.Controllers.TestClass>
+﻿@model O2GEN.Models.HomeModels.ZprTakenModels
 
 <section class="component-section">
     @*<div class="row-container-left">
@@ -34,7 +34,7 @@
         </li>
     </ul>
 
-    <div class="tab-content">
+    <div class="tab-content bg-light">
 
         <div id="first-tab" class="tab-pane active">
             <div class="row-container-left">
@@ -60,35 +60,35 @@
                     <thead>
                         <tr>
                             <th>
-                                <p>@Html.DisplayNameFor(x => x.EquipmentType)</p>
+                                <p>@Model.ZprTakenModelList[0].EquipmentType</p>
                             </th>
                             <th>
-                                <p>@Html.DisplayNameFor(x => x.Status)</p>
+                                <p>@Model.ZprTakenModelList[0].Status</p>
                             </th>
                             <th>
-                                <p>@Html.DisplayNameFor(x => x.Type)</p>
+                                <p>@Model.ZprTakenModelList[0].Type</p>
                             </th>
                             <th>
-                                <p>@Html.DisplayNameFor(x => x.Bypass)</p>
+                                <p>@Model.ZprTakenModelList[0].Bypass</p>
                             </th>
                             <th>
-                                <p>@Html.DisplayNameFor(x => x.Bypasser)</p>
+                                <p>@Model.ZprTakenModelList[0].Bypasser</p>
                             </th>
                             <th>
-                                <p>@Html.DisplayNameFor(x => x.Start)</p>
+                                <p>@Model.ZprTakenModelList[0].Start</p>
                             </th>
                             <th>
-                                <p>@Html.DisplayNameFor(x => x.End)</p>
+                                <p>@Model.ZprTakenModelList[0].End</p>
                             </th>
                             <th>
-                                <p>@Html.DisplayNameFor(x => x.Defect)</p>
+                                <p>@Model.ZprTakenModelList[0].Defect</p>
                             </th>
                             <th>
-                                <p>@Html.DisplayNameFor(x => x.Edit)</p>
+                                <p>@Model.ZprTakenModelList[0].Edit</p>
                             </th>
                         </tr>
                     </thead>
-                    @foreach (var item in Model)
+                    @foreach (var item in Model.ZprTakenModelList)
                     {
                         <tr>
                             <td><p>@Html.DisplayFor(x => item.EquipmentType)</p></td>

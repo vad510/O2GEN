@@ -1,0 +1,103 @@
+﻿@*
+    Control value reports
+*@
+@model O2GEN.Models.HomeModels.ControlValueReportListModel
+@{
+    ViewData["Title"] = "Отчёт по значениям контролей";
+}
+<section>
+    <div class="column-container">
+
+        <div class="margin-between-above">
+            <label for="divisions" class="control-label">Подразделения</label>
+            <select class="form-control form-control-lg" id="divisions">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+            </select>
+        </div>
+
+        <div class="margin-between-above">
+            <label for="route">Маршрут</label>
+            <select class="form-control form-control-lg" id="route">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+            </select>
+        </div>
+
+        <div class="margin-between-above">
+            <label for="techposition">Тех. позиция</label>
+            <select class="form-control form-control-lg" id="techposition">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+            </select>
+        </div>
+
+        <div class="row-container">
+            <p>Сформировать</p>
+            <button class="transparent-btn">
+                <i class="fa fa-file-excel color-black"></i>
+                <p>
+                    Выгрузить в excel
+                </p>
+            </button>
+        </div>
+
+    </div>
+
+    <div class="margin-between-above">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        <p>
+                            @Html.DisplayNameFor(x => x.ControlValueReports.FirstOrDefault().TechPosition)
+                        </p>
+                    </th>
+
+                    <th>
+                        <p>
+                            @Html.DisplayNameFor(x => x.ControlValueReports.FirstOrDefault().Node)
+                        </p>
+                    </th>
+
+                    <th>
+                        <p>
+                            @Html.DisplayNameFor(x => x.ControlValueReports.FirstOrDefault().Control)
+                        </p>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.ControlValueReports)
+                {
+                    <tr>
+                        <td>
+                            <p>
+                                @item.TechPosition
+                            </p>
+                        </td>
+
+                        <td>
+                            <p>
+                                @item.Node
+                            </p>
+                        </td>
+
+                        <td>
+                            <p>
+                                @item.Control
+                            </p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</section>
