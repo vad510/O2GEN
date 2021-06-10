@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using O2GEN.Models.EmployeeModels;
 using O2GEN.Models.HomeModels;
 using System.Linq;
@@ -7,11 +8,17 @@ namespace O2GEN.Controllers
 {
     public class EmployeeController : Controller
     {
+        private readonly ILogger<EmployeeController> _logger;
+
+
         private EmployeeListModel _employeeListModels;
         private DepartmentListModel dps = new();
 
-        public EmployeeController()
+        public EmployeeController(ILogger<EmployeeController> logger)
         {
+            _logger = logger;
+        
+
             _employeeListModels = new EmployeeListModel();
 
             _employeeListModels.EmployeeModels.Add(new EmployeeModel
@@ -43,6 +50,7 @@ namespace O2GEN.Controllers
 
         public IActionResult Index()
         {
+            ViewBag.Engineers = Helpers.DBHelper.GetEngineers(_logger);
             return View(_employeeListModels);
         }
 

@@ -1,8 +1,11 @@
 ﻿@* Employee *@
-@model O2GEN.Models.EmployeeModels.EmployeeListModel
 @{
     ViewData["Title"] = "Работники";
 }
+@using O2GEN.Helpers
+
+
+
 <section class="component-section">
 
     <div class="row-container-left bg-blue">
@@ -33,54 +36,54 @@
                 <tr>
                     <th>
                         <p>
-                            @Html.DisplayNameFor(x => x.EmployeeModels.FirstOrDefault().VisibleName)
+                            Отображаемое название
                         </p>
                     </th>
 
                     <th>
                         <p>
-                            @Html.DisplayNameFor(x => x.EmployeeModels.FirstOrDefault().Department)
+                            Подразделение
                         </p>
                     </th>
 
                     <th>
                         <p>
-                            @Html.DisplayNameFor(x => x.EmployeeModels.FirstOrDefault().UserType)
+                            Пользователь
                         </p>
                     </th>
 
                     <th>
                         <p>
-                            @Html.DisplayNameFor(x => x.EmployeeModels.FirstOrDefault().Edit)
+
                         </p>
                     </th>
 
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model.EmployeeModels)
+                @foreach (var item in ViewBag.Engineers)
                 {
                     <tr>
                         <td>
                             <p>
-                                @item.VisibleName
+                                @item.PersonName
                             </p>
                         </td>
 
                         <td>
                             <p>
-                                @item.Department
+                                @item.DepartmentName
                             </p>
                         </td>
 
                         <td>
                             <p>
-                                @item.UserType
+                                @item.IsUser
                             </p>
                         </td>
 
                         <td>
-                            <div class="fa-container-links-centered">
+                            <div>
                                 <a href="#">
                                     <i class="fa fa-pen"></i>
                                 </a>

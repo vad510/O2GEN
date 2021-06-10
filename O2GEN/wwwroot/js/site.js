@@ -1,4 +1,4 @@
-﻿"use strict"
+﻿/*"use strict"*/
 !(function prepareLists() {
     var treeViewitems = document.getElementsByClassName("caret");
 

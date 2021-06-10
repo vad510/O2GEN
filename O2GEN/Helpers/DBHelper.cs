@@ -14,7 +14,7 @@ namespace O2GEN.Helpers
 {
     public static class DBHelper
     {
-        private static string DBConnection = "";
+        private static string DBConnection = "Data Source=DESKTOP-A17N4G7\\SQLEXPRESS01;Initial Catalog=UFMDBLUK;Integrated Security=SSPI;";
         private static string GetConnectionString()
         {
             return DBConnection;
@@ -265,21 +265,21 @@ namespace O2GEN.Helpers
         private static string SelectEngineers()
         {
             return "SELECT e.Id, t1.PersonName, e.ObjectUID, e.PersonId, t0.DisplayName as DepartmentName, isnull(t2.IsUser,0) as IsUser "+
-                "FROMEngineers ASe " +
+                "FROM Engineers AS e " +
                 "LEFT JOIN( " +
-                "    SELECTe1.Id, e1.DisplayName " +
+                "    SELECT e1.Id, e1.DisplayName " +
                 "    FROM Departments AS e1 " +
-                "    WHERE (e1.IsDeleted <> 1) AND(e1.TenantId = CAST(1 AS bigint)) " +
-                ") ASt0 ONe.DepartmentId = t0.Id " +
+                "    WHERE (e1.IsDeleted <> 1) AND (e1.TenantId = CAST(1 AS bigint)) " +
+                ") AS t0 ON e.DepartmentId = t0.Id " +
                 "LEFT JOIN( " +
-                "    SELECTId, UserId, CONCAT(Surname,' ',GivenName,' ', MiddleName) PersonName " +
-                "   FROMPersons " +
-                "    WHERE(IsDeleted <> 1) ANDTenantId = CAST(1 AS bigint) " +
-                ") ASt1 ONe.PersonId = t1.Id " +
+                "    SELECT Id, UserId, CONCAT(Surname,' ',GivenName,' ', MiddleName) PersonName " +
+                "   FROM Persons " +
+                "    WHERE(IsDeleted <> 1) AND TenantId = CAST(1 AS bigint) " +
+                ") AS t1 ON e.PersonId = t1.Id " +
                 "LEFT JOIN( " +
                 "    SELECT id, count(*) as IsUser " +
-                "    FROMPPUsers " +
-                "    WHERE(IsDeleted <> 1) ANDTenantId = CAST(1 AS bigint) " +
+                "    FROM PPUsers " +
+                "    WHERE(IsDeleted <> 1) AND TenantId = CAST(1 AS bigint) " +
                 "    GROUP BY Id " +
                 ") AS t2 ON t1.UserId = t2.Id " +
                 "WHERE((e.IsDeleted <> 1) AND(e.TenantId = CAST(1 AS bigint))) AND(e.PersonId IS NOT NULL )";
@@ -822,8 +822,8 @@ namespace O2GEN.Helpers
                                 output.Add(new Engineer()
                                 {
                                     Id = int.Parse(row["Id"].ToString()),
-                                    PersonName = row["DisplayName"].ToString(),
-                                    DepartmentName = row["DisplayName"].ToString(),
+                                    PersonName = row["PersonName"].ToString(),
+                                    DepartmentName = row["DepartmentName"].ToString(),
                                     IsUser = row["IsUser"].ToString() !=  "0",
                                     ObjectUID = new Guid(row["ObjectUID"].ToString())
                                 });
