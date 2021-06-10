@@ -40,7 +40,7 @@
 
             </thead>
             <tbody>
-                @foreach (var item in Model.TOTypes)
+                @foreach (var item in ViewBag.TOTypes)
                 {
                     <tr>
 
@@ -52,7 +52,7 @@
 
                         <td>
                             <p>
-                                @item.VisibleName
+                                @item.DisplayName
                             </p>
                         </td>
 

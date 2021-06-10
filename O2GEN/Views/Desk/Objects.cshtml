@@ -49,17 +49,20 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model.ObjectHeadModels)
+                @foreach (var item in ViewBag.Objects)
                 {
                     <tr>
                         <td>
                             <ul class="ul-list-left-aligned-colum color-black">
                                 <li>
-                                    <span class="caret">@item.ObjectName</span>
+                                    <span class="caret">@item.DisplayName</span>
                                     <ul class="nested">
-                                        @foreach (var md in item.ObjectModels)
+                                        @if (item.Childs != null)
                                         {
+                                            foreach (var md in item.Childs)
+                                            {
                                             <li>@md.Name</li>
+                                            }
                                         }
                                     </ul>
                                 </li>
@@ -67,7 +70,7 @@
                         </td>
 
                         <td>
-                            <p>@item.IndexMaximo</p>
+                            <p>@item.Maximo</p>
                         </td>
 
                         <td>

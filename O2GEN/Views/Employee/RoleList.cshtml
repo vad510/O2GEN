@@ -47,18 +47,18 @@
                             </th>
                         </tr>
                     </thead>
-                    @foreach (var item in Model.RoleModels)
+                    @foreach (var item in ViewBag.Roles)
                     {
                         <tr>
                             <td>
                                 <p>
-                                    @item.RoleName
+                                    @item.Name
                                 </p>
                             </td>
 
                             <td>
                                 <p>
-                                    @item.VisibleRoleName
+                                    @item.DisplayName
                                 </p>
                             </td>
 

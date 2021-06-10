@@ -40,19 +40,19 @@
 
             </thead>
             <tbody>
-                @foreach (var item in Model.ControlModels)
+                @foreach (var item in ViewBag.Controls)
                 {
                     <tr>
 
                         <td>
                             <p>
-                                @item.Name
+                                @item.DisplayName
                             </p>
                         </td>
 
                         <td>
                             <p>
-                                @item.Type
+                                @item.DisplayValueType
                             </p>
                         </td>
 

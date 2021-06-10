@@ -56,29 +56,31 @@ namespace O2GEN.Controllers
 
         public IActionResult RoleList()
         {
-            RoleListModels rm = new();
+            //RoleListModels rm = new();
 
-            rm.RoleModels.Add(new RoleModel
-            {
-                RoleName = "1",
-                VisibleRoleName = "1",
-                Edit = ""
-            });
+            //rm.RoleModels.Add(new RoleModel
+            //{
+            //    RoleName = "1",
+            //    VisibleRoleName = "1",
+            //    Edit = ""
+            //});
 
-            return View(rm);
+            ViewBag.Roles = Helpers.DBHelper.GetPPRoles(_logger);
+            return View();
         }
 
         public IActionResult Resources()
         {
-            ResourcesListModels rs = new();
+            //ResourcesListModels rs = new();
 
-            rs.ResourcesModels.Add(new ResourcesModel
-            {
-                VisibleName = "1",
-                Edit = ""
-            });
+            //rs.ResourcesModels.Add(new ResourcesModel
+            //{
+            //    VisibleName = "1",
+            //    Edit = ""
+            //});
 
-            return View(rs);
+            ViewBag.Resources = Helpers.DBHelper.GetResources(_logger);
+            return View();
         }
 
         public IActionResult Calendar()
@@ -88,7 +90,8 @@ namespace O2GEN.Controllers
 
         public IActionResult Department()
         {
-            return View(dps);
+            ViewBag.Departments = Helpers.DBHelper.GetDepartments(_logger);
+            return View();
         }
 
         /// <summary>

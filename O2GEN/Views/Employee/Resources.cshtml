@@ -30,12 +30,12 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model.ResourcesModels)
+                @foreach (var item in ViewBag.Resources)
                 {
                     <tr>
                         <td>
                             <p>
-                                @item.VisibleName
+                                @item.DisplayName
                             </p>
                         </td>
 
