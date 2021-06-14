@@ -22,13 +22,13 @@
                 <tr>
                     <th>
                         <p>
-                            @Html.DisplayNameFor(x => x.DepartmentHeadModels.FirstOrDefault().DisplayName)
+                            Отображаемое значение
                         </p>
                     </th>
 
                     <th>
                         <p>
-                            @Html.DisplayNameFor(x => x.DepartmentHeadModels.FirstOrDefault().Edit)
+                            
                         </p>
                     </th>
 
@@ -46,7 +46,7 @@
                                     <ul class="nested">
                                         @if (item.Childs != null)
                                         {
-                                            foreach (var md in item.DepartmentModels)
+                                            foreach (var md in item.Childs)
                                             {
                                             <li>@md.DisplayName</li>
                                             }

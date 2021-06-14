@@ -14,7 +14,7 @@ namespace O2GEN.Helpers
 {
     public static class DBHelper
     {
-        private static string DBConnection = "Data Source=DESKTOP-A17N4G7\\SQLEXPRESS01;Initial Catalog=UFMDBLUK;Integrated Security=SSPI;";
+        private static string DBConnection = $"Data Source={(Environment.UserName == "Michael"? "DESKTOP-JFNR95O\\SQLEXPRESS" : "DESKTOP-A17N4G7\\SQLEXPRESS01")};Initial Catalog=UFMDBLUK;Integrated Security=SSPI;";
         private static string GetConnectionString()
         {
             return DBConnection;
@@ -94,7 +94,7 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         private static string SelectTOTypes()
         {
-            return "SELECT Id, Name, DisplayName, ObjectUID" +
+            return "SELECT Id, Name, DisplayName, ObjectUID " +
                 "FROM AssetParameterSpecies " +
                 "WHERE(IsDeleted <> 1) AND(TenantId = CAST(1 AS bigint)) " +
                 "ORDER BY Id";
@@ -196,7 +196,7 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         private static string SelectPersonCategories()
         {
-            return "SELECT Id, DisplayName, ObjectUID, ParentId, FROM PersonCategories WHERE (IsDeleted <> 1) AND (TenantId = CAST(1 AS bigint))";
+            return "SELECT Id, DisplayName, ObjectUID, ParentId FROM PersonCategories WHERE (IsDeleted <> 1) AND (TenantId = CAST(1 AS bigint))";
         }
         #endregion
 
@@ -612,7 +612,7 @@ namespace O2GEN.Helpers
                                     Description = row["Description"].ToString(),
                                     Maximo = row["ExternalId"].ToString(),
                                     Status = row["StateName"].ToString(),
-                                    ParentId = int.Parse(row["ParentId"].ToString())
+                                    ParentId = string.IsNullOrEmpty(row["ParentId"].ToString())? (int?)null: int.Parse(row["ParentId"].ToString())
                                 });
                             }
                         }
@@ -677,7 +677,7 @@ namespace O2GEN.Helpers
                                     Id = int.Parse(row["Id"].ToString()),
                                     DisplayName = row["DisplayName"].ToString(),
                                     ObjectUID = new Guid(row["ObjectUID"].ToString()),
-                                    ParentId = int.Parse(row["ParentId"].ToString())
+                                    ParentId = (string.IsNullOrEmpty(row["ParentId"].ToString())? null:int.Parse(row["ParentId"].ToString()))
                                 });
                             }
                         }
