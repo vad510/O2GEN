@@ -2,7 +2,7 @@
 
 @model O2GEN.Models.HomeModels.ReportOnViewedTechPositionList
 @{
-    ViewData["Title"] = "Количество тех. позиций";
+    ViewData["Title"] = "Отчет о количестве тех. позиций";
 }
 <section class="component-section">
     <div class="row-container bg-blue">
@@ -41,29 +41,25 @@
                 <tr>
                     <th>
                         <p>
-                            @Html.DisplayNameFor(x => x.ReportOnViewedTechPositions.FirstOrDefault().StationName)
-
+                            Станция
                         </p>
                     </th>
 
                     <th>
                         <p>
-                            @Html.DisplayNameFor(x => x.ReportOnViewedTechPositions.FirstOrDefault().FirstInterval)
-
+                            Интервал 1
                         </p>
                     </th>
 
                     <th>
                         <p>
-                            @Html.DisplayNameFor(x => x.ReportOnViewedTechPositions.FirstOrDefault().SecondInterval)
-
+                            Интервал 2
                         </p>
                     </th>
 
                     <th>
                         <p>
-                            @Html.DisplayNameFor(x => x.ReportOnViewedTechPositions.FirstOrDefault().Changes)
-
+                            Изменения %
                         </p>
                     </th>
                 </tr>

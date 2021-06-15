@@ -90,7 +90,7 @@ namespace O2GEN.Controllers
 
         public IActionResult Department()
         {
-            ViewBag.Departments = Helpers.DBHelper.GetDepartments(_logger);
+            ViewBag.Departments = Helpers.DBHelper.GetResources(_logger);
             return View();
         }
 

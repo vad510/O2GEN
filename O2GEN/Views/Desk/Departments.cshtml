@@ -1,18 +1,13 @@
-﻿@model O2GEN.Models.EmployeeModels.DepartmentListModel
+﻿@model O2GEN.Models.DeskModels.ControlListModel
 @{
-    ViewData["Title"] = "Бригады";
+    ViewData["Title"] = "Участки";
 }
-<div id="placeholder"></div>
-
 <section class="component-section">
 
-    <div class="row-container-left">
+    <div class="row-container-left bg-blue with-padding">
         <button class="transparent-btn">
-            <i class="fa fa-plus color-white">
-
-            </i>
+            <i class="fa fa-plus color-white"></i>
             <p class="color-white">Создать</p>
-
         </button>
     </div>
 
@@ -22,7 +17,13 @@
                 <tr>
                     <th>
                         <p>
-                            Отображаемое значение
+                            Отображаемое название
+                        </p>
+                    </th>
+
+                    <th>
+                        <p>
+                            Тип
                         </p>
                     </th>
 
@@ -32,13 +33,14 @@
                         </p>
                     </th>
 
-
                 </tr>
+
             </thead>
             <tbody>
                 @foreach (var item in ViewBag.Departments)
                 {
                     <tr>
+
                         <td>
                             <ul class="ul-list-left-aligned-colum color-black">
                                 <li>
@@ -58,15 +60,14 @@
 
                         <td>
                             <div class="fa-container-links-centered">
-                                <button class="transparent-btn" data-toggle="modal-toggler" data-target="#departmentEdit" data-url="@Url.Action("EditDepartment", new { id = item.Id })">
+                                <a href="#">
                                     <i class="fa fa-pen"></i>
-                                </button>
+                                </a>
                                 <a href="#">
                                     <i class="fa fa-trash"></i>
                                 </a>
                             </div>
                         </td>
-
 
                     </tr>
                 }

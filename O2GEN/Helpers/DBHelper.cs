@@ -123,8 +123,8 @@ namespace O2GEN.Helpers
         {
             return "SELECT Id, DisplayName, ObjectUID, ValueType " +
                 "FROM AssetParameters " +
-                "WHERE(IsDeleted <> 1) AND(TenantId = CAST(1 AS bigint)) " + 
-                "ORDER BY Id";
+                "WHERE(IsDeleted <> 1) AND(TenantId = CAST(1 AS bigint)) " +
+                "ORDER BY DisplayName";
         }
         /// <summary>
         /// Вставка Контроля
@@ -163,7 +163,7 @@ namespace O2GEN.Helpers
                 "    WHERE (e0.IsDeleted<> 1) AND(e0.TenantId = CAST(1 AS bigint)) " +
                 ") AS t ON e.DepartmentId = t.Id " +
                 "WHERE e.IsDeleted <> 1 " +
-                "ORDER BY e.Id";
+                "ORDER BY e.DisplayName";
         }
         #endregion
 
@@ -174,7 +174,7 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         private static string SelectAssetClass()
         {
-            return "SELECT Id, DisplayName, ObjectUID, ParentId, FROM AssetClass AS e WHERE (IsDeleted <> 1) AND (TenantId = CAST(1 AS bigint))";
+            return "SELECT Id, DisplayName, ObjectUID, ParentId FROM AssetClass AS e WHERE (IsDeleted <> 1) AND (TenantId = CAST(1 AS bigint)) order by DisplayName";
         }
         #endregion
 
@@ -185,7 +185,7 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         private static string SelectPersonPositions()
         {
-            return "SELECT Id, DisplayName, ObjectUID FROM PersonPositions WHERE (IsDeleted <> 1) AND (TenantId = CAST(1 AS bigint))";
+            return "SELECT Id, DisplayName, ObjectUID FROM PersonPositions WHERE (IsDeleted <> 1) AND (TenantId = CAST(1 AS bigint)) order by DisplayName";
         }
         #endregion
 
@@ -196,7 +196,7 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         private static string SelectPersonCategories()
         {
-            return "SELECT Id, DisplayName, ObjectUID, ParentId FROM PersonCategories WHERE (IsDeleted <> 1) AND (TenantId = CAST(1 AS bigint))";
+            return "SELECT Id, DisplayName, ObjectUID, ParentId FROM PersonCategories WHERE (IsDeleted <> 1) AND (TenantId = CAST(1 AS bigint)) order by DisplayName";
         }
         #endregion
 
@@ -205,7 +205,7 @@ namespace O2GEN.Helpers
         /// Объекты
         /// </summary>
         /// <returns></returns>
-        private static string SelectAssets()
+        private static string SelectAssets(int DeptID = -1)
         {
             return "SELECT e.Id, e.DisplayName, e.Description, e.ExternalId, e.ObjectUID, e.ParentId,  t1.DisplayName as StateName, t1.ObjectUID " +
                 "FROM Assets AS e " +
@@ -214,7 +214,8 @@ namespace O2GEN.Helpers
                 "    FROM AssetStates AS e2 " +
                 "    WHERE (e2.IsDeleted <> 1) AND (e2.TenantId = CAST(1 AS bigint)) " +
                 ") AS t1 ON e.AssetStateId = t1.Id " +
-                "WHERE ((e.IsDeleted <> 1) AND (e.TenantId = CAST(1 AS bigint))) AND e.ParentId IS NULL " +
+                "WHERE ((e.IsDeleted <> 1) AND (e.TenantId = CAST(1 AS bigint))) " +
+                (DeptID!=-1?"AND e.DepartmentId =  {DeptID}":"") +
                 "ORDER BY e.DisplayName";
         }
         #endregion
@@ -228,7 +229,7 @@ namespace O2GEN.Helpers
         {
             return "SELECT Id, DisplayName, ObjectUID, ParentId "+
                 "FROM Departments "+
-                "WHERE(IsDeleted <> 1) AND(TenantId = CAST(1 AS bigint))";
+                "WHERE(IsDeleted <> 1) AND(TenantId = CAST(1 AS bigint)) order by DisplayName";
         }
         #endregion
 
@@ -239,7 +240,7 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         private static string SelectResources()
         {
-            return "SELECT Id, DisplayName, ObjectUID FROM Resources AS e WHERE (IsDeleted <> 1) AND (TenantId = CAST(1 AS bigint))";
+            return "SELECT Id, DisplayName, ObjectUID FROM Resources AS e WHERE (IsDeleted <> 1) AND (TenantId = CAST(1 AS bigint)) order by DisplayName";
         }
         #endregion
 
@@ -282,7 +283,7 @@ namespace O2GEN.Helpers
                 "    WHERE(IsDeleted <> 1) AND TenantId = CAST(1 AS bigint) " +
                 "    GROUP BY Id " +
                 ") AS t2 ON t1.UserId = t2.Id " +
-                "WHERE((e.IsDeleted <> 1) AND(e.TenantId = CAST(1 AS bigint))) AND(e.PersonId IS NOT NULL )";
+                "WHERE((e.IsDeleted <> 1) AND(e.TenantId = CAST(1 AS bigint))) AND(e.PersonId IS NOT NULL ) ORDER BY PersonName";
         }
         #endregion
 
@@ -587,7 +588,7 @@ namespace O2GEN.Helpers
         /// </summary>
         /// <param name="logger"></param>
         /// <returns></returns>
-        public static List<Asset> GetAssets(ILogger logger)
+        public static List<Asset> GetAssets(ILogger logger, int DeptID = -1)
         {
             List<Asset> output = new List<Asset>();
             List<Asset> all = new List<Asset>();
@@ -596,7 +597,7 @@ namespace O2GEN.Helpers
                 using (var connection = new SqlConnection(GetConnectionString()))
                 {
                     connection.Open();
-                    using (var command = new SqlCommand(SelectAssets(), connection))
+                    using (var command = new SqlCommand(SelectAssets(DeptID), connection))
                     {
                         command.CommandType = CommandType.Text;
                         command.Parameters.Clear();

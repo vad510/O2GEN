@@ -93,14 +93,15 @@
                         <li>
                             <a asp-controller="Employee" asp-action="RoleList">Роли</a>
                         </li>
+                        @*???
                         <li>
                             <a asp-controller="Employee" asp-action="Resources">Ресурсы</a>
-                        </li>
+                        </li>*@
                         <li>
                             <a href="#">Рабочие календари</a>
                         </li>
                         <li>
-                            <a asp-controller="Employee" asp-action="Department">Бригады</a>
+                            <a asp-controller="Employee" asp-action="Resources">Бригады</a>
                         </li>
                     </ul>
                 </li>
@@ -108,7 +109,7 @@
                     <a href="#page2Submenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Справочники</a>
                     <ul class="collapse list-unstyled" id="page2Submenu">
                         <li>
-                            <a href="#">Участки</a>
+                            <a asp-controller="Desk" asp-action="Departments">Участки</a>
                         </li>
                         <li>
                             <a asp-controller="Desk" asp-action="Objects">Объекты</a>

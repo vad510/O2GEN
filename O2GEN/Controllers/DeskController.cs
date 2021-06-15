@@ -106,7 +106,7 @@ namespace O2GEN.Controllers
             //}
 
 
-            ViewBag.ObjectClasses = Helpers.DBHelper.GetPersonPositions(_logger);
+            ViewBag.ObjectClasses = Helpers.DBHelper.GetAssetClasses(_logger);
             return View();
         }
 
@@ -161,6 +161,12 @@ namespace O2GEN.Controllers
 
 
             ViewBag.TOTypes = Helpers.DBHelper.GetTOTypes(_logger);
+            return View();
+        }
+
+        public IActionResult Departments()
+        {
+            ViewBag.Departments = Helpers.DBHelper.GetDepartments(_logger);
             return View();
         }
     }
