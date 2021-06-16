@@ -64,45 +64,45 @@
                     <thead class="color-black">
                         <tr>
                             <th>
-                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().EquipmentType)</p>
+                                <p>Тип оборудований</p>
                             </th>
                             <th>
-                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().Status)</p>
+                                <p>Статус обхода</p>
                             </th>
                             <th>
-                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().Type)</p>
+                                <p>Тип обхода</p>
                             </th>
                             <th>
-                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().Bypass)</p>
+                                <p>Обход</p>
                             </th>
                             <th>
-                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().Bypasser)</p>
+                                <p>Обходчик</p>
                             </th>
                             <th>
-                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().Start)</p>
+                                <p>Дата начала (план)</p>
                             </th>
                             <th>
-                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().End)</p>
+                                <p>Дата окончания (план)</p>
                             </th>
                             <th>
-                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().Defect)</p>
+                                <p>Дефект</p>
                             </th>
                             <th>
-                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().Edit)</p>
+                                <p>Редактирование</p>
                             </th>
                         </tr>
                     </thead>
-                    @foreach (var item in Model.ZprTakenModels.ZprTakenModelList)
+                    @foreach (var item in ViewBag.ZRPCreated)
                     {
                         <tr>
-                            <td><p>@Html.DisplayFor(x => item.EquipmentType)</p></td>
-                            <td><p>@Html.DisplayFor(x => item.Status)</p></td>
-                            <td><p>@Html.DisplayFor(x => item.Type)</p></td>
-                            <td><p>@Html.DisplayFor(x => item.Bypass)</p></td>
-                            <td><p>@Html.DisplayFor(x => item.Bypasser)</p></td>
-                            <td><p>@Html.DisplayFor(x => item.Start)</p></td>
-                            <td><p>@Html.DisplayFor(x => item.End)</p></td>
-                            <td><p>@Html.DisplayFor(x => item.Defect)</p></td>
+                            <td><p>@item.ObjName</p></td>
+                            <td><p>@item.StatusName</p></td>
+                            <td><p>@item.TypeName</p></td>
+                            <td><p>@item.RouteName</p></td>
+                            <td><p>@item.ResName</p></td>
+                            <td><p>@item.StartTime.ToString()</p></td>
+                            <td><p>@item.EndTime.ToString()</p></td>
+                            <td><p> </p></td>
                             <td>
                                 <div class="row-container">
                                     <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#editZpr" data-url="@Url.Action("EditZpr", new { id = item.Id })">
@@ -153,45 +153,45 @@
                     <thead class="color-black">
                         <tr>
                             <th>
-                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().EquipmentType)</p>
+                                <p>Тип оборудований</p>
                             </th>
                             <th>
-                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().Status)</p>
+                                <p>Статус обхода</p>
                             </th>
                             <th>
-                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().Type)</p>
+                                <p>Тип обхода</p>
                             </th>
                             <th>
-                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().Bypass)</p>
+                                <p>Обход</p>
                             </th>
                             <th>
-                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().Bypasser)</p>
+                                <p>Обходчик</p>
                             </th>
                             <th>
-                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().Start)</p>
+                                <p>Дата начала (план)</p>
                             </th>
                             <th>
-                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().End)</p>
+                                <p>Дата окончания (план)</p>
                             </th>
                             <th>
-                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().Defect)</p>
+                                <p>Дефект</p>
                             </th>
                             <th>
-                                <p>@Html.DisplayNameFor(x => x.ZprTakenModels.ZprTakenModelList.FirstOrDefault().Edit)</p>
+                                <p>Редактирование</p>
                             </th>
                         </tr>
                     </thead>
-                    @foreach (var item in Model.ZprTakenModels.ZprTakenModelList)
+                    @foreach (var item in ViewBag.ZRPStarted)
                     {
                         <tr>
-                            <td><p>@Html.DisplayFor(x => item.EquipmentType)</p></td>
-                            <td><p>@Html.DisplayFor(x => item.Status)</p></td>
-                            <td><p>@Html.DisplayFor(x => item.Type)</p></td>
-                            <td><p>@Html.DisplayFor(x => item.Bypass)</p></td>
-                            <td><p>@Html.DisplayFor(x => item.Bypasser)</p></td>
-                            <td><p>@Html.DisplayFor(x => item.Start)</p></td>
-                            <td><p>@Html.DisplayFor(x => item.End)</p></td>
-                            <td><p>@Html.DisplayFor(x => item.Defect)</p></td>
+                            <td><p>@item.ObjName</p></td>
+                            <td><p>@item.StatusName</p></td>
+                            <td><p>@item.TypeName</p></td>
+                            <td><p>@item.RouteName</p></td>
+                            <td><p>@item.ResName</p></td>
+                            <td><p>@item.StartTime.ToString()</p></td>
+                            <td><p>@item.EndTime.ToString()</p></td>
+                            <td><p> </p></td>
                             <td>
                                 <div class="row-container">
                                     <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#editZpr" data-url="@Url.Action("EditZpr", new { id = item.Id })">
@@ -203,13 +203,13 @@
                                     </button>
                                 </div>
                                 @*<div class="fa-container-links-centered">
-                                <a href="#">
-                                    <i class="fa fa-pen"></i>
-                                </a>
-                                <a href="#">
-                                    <i class="fa fa-trash"></i>
-                                </a>
-                            </div>*@
+                                    <a href="#">
+                                        <i class="fa fa-pen"></i>
+                                    </a>
+                                    <a href="#">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </div>*@
                             </td>
                         </tr>
                     }
@@ -239,8 +239,70 @@
             </div>
 
             <section>
-                <table>
-                    3
+                <table class="table table-bordered table-hover">
+                    <thead class="color-black">
+                        <tr>
+                            <th>
+                                <p>Тип оборудований</p>
+                            </th>
+                            <th>
+                                <p>Статус обхода</p>
+                            </th>
+                            <th>
+                                <p>Тип обхода</p>
+                            </th>
+                            <th>
+                                <p>Обход</p>
+                            </th>
+                            <th>
+                                <p>Обходчик</p>
+                            </th>
+                            <th>
+                                <p>Дата начала (план)</p>
+                            </th>
+                            <th>
+                                <p>Дата окончания (план)</p>
+                            </th>
+                            <th>
+                                <p>Дефект</p>
+                            </th>
+                            <th>
+                                <p>Редактирование</p>
+                            </th>
+                        </tr>
+                    </thead>
+                    @foreach (var item in ViewBag.ZRPEnded)
+                    {
+                        <tr>
+                            <td><p>@item.ObjName</p></td>
+                            <td><p>@item.StatusName</p></td>
+                            <td><p>@item.TypeName</p></td>
+                            <td><p>@item.RouteName</p></td>
+                            <td><p>@item.ResName</p></td>
+                            <td><p>@item.StartTime.ToString()</p></td>
+                            <td><p>@item.EndTime.ToString()</p></td>
+                            <td><p> </p></td>
+                            <td>
+                                <div class="row-container">
+                                    <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#editZpr" data-url="@Url.Action("EditZpr", new { id = item.Id })">
+                                        <i class="fa fa-pen"></i>
+                                    </button>
+                                    <button class="transparent-btn">
+
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </div>
+                                @*<div class="fa-container-links-centered">
+                                    <a href="#">
+                                        <i class="fa fa-pen"></i>
+                                    </a>
+                                    <a href="#">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </div>*@
+                            </td>
+                        </tr>
+                    }
                 </table>
             </section>
         </div>

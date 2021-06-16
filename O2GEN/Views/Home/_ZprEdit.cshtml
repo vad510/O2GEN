@@ -1,9 +1,10 @@
-﻿@model O2GEN.Models.HomeModels.ZprTakenModel
+﻿@model O2GEN.Models.ZRP
 
 <div class="modal fade" id="editZpr" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
+                <h5>Обход #@Model.Id</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body">
@@ -32,29 +33,28 @@
                                     <div class="form-group">
 
                                         <div class="margin-between-above">
-                                            <label asp-for="Bypass"></label>
-                                            <input asp-for="Bypass" class="form-control" />
-                                            <span asp-validation-for="Bypass" class="text-danger"></span>
+                                            <label asp-for="RouteName"></label>
+                                            <input asp-for="RouteName" class="form-control"/>
+                                            <span asp-validation-for="RouteName" class="text-danger"></span>
                                         </div>
 
                                         <div class="margin-between-above">
-                                            <label asp-for="Type"></label>
-                                            <select class="form-control">
-                                                <option>1</option>
-                                                <option>2</option>
-                                                <option>3</option>
-                                                <option>4</option>
+                                            <label asp-for="TypeName"></label>
+                                            <select asp-for="TypeId" class="form-control">
+                                                <option>Плановое</option>
+                                                <option>Внеплановое</option>
+                                                <option>Аварийное</option>
                                             </select>
                                         </div>
 
                                         <div class="margin-between-above">
-                                            <label asp-for="Start"></label>
-                                            <input asp-for="Start" class="form-control" />
+                                            <label asp-for="StartTime"></label>
+                                            <input asp-for="StartTime" class="form-control" />
                                         </div>
 
                                         <div class="margin-between-above">
-                                            <label asp-for="Bypasser"></label>
-                                            <input asp-for="Bypasser" class="form-control" />
+                                            <label asp-for="ResName"></label>
+                                            <input asp-for="ResName" class="form-control" />
                                         </div>
                                     </div>
                                 </form>
@@ -62,8 +62,13 @@
 
                             <div class="row-div-two">
                                 <div class="margin-between-above">
-                                    <label asp-for="Status"></label>
-                                    <input asp-for="Status" class="form-control" />
+                                    <label asp-for="StatusName"></label>
+                                    <select asp-for="StatusId" class="form-control">
+                                        <option value="1">Создан</option>
+                                        <option value="2">Начат</option>
+                                        <option value="3">Завершен</option>
+                                        <option value="4">Остановлен</option>
+                                    </select>
                                 </div>
 
                                 <div class="margin-between-above">
@@ -72,8 +77,8 @@
                                 </div>
 
                                 <div class="margin-between-above">
-                                    <label asp-for="End"></label>
-                                    <input asp-for="End" class="form-control" />
+                                    <label asp-for="EndTime"></label>
+                                    <input asp-for="EndTime" class="form-control" />
                                 </div>
                             </div>
                         </div>

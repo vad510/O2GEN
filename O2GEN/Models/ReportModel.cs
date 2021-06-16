@@ -23,5 +23,6 @@ namespace O2GEN.Models
         public ReportOnViewedTechPosition SelectedReportOnViewedTechPosition2 { get; set; }
 
         public DefectReportModel SelectedDefectReportModel { get; set; }
+
     }
 }

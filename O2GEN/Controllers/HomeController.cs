@@ -32,7 +32,10 @@ namespace O2GEN.Controllers
         #region Index
         public IActionResult Index()
         {
-            return View(ReportModel);
+            ViewBag.ZRPCreated = Helpers.DBHelper.GetZRP(new DateTime(2021,3,23).AddMinutes(-30), new DateTime(2021, 4, 1).AddMinutes(30), _logger, (int)Helpers.ZRPStatus.Created);
+            ViewBag.ZRPStarted = Helpers.DBHelper.GetZRP(new DateTime(2021,3,23).AddMinutes(-30), new DateTime(2021, 4, 1).AddMinutes(30), _logger, (int)Helpers.ZRPStatus.Started);
+            ViewBag.ZRPEnded = Helpers.DBHelper.GetZRP(new DateTime(2021,3,23).AddMinutes(-30), new DateTime(2021, 4, 1).AddMinutes(30), _logger, (int)Helpers.ZRPStatus.Ended);
+            return View();
         }
         #endregion
 
@@ -47,7 +50,7 @@ namespace O2GEN.Controllers
         [HttpGet]
         public IActionResult EditZpr(int id)
         {
-            var res = ReportModel.ZprTakenModels.ZprTakenModelList.FirstOrDefault(x => x.Id == id);
+            var res = Helpers.DBHelper.GetZRP(id, _logger);
 
             if (res != null)
                 return PartialView("_ZprEdit", res);

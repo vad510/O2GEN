@@ -169,5 +169,15 @@ namespace O2GEN.Controllers
             ViewBag.Departments = Helpers.DBHelper.GetDepartments(_logger);
             return View();
         }
+
+        [HttpGet]
+        public IActionResult DepartmentsEdit(int id)
+        {
+            var res = Helpers.DBHelper.GetDepartment(id, _logger);
+
+            if (res != null)
+                return PartialView("DepartmentEdit", res);
+            return View();
+        }
     }
 }

@@ -22,7 +22,7 @@ namespace O2GEN.Helpers
 
         #region Тексты запросов
 
-        private static string TestTable (DateTime From, DateTime To)
+        private static string GetZRP (DateTime From, DateTime To, int status)
         {
             return "" +
                 $"declare @__start_2 datetime2(7)='{From.ToString("yyyy-MM-dd HH:mm:ss")}', @__finish_1 datetime2(7)='{To.ToString("yyyy-MM-dd HH:mm:ss")}'; " +
@@ -68,7 +68,7 @@ namespace O2GEN.Helpers
                 "   FROM[Resources] AS[e10] " +
                 "    WHERE([e10].[IsDeleted] <> 1) AND([e10].[TenantId] = CAST(1 AS bigint)) " +
                 ") AS[t10] ON[t9].[ResourceId] = [t10].[Id] " +
-                "WHERE(([e].[IsDeleted] <> 1) AND([e].[TenantId] = CAST(1 AS bigint))) AND(([t7].[DepartmentId] IS NOT NULL AND[t7].[DepartmentId] IN(CAST(25 AS bigint))) AND(CASE " +
+                $"WHERE {(status > 0 ? $"[e].[SCStatusId] = {status} AND " : "")}  (([e].[IsDeleted] <> 1) AND([e].[TenantId] = CAST(1 AS bigint))) AND(([t7].[DepartmentId] IS NOT NULL AND[t7].[DepartmentId] IN(CAST(3 AS bigint))) AND(CASE " +
                 "WHEN EXISTS( " +
                 "   SELECT 1 " +
                 "   FROM[Assignments] AS[e9] " +
@@ -85,6 +85,54 @@ namespace O2GEN.Helpers
                 "    END " +
                 "END = 1)) " +
                 "ORDER BY[e].[Id]";
+        }
+
+        private static string GetZRP(int ID)
+        {
+            return "" +
+                "SELECT[e].[Id], [e].[CloseTime], [e].[StartTime], [t0].[Id] as [ObjId], [t0].[DisplayName] as [ObjName], [t0].[ObjectUID],  [t5].[Id] as [TypeId], [t5].[DisplayName] as [TypeName], [t6].[Id] as [StatusId], [t6].[DisplayName] as [StatusName], [t7].[AppointmentFinish], [t7].[AppointmentStart], [t8].[Name] as [RouteName], [t10].[DisplayName] as [ResName] " +
+                "FROM[SchedulingContainers] AS[e] " +
+                "LEFT JOIN( " +
+                "    SELECT[e0].* " +
+                "   FROM[SCReasons] AS[e0] " +
+                "    WHERE([e0].[IsDeleted] <> 1) AND([e0].[TenantId] = CAST(1 AS bigint)) " +
+                ") AS[t] ON[e].[SCReasonId] = [t].[Id] " +
+                "LEFT JOIN( " +
+                "    SELECT[e1].* " +
+                "   FROM[Departments] AS[e1] " +
+                "    WHERE([e1].[IsDeleted] <> 1) AND([e1].[TenantId] = CAST(1 AS bigint)) " +
+                ") AS[t0] ON[e].[DepartmentId] = [t0].[Id] " +
+                "LEFT JOIN( " +
+                "    SELECT[e6].* " +
+                "   FROM[SCTypes] AS[e6] " +
+                "    WHERE([e6].[IsDeleted] <> 1) AND([e6].[TenantId] = CAST(1 AS bigint)) " +
+                ") AS[t5] ON[e].[SCTypeId] = [t5].[Id] " +
+                "LEFT JOIN( " +
+                "    SELECT[e7].* " +
+                "   FROM[SCStatuses] AS[e7] " +
+                "    WHERE([e7].[IsDeleted] <> 1) AND([e7].[TenantId] = CAST(1 AS bigint)) " +
+                ") AS[t6] ON[e].[SCStatusId] = [t6].[Id] " +
+                "LEFT JOIN( " +
+                "    SELECT[e8].* " +
+                "   FROM[SchedulingRequirements] AS[e8] " +
+                "    WHERE[e8].[IsDeleted] <> 1 " +
+                ") AS[t7] ON[e].[RequirementId] = [t7].[Id] " +
+                "LEFT JOIN( " +
+                "    SELECT[e8].* " +
+                "   FROM[InspectionDocuments] AS[e8] " +
+                "    WHERE([e8].[IsDeleted] <> 1)  " +
+                ") AS[t8] on[e].[Id] = [t8].[TaskId] " +
+                "LEFT JOIN( " +
+                "    SELECT[e9].* " +
+                "   FROM[Assignments] AS[e9] " +
+                "    WHERE([e9].[IsDeleted] <> 1)  " +
+                ") AS[t9] on[t9].[SchedulingContainerId] = [e].[Id] " +
+                "LEFT JOIN( " +
+                "    SELECT[e10].* " +
+                "   FROM[Resources] AS[e10] " +
+                "    WHERE([e10].[IsDeleted] <> 1) AND([e10].[TenantId] = CAST(1 AS bigint)) " +
+                ") AS[t10] ON[t9].[ResourceId] = [t10].[Id] " +
+                $"WHERE [e].[Id] = {ID} AND (([e].[IsDeleted] <> 1) AND([e].[TenantId] = CAST(1 AS bigint))) ";
         }
 
         #region Типы ТО
@@ -225,11 +273,14 @@ namespace O2GEN.Helpers
         /// Участки
         /// </summary>
         /// <returns></returns>
-        private static string SelectDepartments()
+        private static string SelectDepartments(int id = -1)
         {
-            return "SELECT Id, DisplayName, ObjectUID, ParentId "+
-                "FROM Departments "+
-                "WHERE(IsDeleted <> 1) AND(TenantId = CAST(1 AS bigint)) order by DisplayName";
+            return "SELECT D.*, P.DisplayName as ParentDisplayName " +
+                "FROM Departments as D " +
+                "LEFT JOIN Departments as P on D.ParentId = P.id " +
+                "WHERE " +
+                $"{(id>0?$"D.id = {id} AND":"")} " +
+                "(D.IsDeleted <> 1) AND(D.TenantId = CAST(1 AS bigint)) order by D.DisplayName";
         }
         #endregion
 
@@ -290,15 +341,16 @@ namespace O2GEN.Helpers
         #endregion
 
         #region Процедуры получения данных
-        public static List<TestTableRow> GetTestTable(DateTime From, DateTime To, ILogger logger)
+        #region ЗРП
+        public static List<ZRP> GetZRP(DateTime From, DateTime To, ILogger logger, int status = -1)
         {
-            List<TestTableRow> output = new List<TestTableRow>();
+            List<ZRP> output = new List<ZRP>();
             try
             {
                 using (var connection = new SqlConnection(GetConnectionString()))
                 {
                     connection.Open();
-                    using (var command = new SqlCommand(TestTable(From, To), connection))
+                    using (var command = new SqlCommand(GetZRP(From, To, status), connection))
                     {
                         command.CommandType = CommandType.Text;
                         command.Parameters.Clear();
@@ -306,7 +358,7 @@ namespace O2GEN.Helpers
                         {
                             foreach (var row in dataReader.Select(row => row))
                             {
-                                output.Add(new TestTableRow()
+                                output.Add(new ZRP()
                                 {
                                     Id = int.Parse(row["Id"].ToString()),
                                     StartTime = Convert.ToDateTime(row["AppointmentStart"]),
@@ -331,6 +383,48 @@ namespace O2GEN.Helpers
             }
             return output;
         }
+        public static ZRP GetZRP(int ID, ILogger logger)
+        {
+            ZRP output = new ZRP();
+            try
+            {
+                using (var connection = new SqlConnection(GetConnectionString()))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(GetZRP(ID), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output = new ZRP()
+                                {
+                                    Id = int.Parse(row["Id"].ToString()),
+                                    StartTime = Convert.ToDateTime(row["AppointmentStart"]),
+                                    EndTime = Convert.ToDateTime(row["AppointmentFinish"]),
+                                    ObjId = int.Parse(row["ObjId"].ToString()),
+                                    ObjName = row["ObjName"].ToString(),
+                                    TypeId = int.Parse(row["TypeId"].ToString()),
+                                    TypeName = row["TypeName"].ToString(),
+                                    StatusId = int.Parse(row["StatusId"].ToString()),
+                                    StatusName = row["StatusName"].ToString(),
+                                    RouteName = row["RouteName"].ToString(),
+                                    ResName = row["ResName"].ToString()
+                                };
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Ошибка на запросе данных БР");
+            }
+            return output;
+        }
+        #endregion
 
         #region Типы ТО
         /// <summary>
@@ -713,6 +807,48 @@ namespace O2GEN.Helpers
             }
             return output;
         }
+
+        public static Department GetDepartment(int id, ILogger logger)
+        {
+            Department output = new Department();
+            try
+            {
+                using (var connection = new SqlConnection(GetConnectionString()))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectDepartments(id), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output = new Department()
+                                {
+                                    Id = int.Parse(row["Id"].ToString()),
+                                    DisplayName = row["DisplayName"].ToString(),
+                                    ObjectUID = new Guid(row["ObjectUID"].ToString()),
+                                    ParentId = (string.IsNullOrEmpty(row["ParentId"].ToString()) ? null : int.Parse(row["ParentId"].ToString())),
+                                    Latitude = (string.IsNullOrEmpty(row["Latitude"].ToString())? 0: double.Parse(row["Latitude"].ToString())),
+                                    Longitude = (string.IsNullOrEmpty(row["Longitude"].ToString()) ? 0 : double.Parse(row["Longitude"].ToString())),
+                                    Name = row["Name"].ToString(),
+                                    Organization = row["Organization"].ToString(),
+                                    ShortCode = row["ShortCode"].ToString(),
+                                    TimeZone = row["TimeZone"].ToString(),
+                                    ParentName = row["ParentDisplayName"].ToString()
+                                };
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
         #endregion
 
         #region Бригады
@@ -920,5 +1056,12 @@ namespace O2GEN.Helpers
         /// Числовой(целочисленный)
         /// </summary>
         Numerical = 2
+    }
+    public enum ZRPStatus
+    {
+        Created = 1,
+        Started = 2,
+        Ended = 3,
+        Stoped = 4
     }
 }
