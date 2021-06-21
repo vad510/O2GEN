@@ -7,7 +7,7 @@ namespace O2GEN.Models
     /// <summary>
     /// Объекты
     /// </summary>
-    public class Asset
+    public class SCStatus
     {
         public int Id { get; set; } = -1;
         [DisplayName("Наименование")]

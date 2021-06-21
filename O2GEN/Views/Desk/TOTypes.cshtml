@@ -4,6 +4,7 @@
 }
 <section class="component-section">
 
+    <div id="placeholder"></div>
     <div class="row-container-left bg-blue with-padding">
         <button class="transparent-btn">
             <i class="fa fa-plus color-white"></i>
@@ -29,7 +30,7 @@
 
                     <th>
                         <p>
-                            
+
                         </p>
                     </th>
 
@@ -55,9 +56,9 @@
 
                         <td>
                             <div class="fa-container-links-centered">
-                                <a href="#">
+                                <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#TOTypeEdit" data-url="@Url.Action("TOTypeEdit", new { id = item.Id })">
                                     <i class="fa fa-pen"></i>
-                                </a>
+                                </button>
                                 <a href="#">
                                     <i class="fa fa-trash"></i>
                                 </a>

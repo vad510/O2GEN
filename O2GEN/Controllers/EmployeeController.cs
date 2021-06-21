@@ -48,37 +48,27 @@ namespace O2GEN.Controllers
             }
         }
 
-        public IActionResult Index()
+        public IActionResult Engineers()
         {
             ViewBag.Engineers = Helpers.DBHelper.GetEngineers(_logger);
             return View(_employeeListModels);
         }
-
-        public IActionResult RoleList()
+        [HttpGet]
+        public IActionResult EngineerEdit(int id)
         {
-            //RoleListModels rm = new();
+            var res = Helpers.DBHelper.GetEngineer(id, _logger);
+            if (res != null) return PartialView("EngineerEdit", res);
+            return View();
+        }
 
-            //rm.RoleModels.Add(new RoleModel
-            //{
-            //    RoleName = "1",
-            //    VisibleRoleName = "1",
-            //    Edit = ""
-            //});
-
+        public IActionResult Roles()
+        {
             ViewBag.Roles = Helpers.DBHelper.GetPPRoles(_logger);
             return View();
         }
 
         public IActionResult Resources()
         {
-            //ResourcesListModels rs = new();
-
-            //rs.ResourcesModels.Add(new ResourcesModel
-            //{
-            //    VisibleName = "1",
-            //    Edit = ""
-            //});
-
             ViewBag.Resources = Helpers.DBHelper.GetResources(_logger);
             return View();
         }
@@ -91,6 +81,13 @@ namespace O2GEN.Controllers
         public IActionResult Department()
         {
             ViewBag.Departments = Helpers.DBHelper.GetResources(_logger);
+            return View();
+        }
+        [HttpGet]
+        public IActionResult ResourceEdit(int id)
+        {
+            var res = Helpers.DBHelper.GetResource(id, _logger);
+            if (res != null) return PartialView("ResourceEdit", res);
             return View();
         }
 

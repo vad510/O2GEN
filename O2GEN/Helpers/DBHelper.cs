@@ -90,7 +90,7 @@ namespace O2GEN.Helpers
         private static string GetZRP(int ID)
         {
             return "" +
-                "SELECT[e].[Id], [e].[CloseTime], [e].[StartTime], [t0].[Id] as [ObjId], [t0].[DisplayName] as [ObjName], [t0].[ObjectUID],  [t5].[Id] as [TypeId], [t5].[DisplayName] as [TypeName], [t6].[Id] as [StatusId], [t6].[DisplayName] as [StatusName], [t7].[AppointmentFinish], [t7].[AppointmentStart], [t8].[Name] as [RouteName], [t10].[DisplayName] as [ResName] " +
+                "SELECT[e].[Id], [e].[CloseTime], [e].[StartTime], [t0].[Id] as [ObjId], [t0].[DisplayName] as [ObjName], [t0].[ObjectUID],  [t5].[Id] as [TypeId], [t5].[DisplayName] as [TypeName], [t6].[Id] as [StatusId], [t6].[DisplayName] as [StatusName], [t7].[AppointmentFinish], [t7].[AppointmentStart], [t8].[Name] as [RouteName], [t10].[DisplayName] as [ResName], t0.Id as DepartmentID " +
                 "FROM[SchedulingContainers] AS[e] " +
                 "LEFT JOIN( " +
                 "    SELECT[e0].* " +
@@ -135,16 +135,39 @@ namespace O2GEN.Helpers
                 $"WHERE [e].[Id] = {ID} AND (([e].[IsDeleted] <> 1) AND([e].[TenantId] = CAST(1 AS bigint))) ";
         }
 
+        #region Статусы
+        /// <summary>
+        /// Календари
+        /// </summary>
+        /// <returns></returns>
+        private static string SelectSCStatuses()
+        {
+            return "SELECT id, DisplayName, ObjectUID FROM SCStatuses where IsDeleted <> 1 AND TenantId = CAST(1 AS bigint)";
+        }
+        #endregion
+
+        #region Календари
+        /// <summary>
+        /// Календари
+        /// </summary>
+        /// <returns></returns>
+        private static string SelectCalendars()
+        {
+            return "SELECT id, Title, ObjectUID FROM PPCalendars where IsDeleted <> 1 AND TenantId = CAST(1 AS bigint)";
+        }
+        #endregion
+
         #region Типы ТО
         /// <summary>
         /// Типы ТО
         /// </summary>
         /// <returns></returns>
-        private static string SelectTOTypes()
+        private static string SelectTOTypes(int ID = -1)
         {
             return "SELECT Id, Name, DisplayName, ObjectUID " +
                 "FROM AssetParameterSpecies " +
                 "WHERE(IsDeleted <> 1) AND(TenantId = CAST(1 AS bigint)) " +
+                $"{(ID == -1 ? "" : "AND Id = " + ID)} " +
                 "ORDER BY Id";
         }
         /// <summary>
@@ -167,11 +190,12 @@ namespace O2GEN.Helpers
         /// Контроли
         /// </summary>
         /// <returns></returns>
-        private static string SelectControls()
+        private static string SelectControls(int ID = -1)
         {
-            return "SELECT Id, DisplayName, ObjectUID, ValueType " +
+            return "SELECT Id, DisplayName, ObjectUID, ValueType, BottomValue1, TopValue1, BottomValue2, TopValue2, BottomValue3, TopValue3 " +
                 "FROM AssetParameters " +
                 "WHERE(IsDeleted <> 1) AND(TenantId = CAST(1 AS bigint)) " +
+                $"{(ID==-1?"": "AND Id = "+ID)} " +
                 "ORDER BY DisplayName";
         }
         /// <summary>
@@ -201,9 +225,9 @@ namespace O2GEN.Helpers
         /// Маршруты
         /// </summary>
         /// <returns></returns>
-        private static string SelectAssetParameterSets()
+        private static string SelectAssetParameterSets(int ID = -1)
         {
-            return "SELECT e.Id, e.DisplayName, e.ObjectUID, t.DisplayName as DepartmentName  " +
+            return "SELECT e.Id, e.DisplayName, e.ObjectUID, t.id as DepartmentID, t.DisplayName as DepartmentName  " +
                 "FROM AssetParameterSets AS e " +
                 "LEFT JOIN( " +
                 "    SELECT * " +
@@ -211,6 +235,7 @@ namespace O2GEN.Helpers
                 "    WHERE (e0.IsDeleted<> 1) AND(e0.TenantId = CAST(1 AS bigint)) " +
                 ") AS t ON e.DepartmentId = t.Id " +
                 "WHERE e.IsDeleted <> 1 " +
+                $"{(ID == -1 ? "" : "AND e.Id = " + ID)} " +
                 "ORDER BY e.DisplayName";
         }
         #endregion
@@ -220,9 +245,14 @@ namespace O2GEN.Helpers
         /// Классы объектов
         /// </summary>
         /// <returns></returns>
-        private static string SelectAssetClass()
+        private static string SelectAssetClass(int ID= -1)
         {
-            return "SELECT Id, DisplayName, ObjectUID, ParentId FROM AssetClass AS e WHERE (IsDeleted <> 1) AND (TenantId = CAST(1 AS bigint)) order by DisplayName";
+            return "SELECT Id, DisplayName, ObjectUID, ParentId " +
+                "FROM AssetClass AS e " +
+                "WHERE (IsDeleted <> 1) " +
+                $"{(ID == -1 ? "" : "AND Id = " + ID)} " +
+                "AND (TenantId = CAST(1 AS bigint)) " +
+                "order by DisplayName";
         }
         #endregion
 
@@ -231,9 +261,13 @@ namespace O2GEN.Helpers
         /// Должность
         /// </summary>
         /// <returns></returns>
-        private static string SelectPersonPositions()
+        private static string SelectPersonPositions(int ID = -1)
         {
-            return "SELECT Id, DisplayName, ObjectUID FROM PersonPositions WHERE (IsDeleted <> 1) AND (TenantId = CAST(1 AS bigint)) order by DisplayName";
+            return "SELECT Id, Name, DisplayName, ObjectUID " +
+                "FROM PersonPositions " +
+                "WHERE (IsDeleted <> 1) " +
+                $"{(ID == -1 ? "" : "AND Id = " + ID)} " +
+                "AND (TenantId = CAST(1 AS bigint)) order by DisplayName";
         }
         #endregion
 
@@ -242,9 +276,13 @@ namespace O2GEN.Helpers
         /// Категория персонала
         /// </summary>
         /// <returns></returns>
-        private static string SelectPersonCategories()
+        private static string SelectPersonCategories(int ID = -1)
         {
-            return "SELECT Id, DisplayName, ObjectUID, ParentId FROM PersonCategories WHERE (IsDeleted <> 1) AND (TenantId = CAST(1 AS bigint)) order by DisplayName";
+            return "SELECT Id, Name, DisplayName, ObjectUID, ParentId " +
+                "FROM PersonCategories " +
+                "WHERE (IsDeleted <> 1) " +
+                $"{(ID == -1 ? "" : "AND Id = " + ID)} " +
+                "AND (TenantId = CAST(1 AS bigint)) order by DisplayName";
         }
         #endregion
 
@@ -255,16 +293,38 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         private static string SelectAssets(int DeptID = -1)
         {
-            return "SELECT e.Id, e.DisplayName, e.Description, e.ExternalId, e.ObjectUID, e.ParentId,  t1.DisplayName as StateName, t1.ObjectUID " +
+            return "SELECT e.Id, e.DisplayName, e.Description, e.ExternalId, e.ObjectUID, e.ParentId,  t1.DisplayName as StateName, t1.ObjectUID, AT.Id as TypeID, AT.DisplayName as TypeName " +
                 "FROM Assets AS e " +
                 "LEFT JOIN ( " +
                 "    SELECT e2.Id, e2.DisplayName, e2.ExternalId, e2.IsDeleted, e2.Name, e2.ObjectUID, e2.Revision, e2.TenantId " +
                 "    FROM AssetStates AS e2 " +
                 "    WHERE (e2.IsDeleted <> 1) AND (e2.TenantId = CAST(1 AS bigint)) " +
                 ") AS t1 ON e.AssetStateId = t1.Id " +
+                "LEFT JOIN AssetTypes AT on AT.Id = e.AssetTypeId " +
                 "WHERE ((e.IsDeleted <> 1) AND (e.TenantId = CAST(1 AS bigint))) " +
                 (DeptID!=-1?"AND e.DepartmentId =  {DeptID}":"") +
                 "ORDER BY e.DisplayName";
+        }
+        private static string SelectAsset(int ID)
+        {
+            return "SELECT e.Id, e.DisplayName, e.Description, e.ExternalId, e.ObjectUID, e.ParentId,  t1.DisplayName as StateName, t1.ObjectUID, AT.Id as TypeID, e.DepartmentId " +
+                "FROM Assets AS e " +
+                "LEFT JOIN ( " +
+                "    SELECT e2.Id, e2.DisplayName, e2.ExternalId, e2.IsDeleted, e2.Name, e2.ObjectUID, e2.Revision, e2.TenantId " +
+                "    FROM AssetStates AS e2 " +
+                "    WHERE (e2.IsDeleted <> 1) AND (e2.TenantId = CAST(1 AS bigint)) " +
+                ") AS t1 ON e.AssetStateId = t1.Id " +
+                "LEFT JOIN AssetTypes AT on AT.Id = e.AssetTypeId " +
+                $"WHERE ((e.IsDeleted <> 1) AND (e.TenantId = CAST(1 AS bigint))) AND e.Id = {ID}" +
+                "ORDER BY e.DisplayName";
+        }
+
+        private static string SelectAssetTypes()
+        {
+            return "SELECT id, DisplayName, ObjectUID " +
+                "FROM AssetTypes " +
+                "where IsDeleted <> 1 " +
+                "AND TenantId = CAST(1 AS bigint)";
         }
         #endregion
 
@@ -273,13 +333,13 @@ namespace O2GEN.Helpers
         /// Участки
         /// </summary>
         /// <returns></returns>
-        private static string SelectDepartments(int id = -1)
+        private static string SelectDepartments(int ID = -1)
         {
             return "SELECT D.*, P.DisplayName as ParentDisplayName " +
                 "FROM Departments as D " +
                 "LEFT JOIN Departments as P on D.ParentId = P.id " +
                 "WHERE " +
-                $"{(id>0?$"D.id = {id} AND":"")} " +
+                $"{(ID>0?$"D.id = {ID} AND":"")} " +
                 "(D.IsDeleted <> 1) AND(D.TenantId = CAST(1 AS bigint)) order by D.DisplayName";
         }
         #endregion
@@ -289,9 +349,20 @@ namespace O2GEN.Helpers
         /// Бригады
         /// </summary>
         /// <returns></returns>
-        private static string SelectResources()
+        private static string SelectResources(int ID = -1)
         {
-            return "SELECT Id, DisplayName, ObjectUID FROM Resources AS e WHERE (IsDeleted <> 1) AND (TenantId = CAST(1 AS bigint)) order by DisplayName";
+            return "SELECT Id, DisplayName, ObjectUID, ResourceTypeId, ResourceStateId, DepartmentId, Latitude, Longitude, Address " +
+                "FROM Resources AS e " +
+                $"{(ID > 0 ? $"e.id = {ID} AND" : "")} " +
+                "WHERE (IsDeleted <> 1) AND (TenantId = CAST(1 AS bigint)) order by DisplayName";
+        }
+        private static string SelectResourceTypes()
+        {
+            return "SELECT id, DisplayName, ObjectUID FROM ResourceTypes where IsDeleted <> 1 AND TenantId = CAST(1 AS bigint)";
+        }
+        private static string SelectResourceStates()
+        {
+            return "SELECT id, DisplayName, ObjectUID FROM ResourceStates where IsDeleted <> 1 AND TenantId = CAST(1 AS bigint)";
         }
         #endregion
 
@@ -314,9 +385,9 @@ namespace O2GEN.Helpers
         /// Работники
         /// </summary>
         /// <returns></returns>
-        private static string SelectEngineers()
+        private static string SelectEngineers(int ID = -1)
         {
-            return "SELECT e.Id, t1.PersonName, e.ObjectUID, e.PersonId, t0.DisplayName as DepartmentName, isnull(t2.IsUser,0) as IsUser "+
+            return "SELECT e.Id, t1.PersonName, e.ObjectUID, e.PersonId, t0.DisplayName as DepartmentName, isnull(t2.IsUser,0) as IsUser , e.DepartmentId, e.PersonId, t1.Surname, t1.GivenName, t1.MiddleName, e.CalendarId, t1.PersonPositionId " +
                 "FROM Engineers AS e " +
                 "LEFT JOIN( " +
                 "    SELECT e1.Id, e1.DisplayName " +
@@ -324,7 +395,7 @@ namespace O2GEN.Helpers
                 "    WHERE (e1.IsDeleted <> 1) AND (e1.TenantId = CAST(1 AS bigint)) " +
                 ") AS t0 ON e.DepartmentId = t0.Id " +
                 "LEFT JOIN( " +
-                "    SELECT Id, UserId, CONCAT(Surname,' ',GivenName,' ', MiddleName) PersonName " +
+                "    SELECT Id, UserId, CONCAT(Surname,' ',GivenName,' ', MiddleName) as PersonName, PersonPositionId, Surname, GivenName, MiddleName " +
                 "   FROM Persons " +
                 "    WHERE(IsDeleted <> 1) AND TenantId = CAST(1 AS bigint) " +
                 ") AS t1 ON e.PersonId = t1.Id " +
@@ -334,7 +405,10 @@ namespace O2GEN.Helpers
                 "    WHERE(IsDeleted <> 1) AND TenantId = CAST(1 AS bigint) " +
                 "    GROUP BY Id " +
                 ") AS t2 ON t1.UserId = t2.Id " +
-                "WHERE((e.IsDeleted <> 1) AND(e.TenantId = CAST(1 AS bigint))) AND(e.PersonId IS NOT NULL ) ORDER BY PersonName";
+                "WHERE ((e.IsDeleted <> 1) " +
+                $"{(ID == -1 ? "" : "AND e.Id = " + ID)} " +
+                "AND(e.TenantId = CAST(1 AS bigint))) " +
+                "AND(e.PersonId IS NOT NULL ) ORDER BY PersonName";
         }
         #endregion
 
@@ -411,7 +485,8 @@ namespace O2GEN.Helpers
                                     StatusId = int.Parse(row["StatusId"].ToString()),
                                     StatusName = row["StatusName"].ToString(),
                                     RouteName = row["RouteName"].ToString(),
-                                    ResName = row["ResName"].ToString()
+                                    ResName = row["ResName"].ToString(),
+                                    DepartmentID = string.IsNullOrEmpty(row["DepartmentID"].ToString()) ? (int?)null : int.Parse(row["DepartmentID"].ToString())
                                 };
                             }
                         }
@@ -426,6 +501,86 @@ namespace O2GEN.Helpers
         }
         #endregion
 
+        #region Календари
+        /// <summary>
+        /// Календари
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <returns></returns>
+        public static List<Models.Calendar> GetCalendars(ILogger logger = null)
+        {
+            List<Models.Calendar> output = new List<Models.Calendar>();
+            try
+            {
+                using (var connection = new SqlConnection(GetConnectionString()))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectCalendars(), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output.Add(new Models.Calendar()
+                                {
+                                    Id = int.Parse(row["Id"].ToString()),
+                                    Title = row["Title"].ToString(),
+                                    ObjectUID = new Guid(row["ObjectUID"].ToString())
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
+        #endregion
+        #region Статусы
+        /// <summary>
+        /// Календари
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <returns></returns>
+        public static List<SCStatus> GetSCStatuses(ILogger logger = null)
+        {
+            List<SCStatus> output = new List<SCStatus>();
+            try
+            {
+                using (var connection = new SqlConnection(GetConnectionString()))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectSCStatuses(), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output.Add(new Models.SCStatus()
+                                {
+                                    Id = int.Parse(row["Id"].ToString()),
+                                    DisplayName = row["DisplayName"].ToString(),
+                                    ObjectUID = new Guid(row["ObjectUID"].ToString())
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
+        #endregion
         #region Типы ТО
         /// <summary>
         /// Типы ТО
@@ -466,6 +621,40 @@ namespace O2GEN.Helpers
             }
             return output;
         }
+        public static TOType GetTOType(int ID, ILogger logger)
+        {
+            TOType output = new TOType();
+            try
+            {
+                using (var connection = new SqlConnection(GetConnectionString()))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectTOTypes(), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output  = new TOType()
+                                {
+                                    Id = int.Parse(row["Id"].ToString()),
+                                    Name = row["Name"].ToString(),
+                                    DisplayName = row["DisplayName"].ToString(),
+                                    ObjectUID = new Guid(row["ObjectUID"].ToString())
+                                };
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
         #endregion
 
         #region Контроли
@@ -495,9 +684,51 @@ namespace O2GEN.Helpers
                                     Id = int.Parse(row["Id"].ToString()),
                                     DisplayName = row["DisplayName"].ToString(),
                                     ObjectUID = new Guid(row["ObjectUID"].ToString()),
-                                    ValueType = row["ValueType"].ToString(),
+                                    ValueType = GetControlTypeIndex(row["ValueType"].ToString()),
                                     DisplayValueType = GetControlTypeDisplay(row["ValueType"].ToString())
                                 });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
+
+        public static Control GetControl(int ID, ILogger logger)
+        {
+            Control output = new Control();
+            try
+            {
+                using (var connection = new SqlConnection(GetConnectionString()))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectControls(ID), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output = new Control()
+                                {
+                                    Id = int.Parse(row["Id"].ToString()),
+                                    DisplayName = row["DisplayName"].ToString(),
+                                    ObjectUID = new Guid(row["ObjectUID"].ToString()),
+                                    ValueType = GetControlTypeIndex(row["ValueType"].ToString()),
+                                    DisplayValueType = GetControlTypeDisplay(row["ValueType"].ToString()),
+                                    ValueBottom1 = row["BottomValue1"].ToString(),
+                                    ValueTop1 = row["TopValue1"].ToString(),
+                                    ValueBottom2 = row["BottomValue2"].ToString(),
+                                    ValueTop2 = row["TopValue2"].ToString(),
+                                    ValueBottom3 = row["BottomValue3"].ToString(),
+                                    ValueTop3 = row["TopValue3"].ToString(),
+                                };
                             }
                         }
                     }
@@ -538,8 +769,44 @@ namespace O2GEN.Helpers
                                     Id = int.Parse(row["Id"].ToString()),
                                     DisplayName = row["DisplayName"].ToString(),
                                     ObjectUID = new Guid(row["ObjectUID"].ToString()),
-                                    DepartmentName = row["DepartmentName"].ToString()
+                                    DepartmentName = row["DepartmentName"].ToString(),
+                                    DepartmentID = string.IsNullOrEmpty(row["DepartmentID"].ToString()) ? (int?)null : int.Parse(row["DepartmentID"].ToString())
                                 });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
+        public static AssetParameterSet GetAssetParameterSet(int ID, ILogger logger)
+        {
+            AssetParameterSet output = new AssetParameterSet();
+            try
+            {
+                using (var connection = new SqlConnection(GetConnectionString()))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectAssetParameterSets(ID), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output = new AssetParameterSet()
+                                {
+                                    Id = int.Parse(row["Id"].ToString()),
+                                    DisplayName = row["DisplayName"].ToString(),
+                                    ObjectUID = new Guid(row["ObjectUID"].ToString()),
+                                    DepartmentName = row["DepartmentName"].ToString(),
+                                    DepartmentID = string.IsNullOrEmpty(row["DepartmentID"].ToString()) ? (int?)null : int.Parse(row["DepartmentID"].ToString())
+                                };
                             }
                         }
                     }
@@ -592,6 +859,39 @@ namespace O2GEN.Helpers
             }
             return output;
         }
+        public static AssetClass GetAssetClass(int ID, ILogger logger)
+        {
+            AssetClass output = new AssetClass();
+            try
+            {
+                using (var connection = new SqlConnection(GetConnectionString()))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectAssetClass(ID), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output = new AssetClass()
+                                {
+                                    Id = int.Parse(row["Id"].ToString()),
+                                    DisplayName = row["DisplayName"].ToString(),
+                                    ObjectUID = new Guid(row["ObjectUID"].ToString())
+                                };
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
         #endregion
 
         #region Должность
@@ -600,7 +900,7 @@ namespace O2GEN.Helpers
         /// </summary>
         /// <param name="logger"></param>
         /// <returns></returns>
-        public static List<PersonPosition> GetPersonPositions(ILogger logger)
+        public static List<PersonPosition> GetPersonPositions(ILogger logger  = null)
         {
             List<PersonPosition> output = new List<PersonPosition>();
             try
@@ -622,6 +922,40 @@ namespace O2GEN.Helpers
                                     DisplayName = row["DisplayName"].ToString(),
                                     ObjectUID = new Guid(row["ObjectUID"].ToString())
                                 });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
+        public static PersonPosition GetPersonPosition(int ID, ILogger logger)
+        {
+            PersonPosition output = new PersonPosition();
+            try
+            {
+                using (var connection = new SqlConnection(GetConnectionString()))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectPersonPositions(ID), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output = new PersonPosition()
+                                {
+                                    Id = int.Parse(row["Id"].ToString()),
+                                    Name = row["Name"].ToString(),
+                                    DisplayName = row["DisplayName"].ToString(),
+                                    ObjectUID = new Guid(row["ObjectUID"].ToString())
+                                };
                             }
                         }
                     }
@@ -663,6 +997,40 @@ namespace O2GEN.Helpers
                                     DisplayName = row["DisplayName"].ToString(),
                                     ObjectUID = new Guid(row["ObjectUID"].ToString())
                                 });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
+        public static PersonCategory GetPersonCategory(int ID, ILogger logger)
+        {
+            PersonCategory output = new PersonCategory();
+            try
+            {
+                using (var connection = new SqlConnection(GetConnectionString()))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectPersonCategories(ID), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output = new PersonCategory()
+                                {
+                                    Id = int.Parse(row["Id"].ToString()),
+                                    Name = row["Name"].ToString(),
+                                    DisplayName = row["DisplayName"].ToString(),
+                                    ObjectUID = new Guid(row["ObjectUID"].ToString())
+                                };
                             }
                         }
                     }
@@ -742,6 +1110,79 @@ namespace O2GEN.Helpers
             }
             return output;
         }
+
+        public static Asset GetAssets(int ID, ILogger logger)
+        {
+            Asset output = new Asset();
+            try
+            {
+                using (var connection = new SqlConnection(GetConnectionString()))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectAsset(ID), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output = new Asset()
+                                {
+                                    Id = int.Parse(row["Id"].ToString()),
+                                    DisplayName = row["DisplayName"].ToString(),
+                                    ObjectUID = new Guid(row["ObjectUID"].ToString()),
+                                    Maximo = row["ExternalId"].ToString(),
+                                    Status = row["StateName"].ToString(),
+                                    ParentId = string.IsNullOrEmpty(row["ParentId"].ToString()) ? (int?)null : int.Parse(row["ParentId"].ToString()),
+                                    DepartmentId = string.IsNullOrEmpty(row["DepartmentId"].ToString()) ? (int?)null : int.Parse(row["DepartmentId"].ToString()),
+                                    TypeID = string.IsNullOrEmpty(row["TypeID"].ToString()) ? (int?)null : int.Parse(row["TypeID"].ToString()),
+
+                                };
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
+        public static List<AssetType> GetAssetTypes(ILogger logger = null)
+        {
+            List<AssetType> output = new List<AssetType>();
+            try
+            {
+                using (var connection = new SqlConnection(GetConnectionString()))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectAssetTypes(), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output.Add(new AssetType()
+                                {
+                                    Id = int.Parse(row["Id"].ToString()),
+                                    DisplayName = row["DisplayName"].ToString(),
+                                    ObjectUID = new Guid(row["ObjectUID"].ToString())
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
         #endregion
 
         #region Участки
@@ -750,7 +1191,7 @@ namespace O2GEN.Helpers
         /// </summary>
         /// <param name="logger"></param>
         /// <returns></returns>
-        public static List<Department> GetDepartments(ILogger logger)
+        public static List<Department> GetDepartments(ILogger logger = null)
         {
             List<Department> output = new List<Department>();
             List<Department> all = new List<Department>();
@@ -781,7 +1222,7 @@ namespace O2GEN.Helpers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+                logger?.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
             }
             while (all.Count > 0)
             {
@@ -890,6 +1331,111 @@ namespace O2GEN.Helpers
             }
             return output;
         }
+        public static Resource GetResource(int ID, ILogger logger)
+        {
+            Resource output = new Resource();
+            try
+            {
+                using (var connection = new SqlConnection(GetConnectionString()))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectResources(), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output = new Resource()
+                                {
+                                    Id = int.Parse(row["Id"].ToString()),
+                                    DisplayName = row["DisplayName"].ToString(),
+                                    ObjectUID = new Guid(row["ObjectUID"].ToString()),
+                                    Address = row["Address"].ToString(),
+                                    DepartmentId = string.IsNullOrEmpty(row["DepartmentId"].ToString()) ? (int?)null : int.Parse(row["DepartmentId"].ToString()),
+                                    ResourceStateId = string.IsNullOrEmpty(row["ResourceStateId"].ToString()) ? (int?)null : int.Parse(row["ResourceStateId"].ToString()),
+                                    ResourceTypeId = string.IsNullOrEmpty(row["ResourceTypeId"].ToString()) ? (int?)null : int.Parse(row["ParResourceTypeIdentId"].ToString()),
+                                    Latitude = (string.IsNullOrEmpty(row["Latitude"].ToString()) ? 0 : double.Parse(row["Latitude"].ToString())),
+                                    Longitude = (string.IsNullOrEmpty(row["Longitude"].ToString()) ? 0 : double.Parse(row["Longitude"].ToString()))
+                                };
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
+        public static List<ResourceState> GetResourceStates(ILogger logger = null)
+        {
+            List<ResourceState> output = new List<ResourceState>();
+            try
+            {
+                using (var connection = new SqlConnection(GetConnectionString()))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectResourceStates(), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output.Add(new ResourceState()
+                                {
+                                    Id = int.Parse(row["Id"].ToString()),
+                                    DisplayName = row["DisplayName"].ToString(),
+                                    ObjectUID = new Guid(row["ObjectUID"].ToString())
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
+        public static List<ResourceType> GetResourceTypes(ILogger logger=null)
+        {
+            List<ResourceType> output = new List<ResourceType>();
+            try
+            {
+                using (var connection = new SqlConnection(GetConnectionString()))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectResourceTypes(), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output.Add(new ResourceType()
+                                {
+                                    Id = int.Parse(row["Id"].ToString()),
+                                    DisplayName = row["DisplayName"].ToString(),
+                                    ObjectUID = new Guid(row["ObjectUID"].ToString())
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
         #endregion
 
         #region Роли
@@ -975,6 +1521,48 @@ namespace O2GEN.Helpers
             }
             return output;
         }
+        public static Engineer GetEngineer(int ID, ILogger logger)
+        {
+            Engineer output = new Engineer();
+            try
+            {
+                using (var connection = new SqlConnection(GetConnectionString()))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectEngineers(ID), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output = new Engineer()
+                                {
+                                    Id = int.Parse(row["Id"].ToString()),
+                                    PersonName = row["PersonName"].ToString(),
+                                    DepartmentName = row["DepartmentName"].ToString(),
+                                    IsUser = row["IsUser"].ToString() != "0",
+                                    ObjectUID = new Guid(row["ObjectUID"].ToString()),
+                                    DepartmentId = string.IsNullOrEmpty(row["DepartmentId"].ToString()) ? (int?)null : int.Parse(row["DepartmentId"].ToString()),
+                                    CalendarId = string.IsNullOrEmpty(row["CalendarId"].ToString()) ? (int?)null : int.Parse(row["CalendarId"].ToString()),
+                                    PersonId = string.IsNullOrEmpty(row["PersonId"].ToString()) ? (int?)null : int.Parse(row["PersonId"].ToString()),
+                                    PersonPositionId = string.IsNullOrEmpty(row["PersonPositionId"].ToString()) ? (int?)null : int.Parse(row["PersonPositionId"].ToString()),
+                                    GivenName = row["GivenName"].ToString(),
+                                    MiddleName = row["MiddleName"].ToString(),
+                                    Surname = row["Surname"].ToString()
+                                };
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
         #endregion
 
         #endregion
@@ -1025,6 +1613,19 @@ namespace O2GEN.Helpers
                     return "";
             }
         }
+        private static int GetControlTypeIndex(string type)
+        {
+            switch (type)
+            {
+                case "TYPE_DOUBLE_N":
+                    return 0;
+                case "TYPE_BOOLEAN_N":
+                    return 1;
+                case "TYPE_INT64_N":
+                    return 2;
+                default: return -1;
+            }
+        }
         private static string GetControlTypeDisplay(string type)
         {
             switch (type.Trim())
@@ -1034,6 +1635,19 @@ namespace O2GEN.Helpers
                 case "TYPE_BOOLEAN_N":
                     return "Визуальный";
                 case "TYPE_INT64_N":
+                    return "Числовой";
+                default: return "";
+            }
+        }
+        public static string GetControlTypeDisplay(int type)
+        {
+            switch (type)
+            {
+                case 0:
+                    return "Измеряемый";
+                case 1:
+                    return "Визуальный";
+                case 2:
                     return "Числовой";
                 default: return "";
             }

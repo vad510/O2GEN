@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace O2GEN.Models
 {
@@ -51,5 +48,8 @@ namespace O2GEN.Models
 
         [DisplayName("Подразделение")]
         public string Department { get; set; }
+
+        [DisplayName("Подразделение")]
+        public int? DepartmentID { get; set; }
     }
 }

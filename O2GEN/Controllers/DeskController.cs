@@ -15,32 +15,6 @@ namespace O2GEN.Controllers
 
         public IActionResult Objects()
         {
-            //ObjectListModel obj = new();
-
-            //for (var i = 0; i < 3; i++)
-            //{
-            //    ObjectHeadModels headModel = new()
-            //    {
-            //        ObjectName = "Head",
-            //        Description = "1",
-            //        Edit = "",
-            //        IndexMaximo = "1",
-            //        Status = "1",
-            //    };
-
-            //    for (var j = 0; j < 3; j++)
-            //    {
-            //        ObjectModel objectModel = new ObjectModel
-            //        {
-            //            Name = "name",
-            //        };
-            //        headModel.ObjectModels.Add(objectModel);
-            //    }
-
-            //    obj.ObjectHeadModels.Add(headModel);
-            //}
-
-
             ViewBag.Objects = Helpers.DBHelper.GetAssets(_logger);
             return View(obj);
         }
@@ -52,115 +26,91 @@ namespace O2GEN.Controllers
         }
 
         [HttpGet]
-        public IActionResult EditObject()
+        public IActionResult ObjectEdit(int id)
         {
+            var res = Helpers.DBHelper.GetAssets(id, _logger);
+            if (res != null) return PartialView("ObjectEdit", res);
             return View();
         }
 
 
         public IActionResult EmployeeCategory()
         {
-            //EmployeeCategoryList categoryList = new();
-
-            //for (var i = 0; i < 3; i++)
-            //{
-            //    categoryList.EmployeeCategroys.Add(new EmployeeCategroyModel
-            //    {
-            //        Name = i.ToString()
-            //    });
-            //}
-
-
             ViewBag.EmployeeCategories = Helpers.DBHelper.GetPersonCategories(_logger);
-
+            return View();
+        }
+        [HttpGet]
+        public IActionResult EmployeeCategoryEdit(int id)
+        {
+            var res = Helpers.DBHelper.GetPersonCategory(id, _logger);
+            if (res != null) return PartialView("EmployeeCategoryEdit", res);
             return View();
         }
 
         public IActionResult EmployeePosition()
         {
-            //EmployeeCategoryList categoryList = new();
-
-            //for (var i = 0; i < 3; i++)
-            //{
-            //    categoryList.EmployeeCategroys.Add(new EmployeeCategroyModel
-            //    {
-            //        Name = i.ToString()
-            //    });
-            //}
-
-
             ViewBag.EmployeePositions = Helpers.DBHelper.GetPersonPositions(_logger);
+            return View();
+        }
+        [HttpGet]
+        public IActionResult EmployeePositionEdit(int id)
+        {
+            var res = Helpers.DBHelper.GetPersonPosition(id, _logger);
+            if (res != null) return PartialView("EmployeePositionEdit", res);
             return View();
         }
 
         public IActionResult ObjectClass()
         {
-            //EmployeeCategoryList categoryList = new();
-
-            //for (var i = 0; i < 3; i++)
-            //{
-            //    categoryList.EmployeeCategroys.Add(new EmployeeCategroyModel
-            //    {
-            //        Name = i.ToString()
-            //    });
-            //}
-
-
             ViewBag.ObjectClasses = Helpers.DBHelper.GetAssetClasses(_logger);
+            return View();
+        }
+        [HttpGet]
+        public IActionResult ObjectClassEdit(int id)
+        {
+            var res = Helpers.DBHelper.GetAssetClass(id, _logger);
+            if (res != null) return PartialView("ObjectClassEdit", res);
             return View();
         }
 
         public IActionResult Route()
         {
-            //RouteListModel rt = new();
-
-            //for (var i = 0; i < 3; i++)
-            //{
-            //    rt.RouteModels.Add(new RouteModel
-            //    {
-            //        Name = i.ToString(),
-            //        SubDivision = i.ToString()
-            //    });
-            //}
-
-
             ViewBag.Routes = Helpers.DBHelper.GetAssetParameterSets(_logger);
+            return View();
+        }
+        [HttpGet]
+        public IActionResult RouteEdit(int id)
+        {
+            var res = Helpers.DBHelper.GetAssetParameterSet(id, _logger);
+            if (res != null) return PartialView("RouteEdit", res);
             return View();
         }
 
         public IActionResult Controls()
         {
-            //ControlListModel clm = new();
-
-            //for (var i = 0; i < 3; i++)
-            //{
-            //    clm.ControlModels.Add(new ControlModel
-            //    {
-            //        Name = i.ToString(),
-            //        Type = i.ToString()
-            //    });
-            //}
-
-
             ViewBag.Controls = Helpers.DBHelper.GetControls(_logger);
+            return View();
+        }
+        [HttpGet]
+        public IActionResult ControlEdit(int id)
+        {
+            var res = Helpers.DBHelper.GetControl(id, _logger);
+            if (res != null) return PartialView("ControlEdit", res);
             return View();
         }
 
         public IActionResult TOTypes()
         {
-            //TOTypeListModel clm = new();
-
-            //for (var i = 0; i < 3; i++)
-            //{
-            //    clm.TOTypes.Add(new TOTypeModel
-            //    {
-            //        Name = i.ToString(),
-            //        VisibleName = i.ToString()
-            //    });
-            //}
-
-
             ViewBag.TOTypes = Helpers.DBHelper.GetTOTypes(_logger);
+            return View();
+        }
+        [HttpGet]
+        public IActionResult TOTypeEdit(int id)
+        {
+            var res = Helpers.DBHelper.GetTOType(id, _logger);
+
+            if (res != null)
+                return PartialView("TOTypeEdit", res);
             return View();
         }
 

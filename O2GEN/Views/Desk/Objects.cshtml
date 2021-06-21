@@ -4,6 +4,7 @@
 }
 <section class="component-section">
 
+    <div id="placeholder"></div>
     <div class="row-container-left bg-blue with-padding">
         <button class="transparent-btn">
             <i class="fa fa-plus color-white"></i>
@@ -41,7 +42,7 @@
 
                     <th>
                         <p>
-                            
+
                         </p>
                     </th>
 
@@ -61,7 +62,7 @@
                                         {
                                             foreach (var md in item.Childs)
                                             {
-                                            <li>@md.DisplayName</li>
+                                                <li>@md.DisplayName</li>
                                             }
                                         }
                                     </ul>
@@ -83,9 +84,9 @@
 
                         <td>
                             <div class="fa-container-links-centered">
-                                <a href="#">
+                                <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#ObjectEdit" data-url="@Url.Action("ObjectEdit", new { id = item.Id })">
                                     <i class="fa fa-pen"></i>
-                                </a>
+                                </button>
                                 <a href="#">
                                     <i class="fa fa-trash"></i>
                                 </a>

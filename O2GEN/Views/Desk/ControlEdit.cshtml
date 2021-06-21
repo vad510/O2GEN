@@ -1,6 +1,6 @@
-﻿@model O2GEN.Models.Department
+﻿@model O2GEN.Models.Control
 
-<div class="modal fade" id="DepartmentsEdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade" id="ControlEdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -24,49 +24,56 @@
                             <div class="row-div-two">
                                 <form action="CreateZpr">
                                     <div class="form-group">
-
-                                        <div class="margin-between-above">
-                                            <label asp-for="Name"></label>
-                                            <input asp-for="Name" class="form-control" />
-                                            <span asp-validation-for="Name" class="text-danger"></span>
-                                        </div>
                                         <div class="margin-between-above">
                                             <label asp-for="DisplayName"></label>
                                             <input asp-for="DisplayName" class="form-control" />
                                             <span asp-validation-for="DisplayName" class="text-danger"></span>
                                         </div>
                                         <div class="margin-between-above">
-                                            <label asp-for="ParentName"></label>
-                                            <input asp-for="ParentName" class="form-control" />
+                                            <label asp-for="ValueType"></label>
+                                            @*Для 1 скрыть нижнее*@
+                                            <select asp-for="ValueType" class="form-control">
+                                                <option value="0">@O2GEN.Helpers.DBHelper.GetControlTypeDisplay(0)</option>
+                                                <option value="1">@O2GEN.Helpers.DBHelper.GetControlTypeDisplay(1)</option>
+                                                <option value="2">@O2GEN.Helpers.DBHelper.GetControlTypeDisplay(2)</option>
+                                            </select>
+                                            <span asp-validation-for="DisplayName" class="text-danger"></span>
+                                        </div>
+
+                                        <label>Уставки</label>
+
+                                        <label>Норма</label>
+                                        <div class="margin-between-above">
+                                            <label asp-for="ValueBottom1"></label>
+                                            <input asp-for="ValueBottom1" class="form-control" />
                                         </div>
                                         <div class="margin-between-above">
-                                            <label asp-for="Organization"></label>
-                                            <input asp-for="Organization" class="form-control" />
+                                            <label asp-for="ValueTop1"></label>
+                                            <input asp-for="ValueTop1" class="form-control" />
+                                        </div>
+                                        <label>Отклонение:</label>
+                                        <div class="margin-between-above">
+                                            <label asp-for="ValueBottom2"></label>
+                                            <input asp-for="ValueBottom2" class="form-control" />
                                         </div>
                                         <div class="margin-between-above">
-                                            <label asp-for="Latitude"></label>
-                                            <input asp-for="Latitude" class="form-control" />
+                                            <label asp-for="ValueTop2"></label>
+                                            <input asp-for="ValueTop2" class="form-control" />
+                                        </div>
+                                        <label>Сильное отклонение:</label>
+                                        <div class="margin-between-above">
+                                            <label asp-for="ValueBottom3"></label>
+                                            <input asp-for="ValueBottom3" class="form-control" />
                                         </div>
                                         <div class="margin-between-above">
-                                            <label asp-for="Longitude"></label>
-                                            <input asp-for="Longitude" class="form-control" />
-                                        </div>
-                                        <div class="margin-between-above">
-                                            <label asp-for="TimeZone"></label>
-                                            <input asp-for="TimeZone" class="form-control" />
-                                        </div>
-                                        <div class="margin-between-above">
-                                            <label asp-for="ShortCode"></label>
-                                            <input asp-for="ShortCode" class="form-control" />
+                                            <label asp-for="ValueTop3"></label>
+                                            <input asp-for="ValueTop3" class="form-control" />
                                         </div>
                                     </div>
                                 </form>
                             </div>
                         </div>
-
                     </div>
-
-
                 </div>
             </div>
             <div class="modal-footer">

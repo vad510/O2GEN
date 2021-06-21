@@ -62,18 +62,23 @@
 
                             <div class="row-div-two">
                                 <div class="margin-between-above">
-                                    <label asp-for="StatusName"></label>
+                                    <label asp-for="StatusId"></label>
                                     <select asp-for="StatusId" class="form-control">
-                                        <option value="1">Создан</option>
-                                        <option value="2">Начат</option>
-                                        <option value="3">Завершен</option>
-                                        <option value="4">Остановлен</option>
+                                        @foreach (SCStatus item in O2GEN.Helpers.DBHelper.GetSCStatuses())
+                                        {
+                                            <option value="@item.Id">@item.DisplayName</option>
+                                        }
                                     </select>
                                 </div>
 
                                 <div class="margin-between-above">
-                                    <label asp-for="Department"></label>
-                                    <input asp-for="Department" class="form-control" />
+                                    <label asp-for="DepartmentID"></label>
+                                    <select asp-for="DepartmentID" class="form-control">
+                                        @foreach (Department item in O2GEN.Helpers.DBHelper.GetDepartments())
+                                        {
+                                            <option value="@item.Id">@item.DisplayName</option>
+                                        }
+                                    </select>
                                 </div>
 
                                 <div class="margin-between-above">

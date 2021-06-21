@@ -4,14 +4,13 @@ using System.ComponentModel;
 namespace O2GEN.Models
 {
     /// <summary>
-    /// Классы объектов
+    /// Должность
     /// </summary>
-    public class AssetClass
+    public class Calendar
     {
         public int Id { get; set; }
-
         [DisplayName("Название")]
-        public string DisplayName { get; set; }
+        public string Title { get; set; }
         public Guid ObjectUID { get; set; }
     }
 }

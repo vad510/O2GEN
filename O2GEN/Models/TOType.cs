@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace O2GEN.Models
 {
@@ -10,9 +8,15 @@ namespace O2GEN.Models
     /// </summary>
     public class TOType
     {
-        public int Id { get; set; }
+        public int Id { get; set; } = -1;
+
+        [DisplayName("Название")]
         public string Name { get; set; }
+
+        [DisplayName("Отображаемое название")]
         public string DisplayName { get; set; }
+
+        [DisplayName("Идентификатор объекта")]
         public Guid ObjectUID { get; set; }
     }
 }

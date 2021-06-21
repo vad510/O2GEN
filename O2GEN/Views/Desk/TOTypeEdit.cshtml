@@ -1,6 +1,6 @@
-﻿@model O2GEN.Models.Department
+﻿@model O2GEN.Models.TOType
 
-<div class="modal fade" id="DepartmentsEdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade" id="TOTypeEdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -35,29 +35,10 @@
                                             <input asp-for="DisplayName" class="form-control" />
                                             <span asp-validation-for="DisplayName" class="text-danger"></span>
                                         </div>
+                                        @*Стоит ли это редактировать?*@
                                         <div class="margin-between-above">
-                                            <label asp-for="ParentName"></label>
-                                            <input asp-for="ParentName" class="form-control" />
-                                        </div>
-                                        <div class="margin-between-above">
-                                            <label asp-for="Organization"></label>
-                                            <input asp-for="Organization" class="form-control" />
-                                        </div>
-                                        <div class="margin-between-above">
-                                            <label asp-for="Latitude"></label>
-                                            <input asp-for="Latitude" class="form-control" />
-                                        </div>
-                                        <div class="margin-between-above">
-                                            <label asp-for="Longitude"></label>
-                                            <input asp-for="Longitude" class="form-control" />
-                                        </div>
-                                        <div class="margin-between-above">
-                                            <label asp-for="TimeZone"></label>
-                                            <input asp-for="TimeZone" class="form-control" />
-                                        </div>
-                                        <div class="margin-between-above">
-                                            <label asp-for="ShortCode"></label>
-                                            <input asp-for="ShortCode" class="form-control" />
+                                            <label asp-for="ObjectUID"></label>
+                                            <input asp-for="ObjectUID" class="form-control" />
                                         </div>
                                     </div>
                                 </form>
