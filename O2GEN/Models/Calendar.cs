@@ -8,7 +8,7 @@ namespace O2GEN.Models
     /// </summary>
     public class Calendar
     {
-        public int Id { get; set; }
+        public int Id { get; set; } = -1;
         [DisplayName("Название")]
         public string Title { get; set; }
         public Guid ObjectUID { get; set; }

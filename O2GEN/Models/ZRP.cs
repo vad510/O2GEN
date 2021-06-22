@@ -6,7 +6,7 @@ namespace O2GEN.Models
 
     public class ZRP
     {
-        public int Id { get; set; }
+        public int Id { get; set; } = -1;
         /// <summary>
         /// Дата начала
         /// </summary>

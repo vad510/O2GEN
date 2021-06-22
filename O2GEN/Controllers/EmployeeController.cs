@@ -54,6 +54,12 @@ namespace O2GEN.Controllers
             return View(_employeeListModels);
         }
         [HttpGet]
+        public IActionResult EngineerCreate()
+        {
+            O2GEN.Models.Engineer model = new();
+            return PartialView("EngineerEdit", model);
+        }
+        [HttpGet]
         public IActionResult EngineerEdit(int id)
         {
             var res = Helpers.DBHelper.GetEngineer(id, _logger);
@@ -82,6 +88,12 @@ namespace O2GEN.Controllers
         {
             ViewBag.Departments = Helpers.DBHelper.GetResources(_logger);
             return View();
+        }
+        [HttpGet]
+        public IActionResult ResourceCreate()
+        {
+            O2GEN.Models.Resource model = new();
+            return PartialView("ResourceEdit", model);
         }
         [HttpGet]
         public IActionResult ResourceEdit(int id)

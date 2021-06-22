@@ -19,10 +19,12 @@ namespace O2GEN.Controllers
             return View(obj);
         }
 
+
         [HttpGet]
-        public IActionResult CreateObject()
+        public IActionResult ObjectCreate()
         {
-            return View();
+            O2GEN.Models.Asset model = new();
+            return PartialView("ObjectEdit", model);
         }
 
         [HttpGet]
@@ -40,6 +42,12 @@ namespace O2GEN.Controllers
             return View();
         }
         [HttpGet]
+        public IActionResult EmployeeCategoryCreate()
+        {
+            O2GEN.Models.PersonCategory model = new();
+            return PartialView("EmployeeCategoryEdit", model);
+        }
+        [HttpGet]
         public IActionResult EmployeeCategoryEdit(int id)
         {
             var res = Helpers.DBHelper.GetPersonCategory(id, _logger);
@@ -51,6 +59,12 @@ namespace O2GEN.Controllers
         {
             ViewBag.EmployeePositions = Helpers.DBHelper.GetPersonPositions(_logger);
             return View();
+        }
+        [HttpGet]
+        public IActionResult mployeePositionCreate()
+        {
+            O2GEN.Models.PersonPosition model = new();
+            return PartialView("EmployeePositionEdit", model);
         }
         [HttpGet]
         public IActionResult EmployeePositionEdit(int id)
@@ -66,6 +80,12 @@ namespace O2GEN.Controllers
             return View();
         }
         [HttpGet]
+        public IActionResult ObjectClassCreate()
+        {
+            O2GEN.Models.AssetClass model = new();
+            return PartialView("ObjectClassEdit", model);
+        }
+        [HttpGet]
         public IActionResult ObjectClassEdit(int id)
         {
             var res = Helpers.DBHelper.GetAssetClass(id, _logger);
@@ -77,6 +97,12 @@ namespace O2GEN.Controllers
         {
             ViewBag.Routes = Helpers.DBHelper.GetAssetParameterSets(_logger);
             return View();
+        }
+        [HttpGet]
+        public IActionResult RouteCreate()
+        {
+            O2GEN.Models.AssetParameterSet model = new();
+            return PartialView("RouteEdit", model);
         }
         [HttpGet]
         public IActionResult RouteEdit(int id)
@@ -92,6 +118,12 @@ namespace O2GEN.Controllers
             return View();
         }
         [HttpGet]
+        public IActionResult ControlsCreate()
+        {
+            O2GEN.Models.Control model = new();
+            return PartialView("ControlEdit", model);
+        }
+        [HttpGet]
         public IActionResult ControlEdit(int id)
         {
             var res = Helpers.DBHelper.GetControl(id, _logger);
@@ -103,6 +135,12 @@ namespace O2GEN.Controllers
         {
             ViewBag.TOTypes = Helpers.DBHelper.GetTOTypes(_logger);
             return View();
+        }
+        [HttpGet]
+        public IActionResult TOTypeCreate()
+        {
+            O2GEN.Models.TOType model = new();
+            return PartialView("TOTypeEdit", model);
         }
         [HttpGet]
         public IActionResult TOTypeEdit(int id)
@@ -118,6 +156,12 @@ namespace O2GEN.Controllers
         {
             ViewBag.Departments = Helpers.DBHelper.GetDepartments(_logger);
             return View();
+        }
+        [HttpGet]
+        public IActionResult DepartmentsCreate()
+        {
+            O2GEN.Models.Department model = new();
+            return PartialView("DepartmentEdit", model);
         }
 
         [HttpGet]

@@ -8,7 +8,7 @@ namespace O2GEN.Models
     /// </summary>
     public class Engineer
     {
-        public int Id { get; set; }
+        public int Id { get; set; } = -1;
         [DisplayName("Фамилия")]
         public string Surname { get; set; }
         [DisplayName("Имя")]

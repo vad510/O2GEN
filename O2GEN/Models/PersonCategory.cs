@@ -8,7 +8,7 @@ namespace O2GEN.Models
     /// </summary>
     public class PersonCategory
     {
-        public int Id { get; set; }
+        public int Id { get; set; } = -1;
         [DisplayName("Название")]
         public string Name { get; set; }
         [DisplayName("Отображаемое название")]

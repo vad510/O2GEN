@@ -8,7 +8,7 @@ namespace O2GEN.Models
     /// </summary>
     public class Resource
     {
-        public int Id { get; set; }
+        public int Id { get; set; } = -1;
         [DisplayName("ФИО (Название)")]
         public string DisplayName { get; set; }
         public Guid ObjectUID { get; set; }

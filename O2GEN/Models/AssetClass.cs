@@ -8,7 +8,7 @@ namespace O2GEN.Models
     /// </summary>
     public class AssetClass
     {
-        public int Id { get; set; }
+        public int Id { get; set; } = -1;
 
         [DisplayName("Название")]
         public string DisplayName { get; set; }
