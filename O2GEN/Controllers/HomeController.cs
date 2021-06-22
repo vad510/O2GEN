@@ -40,21 +40,18 @@ namespace O2GEN.Controllers
         #endregion
 
         [HttpGet]
-        public IActionResult CreateZpr()
+        public IActionResult ZRPCreate()
         {
-            ZprTakenModel zprTakenModel = new();
-
-            return PartialView("_ZprCreate", zprTakenModel);
+            ZRP model = new();
+            return PartialView("ZRPEdit", model);
         }
 
         [HttpGet]
-        public IActionResult EditZpr(int id)
+        public IActionResult ZRPEdit(int id)
         {
             var res = Helpers.DBHelper.GetZRP(id, _logger);
-
             if (res != null)
-                return PartialView("_ZprEdit", res);
-
+                return PartialView("ZRPEdit", res);
             return View();
         }
 

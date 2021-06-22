@@ -1,10 +1,17 @@
 ﻿@model O2GEN.Models.ZRP
 
-<div class="modal fade" id="editZpr" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade" id="ZRPEdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5>Обход #@Model.Id</h5>
+                @if (Model.Id == -1)
+                {
+                    <h5>Новая запись</h5>
+                }
+                else
+                {
+                    <h5>Обход #@Model.Id</h5>
+                }
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body">
@@ -34,16 +41,17 @@
 
                                         <div class="margin-between-above">
                                             <label asp-for="RouteName"></label>
-                                            <input asp-for="RouteName" class="form-control"/>
+                                            <input asp-for="RouteName" class="form-control" />
                                             <span asp-validation-for="RouteName" class="text-danger"></span>
                                         </div>
 
                                         <div class="margin-between-above">
-                                            <label asp-for="TypeName"></label>
+                                            <label asp-for="TypeId"></label>
                                             <select asp-for="TypeId" class="form-control">
-                                                <option>Плановое</option>
-                                                <option>Внеплановое</option>
-                                                <option>Аварийное</option>
+                                                @foreach (SCTypes item in O2GEN.Helpers.DBHelper.GetSCTypes())
+                                                {
+                                                    <option value="@item.Id">@item.DisplayName</option>
+                                                }
                                             </select>
                                         </div>
 
@@ -52,9 +60,15 @@
                                             <input asp-for="StartTime" class="form-control" />
                                         </div>
 
+
                                         <div class="margin-between-above">
-                                            <label asp-for="ResName"></label>
-                                            <input asp-for="ResName" class="form-control" />
+                                            <label asp-for="ResourceId"></label>
+                                            <select asp-for="ResourceId" class="form-control">
+                                                @foreach (Resource item in O2GEN.Helpers.DBHelper.GetResources())
+                                                {
+                                                    <option value="@item.Id">@item.DisplayName</option>
+                                                }
+                                            </select>
                                         </div>
                                     </div>
                                 </form>
@@ -74,7 +88,7 @@
                                 <div class="margin-between-above">
                                     <label asp-for="DepartmentID"></label>
                                     <select asp-for="DepartmentID" class="form-control">
-                                        @foreach (Department item in O2GEN.Helpers.DBHelper.GetDepartments())
+                                        @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments())
                                         {
                                             <option value="@item.Id">@item.DisplayName</option>
                                         }

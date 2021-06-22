@@ -154,7 +154,7 @@ namespace O2GEN.Controllers
 
         public IActionResult Departments()
         {
-            ViewBag.Departments = Helpers.DBHelper.GetDepartments(_logger);
+            ViewBag.Departments = Helpers.DBHelper.GetDepartments(logger: _logger);
             return View();
         }
         [HttpGet]

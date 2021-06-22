@@ -20,6 +20,8 @@ namespace O2GEN.Models
         public Guid ObjectUID { get; set; }
         [DisplayName("Родительский объект")]
         public int? ParentId { get; set; }
+        [DisplayName("Класс объектов")]
+        public int? AssetTypeId { get; set; } = null;
         [DisplayName("Тип объекта")]
         public int? TypeID { get; set; }
         [DisplayName("Подразделение")]

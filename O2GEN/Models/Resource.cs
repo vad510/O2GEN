@@ -22,7 +22,7 @@ namespace O2GEN.Models
         public int? ResourceTypeId { get; set; }
         [DisplayName("Состояние ресурса")]
         public int? ResourceStateId { get; set; }
-        [DisplayName("Участок")]
+        [DisplayName("Подразделение")]
         public int? DepartmentId { get; set; }
     }
 }

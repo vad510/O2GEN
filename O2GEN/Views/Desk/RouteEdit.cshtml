@@ -33,7 +33,7 @@
                                         <div class="margin-between-above">
                                             <label asp-for="DepartmentID"></label>
                                             <select asp-for="DepartmentID" class="form-control">
-                                                @foreach (Department item in O2GEN.Helpers.DBHelper.GetDepartments())
+                                                @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments())
                                                 {
                                                     <option value="@item.Id">@item.DisplayName</option>
                                                 }

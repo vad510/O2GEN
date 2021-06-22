@@ -11,12 +11,12 @@ namespace O2GEN.Models
         /// Дата начала
         /// </summary>
         [DisplayName("Дата начала (план)")]
-        public DateTime StartTime { get; set; }
+        public DateTime StartTime { get; set; } = DateTime.Now.Date;
         /// <summary>
         /// Дата  окончания
         /// </summary>
         [DisplayName("Дата окончания (план)")]
-        public DateTime EndTime { get; set; }
+        public DateTime EndTime { get; set; } = DateTime.Now.Date.AddDays(1);
         public int ObjId { get; set; }
         /// <summary>
         /// Тип оборудования
@@ -45,6 +45,8 @@ namespace O2GEN.Models
         /// </summary>
         [DisplayName("Обходчик")]
         public string ResName { get; set; }
+        [DisplayName("Обходчик")]
+        public int? ResourceId { get; set; }
 
         [DisplayName("Подразделение")]
         public string Department { get; set; }

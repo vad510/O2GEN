@@ -44,7 +44,7 @@
             <div class="row-container-left bg-blue">
                 <ul class="ul-list-left-aligned">
                     <li class="li-text-white">
-                        <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#addZpr" data-url="@Url.Action("CreateZpr")">
+                        <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPCreate")">
                             <i class="fa fa-plus color-white"></i>
                             <p class="color-white">Создать</p>
                         </button>
@@ -105,7 +105,7 @@
                             <td><p> </p></td>
                             <td>
                                 <div class="row-container">
-                                    <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#editZpr" data-url="@Url.Action("EditZpr", new { id = item.Id })">
+                                    <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPEdit", new { id = item.Id })">
                                         <i class="fa fa-pen"></i>
                                     </button>
                                     <button class="transparent-btn">
