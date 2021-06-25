@@ -39,10 +39,12 @@ var ready = function (action) {
         action();
     else
         document.addEventListener("DOMContentLoaded", action);
+    console.log("ready created");
 };
 ready(function () {
     var elems = document.querySelectorAll('[data-toggle="modal-toggler"]');
     for (var i = 0; i < elems.length; i++) {
+        console.log("buttons founded: " + i);
         elems[i].addEventListener('click', btnClick);
     }
 });
@@ -51,51 +53,52 @@ function btnClick() {
         return;
     var placeholder = document.getElementById("placeholder");
     if (placeholder == undefined) {
-        console.log("could not find element with id=placeholder");
         return;
     }
     var url = this.getAttribute("data-url");
-    getData(url)
-        .then(function (response) {
-        if (response == null)
-            return;
-        placeholder.innerHTML = response;
-        var div = placeholder.querySelector(".modal");
-        var modal = new bootstrap.Modal(div);
-        modal.show();
-    })
-        .catch(function (error) {
-        console.log(error);
-    });
+    if (self.fetch) {
+        getDataWithFetch(url).then(function (response) {
+            tryCreateModal(placeholder, response);
+        });
+    }
+    else {
+        getDataWithXmlHttpRequest(url, tryCreateModal, placeholder);
+    }
 }
-function getData(url) {
+function getDataWithFetch(url) {
     return __awaiter(this, void 0, void 0, function () {
-        var response, xhr;
+        var response;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0:
-                    if (!self.fetch) return [3, 4];
-                    return [4, fetch(url)];
+                case 0: return [4, fetch(url)];
                 case 1:
                     response = _a.sent();
                     if (!response.ok) return [3, 3];
                     return [4, response.text()];
                 case 2: return [2, _a.sent()];
-                case 3: return [3, 5];
-                case 4:
-                    xhr = new XMLHttpRequest();
-                    xhr.onload = function (e) {
-                        return this.responseText;
-                    };
-                    xhr.onerror = function (e) {
-                        console.log(e);
-                    };
-                    xhr.open('get', url);
-                    xhr.send();
-                    _a.label = 5;
-                case 5: return [2, null];
+                case 3: return [2];
             }
         });
     });
+}
+function getDataWithXmlHttpRequest(url, callback, placeholder) {
+    var xhr = new XMLHttpRequest();
+    xhr.onloadstart = function (e) {
+        xhr.responseType = 'json';
+    };
+    xhr.onload = function (e) {
+        callback(placeholder, xhr.responseText);
+    };
+    xhr.onerror = function (e) {
+        console.log(e);
+    };
+    xhr.open('get', url);
+    xhr.send();
+}
+function tryCreateModal(placeholder, response) {
+    placeholder.innerHTML = response;
+    var div = placeholder.querySelector(".modal");
+    var modal = new bootstrap.Modal(div);
+    modal.show();
 }
 //# sourceMappingURL=vlvscript.js.map

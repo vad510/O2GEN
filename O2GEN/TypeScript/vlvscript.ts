@@ -4,12 +4,13 @@
 
 /*
  * this function gets callback as a parameter and firing it whenever page is loaded
- */ 
+ */
 let ready = (action) => {
     if (document.readyState != "loading")
         action();
     else
         document.addEventListener("DOMContentLoaded", action);
+    console.log("ready created");
 }
 
 /*
@@ -20,14 +21,15 @@ ready(() => {
     let elems = document.querySelectorAll('[data-toggle="modal-toggler"]')
 
     for (var i = 0; i < elems.length; i++) {
+        console.log("buttons founded: " + i)
         elems[i].addEventListener('click', btnClick);
     }
 });
 
 /*
- * 'onclick function for button with attibute 'modal-toggler'
- * attempts to fetch data from server (as partial view) and place it onto
- * #placeholder div element.
+  'onclick function for button with attibute 'modal-toggler'
+   attempts to fetch data from server (as partial view) and place it onto
+   #placeholder div element.
  */
 function btnClick(this: HTMLButtonElement) {
 
@@ -38,28 +40,24 @@ function btnClick(this: HTMLButtonElement) {
     var placeholder = document.getElementById("placeholder");
 
     if (placeholder == undefined) {
-        console.log("could not find element with id=placeholder");
         return;
     }
 
     var url: string = this.getAttribute("data-url");
 
-    getData(url)
-        .then(response => {
+    // this self.fetch - determines if browser supports Promise.
+    // IE does not.
+    if (self.fetch) {
 
-            if (response == null)
-                return;
-
-            //console.log(response);
-            placeholder.innerHTML = response;
-
-            let div: HTMLDivElement = placeholder.querySelector(".modal");
-            let modal = new bootstrap.Modal(div);
-            modal.show();
-        })
-        .catch(error => {
-            console.log(error);
-        })
+        // is this call actualy async?
+        getDataWithFetch(url).then(response => {
+            tryCreateModal(placeholder, response);
+        });
+    }
+    else {
+        // and this?
+        getDataWithXmlHttpRequest(url, tryCreateModal, placeholder);
+    }
 }
 
 /*
@@ -67,35 +65,52 @@ function btnClick(this: HTMLButtonElement) {
  * should use credentials: 'include' options in future
  * look for options here https://developer.mozilla.org/ru/docs/Web/API/Fetch_API/Using_Fetch
  */
-async function getData(url: string) {
+async function getDataWithFetch(url: string) {
 
-    // helper to determine if fetch request is allowed in current browser
-    if (self.fetch) {
+    const response = await fetch(url);
 
-        // here we also can get error 
-        // so possible wrap with try/catch
-        // also have no support in IE
-        const response = await fetch(url);
+    if (response.ok)
+        return await response.text();
+}
 
-        if (response.ok)
-            return await response.text();
-    }
-    else {
-        // for IE
-        var xhr = new XMLHttpRequest();
+/*
+ This method used for creates xmlHttpRequest for Internet Explorer.
+ params:
+    url: where to make request
+    callback: function which accepts HtmlElement and response to insert into that HtmlElement. This one calls whenever xhr got response
+    placeholder: element in which response should be pasted
+ */
+function getDataWithXmlHttpRequest(url: string, callback: (placeholder: HTMLElement, text: string) => void, placeholder: HTMLElement) {
 
-        xhr.onload = function (e) {
-            return this.responseText;
-        }
+    var xhr = new XMLHttpRequest();
 
-        xhr.onerror = function (e) {
-            console.log(e);
-        }
-
-        xhr.open('get', url);
-        xhr.send();
+    xhr.onloadstart = function (e) {
+        xhr.responseType = 'json';
     }
 
-    return null;
+    xhr.onload = function (e) {
+        callback(placeholder, xhr.responseText);
+    }
+
+    xhr.onerror = function (e) {
+        console.log(e);
+    }
+
+    xhr.open('get', url);
+    xhr.send();
+}
+
+/*
+ Creates modal for provided htmlElement (here I use <div> with #id == placeholder)
+ and response as planty HTML for insert into placeholder.
+ */
+function tryCreateModal(placeholder: HTMLElement, response: string) {
+
+    placeholder.innerHTML = response;
+
+    let div: HTMLDivElement = placeholder.querySelector(".modal");
+
+    let modal = new bootstrap.Modal(div);
+    modal.show();
 }
 

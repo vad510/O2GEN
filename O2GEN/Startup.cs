@@ -34,7 +34,7 @@ namespace O2GEN
             {
                 app.UseDeveloperExceptionPage();
 
-                app.UseHttpsRedirection();
+                //app.UseHttpsRedirection();
                 app.UseStaticFiles();
 
                 app.UseRouting();

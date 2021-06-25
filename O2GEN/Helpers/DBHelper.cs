@@ -4,10 +4,6 @@ using O2GEN.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Data.SqlClient;
-using System.Globalization;
 using System.Diagnostics;
 
 namespace O2GEN.Helpers
@@ -15,8 +11,13 @@ namespace O2GEN.Helpers
     public static class DBHelper
     {
         private static string DBConnection = $"Data Source={(Environment.UserName == "Michael"? "DESKTOP-JFNR95O\\SQLEXPRESS" : "DESKTOP-A17N4G7\\SQLEXPRESS01")};Initial Catalog=UFMDBLUK;Integrated Security=SSPI;";
+        //private static string DBConnection = "Data Source=10.201.192.241;Initial Catalog=UFMDBLUK;User ID=sa;Password=Zz123456789;";
+
         private static string GetConnectionString()
         {
+            //if (Environment.UserName == "E")
+            //    return string.Empty;
+            
             return DBConnection;
         }
 
