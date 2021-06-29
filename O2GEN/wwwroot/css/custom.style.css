@@ -134,12 +134,12 @@ input:-webkit-autofill:focus {
 
 .row-col-70 {
   float: left;
-  width: 69%;
+  width: 79%;
   padding: 5px; }
 
 .row-col-40 {
   float: left;
-  width: 39%;
+  width: 19%;
   padding: 5px; }
 
 .content-div {
@@ -259,7 +259,7 @@ input:-webkit-autofill:focus {
 .no-left-margin {
   margin-left: 0px; }
 
-@media screen and (max-width: 1200px) {
+@media screen and (max-width: 1000px) {
   .row-container {
     flex-direction: column;
     justify-content: center;

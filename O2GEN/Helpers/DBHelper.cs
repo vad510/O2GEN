@@ -431,10 +431,19 @@ namespace O2GEN.Helpers
         #region ЗРП
         public static List<ZRP> GetZRP(DateTime From, DateTime To, ILogger logger, int status = -1)
         {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
             List<ZRP> output = new List<ZRP>();
+
             try
             {
-                using (var connection = new SqlConnection(GetConnectionString()))
+                using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
                     using (var command = new SqlCommand(GetZRP(From, To, status), connection))
@@ -470,12 +479,22 @@ namespace O2GEN.Helpers
             }
             return output;
         }
+
         public static ZRP GetZRP(int ID, ILogger logger)
         {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
             ZRP output = new ZRP();
+
             try
             {
-                using (var connection = new SqlConnection(GetConnectionString()))
+                using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
                     using (var command = new SqlCommand(GetZRP(ID), connection))
@@ -522,12 +541,21 @@ namespace O2GEN.Helpers
         /// </summary>
         /// <param name="logger"></param>
         /// <returns></returns>
-        public static List<Models.Calendar> GetCalendars(ILogger logger = null)
+        public static List<Calendar> GetCalendars(ILogger logger = null)
         {
-            List<Models.Calendar> output = new List<Models.Calendar>();
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
+            List<Calendar> output = new List<Calendar>();
+
             try
             {
-                using (var connection = new SqlConnection(GetConnectionString()))
+                using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
                     using (var command = new SqlCommand(SelectCalendars(), connection))
@@ -556,6 +584,7 @@ namespace O2GEN.Helpers
             return output;
         }
         #endregion
+
         #region Статусы
         /// <summary>
         /// Календари
@@ -564,10 +593,19 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         public static List<SCStatus> GetSCStatuses(ILogger logger = null)
         {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
             List<SCStatus> output = new List<SCStatus>();
+
             try
             {
-                using (var connection = new SqlConnection(GetConnectionString()))
+                using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
                     using (var command = new SqlCommand(SelectSCStatuses(), connection))
@@ -605,10 +643,19 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         public static List<SCTypes> GetSCTypes(ILogger logger = null)
         {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
             List<SCTypes> output = new List<SCTypes>();
+
             try
             {
-                using (var connection = new SqlConnection(GetConnectionString()))
+                using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
                     using (var command = new SqlCommand(SelectSCTypes(), connection))
@@ -637,6 +684,7 @@ namespace O2GEN.Helpers
             return output;
         }
         #endregion
+
         #region Типы ТО
         /// <summary>
         /// Типы ТО
@@ -645,10 +693,19 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         public static List<TOType> GetTOTypes(ILogger logger)
         {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
             List<TOType> output = new List<TOType>();
+
             try
             {
-                using (var connection = new SqlConnection(GetConnectionString()))
+                using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
                     using (var command = new SqlCommand(SelectTOTypes(), connection))
@@ -721,10 +778,19 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         public static List<Control> GetControls(ILogger logger)
         {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
             List<Control> output = new List<Control>();
+
             try
             {
-                using (var connection = new SqlConnection(GetConnectionString()))
+                using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
                     using (var command = new SqlCommand(SelectControls(), connection))
@@ -806,10 +872,19 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         public static List<AssetParameterSet> GetAssetParameterSets(ILogger logger)
         {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
             List<AssetParameterSet> output = new List<AssetParameterSet>();
+
             try
             {
-                using (var connection = new SqlConnection(GetConnectionString()))
+                using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
                     using (var command = new SqlCommand(SelectAssetParameterSets(), connection))
@@ -884,10 +959,19 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         public static List<AssetClass> GetAssetClasses(ILogger logger = null )
         {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+            
             List<AssetClass> output = new List<AssetClass>();
+
             try
             {
-                using (var connection = new SqlConnection(GetConnectionString()))
+                using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
                     using (var command = new SqlCommand(SelectAssetClass(), connection))
@@ -958,10 +1042,19 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         public static List<PersonPosition> GetPersonPositions(ILogger logger  = null)
         {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
             List<PersonPosition> output = new List<PersonPosition>();
+
             try
             {
-                using (var connection = new SqlConnection(GetConnectionString()))
+                using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
                     using (var command = new SqlCommand(SelectPersonPositions(), connection))
@@ -1033,10 +1126,19 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         public static List<PersonCategory> GetPersonCategories(ILogger logger)
         {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
             List<PersonCategory> output = new List<PersonCategory>();
+
             try
             {
-                using (var connection = new SqlConnection(GetConnectionString()))
+                using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
                     using (var command = new SqlCommand(SelectPersonCategories(), connection))
@@ -1108,11 +1210,20 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         public static List<Asset> GetAssets(ILogger logger, int DeptID = -1)
         {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
             List<Asset> output = new List<Asset>();
             List<Asset> all = new List<Asset>();
+
             try
             {
-                using (var connection = new SqlConnection(GetConnectionString()))
+                using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
                     using (var command = new SqlCommand(SelectAssets(DeptID), connection))
@@ -1250,11 +1361,20 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         public static List<Department> GetDepartments(bool ClearList = false, ILogger logger = null)
         {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
             List<Department> output = new List<Department>();
             List<Department> all = new List<Department>();
+
             try
             {
-                using (var connection = new SqlConnection(GetConnectionString()))
+                using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
                     using (var command = new SqlCommand(SelectDepartments(), connection))
@@ -1392,10 +1512,18 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         public static List<Resource> GetResources(ILogger logger = null)
         {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
             List<Resource> output = new List<Resource>();
             try
             {
-                using (var connection = new SqlConnection(GetConnectionString()))
+                using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
                     using (var command = new SqlCommand(SelectResources(), connection))
@@ -1538,10 +1666,18 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         public static List<PPRole> GetPPRoles(ILogger logger)
         {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
             List<PPRole> output = new List<PPRole>();
             try
             {
-                using (var connection = new SqlConnection(GetConnectionString()))
+                using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
                     using (var command = new SqlCommand(SelectPPRoles(), connection))
@@ -1580,10 +1716,18 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         public static List<Engineer> GetEngineers(ILogger logger)
         {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
             List<Engineer> output = new List<Engineer>();
             try
             {
-                using (var connection = new SqlConnection(GetConnectionString()))
+                using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
                     using (var command = new SqlCommand(SelectEngineers(), connection))
@@ -1613,12 +1757,21 @@ namespace O2GEN.Helpers
             }
             return output;
         }
+
         public static Engineer GetEngineer(int ID, ILogger logger)
         {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
             Engineer output = new Engineer();
             try
             {
-                using (var connection = new SqlConnection(GetConnectionString()))
+                using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
                     using (var command = new SqlCommand(SelectEngineers(ID), connection))
@@ -1662,10 +1815,18 @@ namespace O2GEN.Helpers
         #region Служебные
         private static string ExecuteScalar(string commandString, ILogger logger)
         {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
             string output = "";
             try
             {
-                using (var connection = new SqlConnection(GetConnectionString()))
+                using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
                     using (var command = new SqlCommand(commandString, connection))
@@ -1683,6 +1844,7 @@ namespace O2GEN.Helpers
             }
             return output;
         }
+
         public static IEnumerable<T> Select<T>(this IDataReader reader,
                                        Func<IDataReader, T> projection)
         {
@@ -1691,6 +1853,7 @@ namespace O2GEN.Helpers
                 yield return projection(reader);
             }
         }
+
         private static string GetControlType(ControlType type)
         {
             switch (type)
@@ -1705,6 +1868,7 @@ namespace O2GEN.Helpers
                     return "";
             }
         }
+
         private static int GetControlTypeIndex(string type)
         {
             switch (type)
@@ -1718,6 +1882,7 @@ namespace O2GEN.Helpers
                 default: return -1;
             }
         }
+
         private static string GetControlTypeDisplay(string type)
         {
             switch (type.Trim())
@@ -1731,6 +1896,7 @@ namespace O2GEN.Helpers
                 default: return "";
             }
         }
+
         public static string GetControlTypeDisplay(int type)
         {
             switch (type)
