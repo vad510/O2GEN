@@ -1281,10 +1281,18 @@ namespace O2GEN.Helpers
 
         public static Asset GetAssets(int ID, ILogger logger)
         {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
             Asset output = new Asset();
             try
             {
-                using (var connection = new SqlConnection(GetConnectionString()))
+                using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
                     using (var command = new SqlCommand(SelectAsset(ID), connection))
@@ -1320,10 +1328,18 @@ namespace O2GEN.Helpers
         }
         public static List<AssetType> GetAssetTypes(ILogger logger = null)
         {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
             List<AssetType> output = new List<AssetType>();
             try
             {
-                using (var connection = new SqlConnection(GetConnectionString()))
+                using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
                     using (var command = new SqlCommand(SelectAssetTypes(), connection))
@@ -1428,10 +1444,18 @@ namespace O2GEN.Helpers
 
         public static List<Department> GetChildDepartments(ILogger logger = null)
         {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
             List<Department> output = new List<Department>();
             try
             {
-                using (var connection = new SqlConnection(GetConnectionString()))
+                using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
                     using (var command = new SqlCommand(SelectDepartments(IsChildOnly: true), connection))
@@ -1463,10 +1487,18 @@ namespace O2GEN.Helpers
 
         public static Department GetDepartment(int id, ILogger logger)
         {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+
+            }
             Department output = new Department();
             try
             {
-                using (var connection = new SqlConnection(GetConnectionString()))
+                using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
                     using (var command = new SqlCommand(SelectDepartments(id), connection))
@@ -1553,10 +1585,18 @@ namespace O2GEN.Helpers
         }
         public static Resource GetResource(int ID, ILogger logger)
         {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
             Resource output = new Resource();
             try
             {
-                using (var connection = new SqlConnection(GetConnectionString()))
+                using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
                     using (var command = new SqlCommand(SelectResources(), connection))
@@ -1592,10 +1632,18 @@ namespace O2GEN.Helpers
         }
         public static List<ResourceState> GetResourceStates(ILogger logger = null)
         {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
             List<ResourceState> output = new List<ResourceState>();
             try
             {
-                using (var connection = new SqlConnection(GetConnectionString()))
+                using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
                     using (var command = new SqlCommand(SelectResourceStates(), connection))
@@ -1625,10 +1673,18 @@ namespace O2GEN.Helpers
         }
         public static List<ResourceType> GetResourceTypes(ILogger logger=null)
         {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
             List<ResourceType> output = new List<ResourceType>();
             try
             {
-                using (var connection = new SqlConnection(GetConnectionString()))
+                using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
                     using (var command = new SqlCommand(SelectResourceTypes(), connection))
