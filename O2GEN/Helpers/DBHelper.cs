@@ -214,21 +214,85 @@ namespace O2GEN.Helpers
         /// Вставка Контроля
         /// </summary>
         /// <returns></returns>
-        private static string InsertControl(string Name, Guid ObjectUID, ControlType type, string UserName, double NormaFrom=0, double NormaTo=0, double WarningFrom = 0, double WarningTo = 0, double ErrorFrom = 0, double ErrorTo = 0)
+        private static string InsertControl(Control obj, string UserName)
         {
-            /*Возможно нужно обновление в таблице PPEntityCollections по Id=5*/
-            return "INSERT INTO AssetParameters (AssetParameterMeasureId, BottomValue1, BottomValue2, BottomValue3, BottomValue4, Comment, CreatedByUser, CreationTime, Critical1, Critical2, Critical3, Critical4, DefaultValue, DeletedByUser, DeletionTime, Description, DisplayName, ExternalId, Index, IsDeleted, IsDynamic, Level1, Level2, Level3, Level4, ModificationTime, ModifiedByUser, Name, ObjectUID, Revision, SpanCount, TenantId, TopValue1, TopValue2, TopValue3, TopValue4, ValueType) " +
-                $"VALUES (NULL, N'{NormaFrom.ToString().Replace(',','.')}', N'{WarningFrom.ToString().Replace(',', '.')}', N'{ErrorFrom.ToString().Replace(',', '.')}', NULL, NULL, (isnull((SELECT top 1 id FROM PPUsers  where name = '{UserName}'),-1)) , getdate(), 0, 0, 0, 0, NULL, NULL, NULL, NULL, N'{Name}', N'{ObjectUID.ToString("D")}', NULL, 0, 0, 0, 0, 0, 0, NULL, NULL, N'{Name}', '{ObjectUID.ToString("D")}', (isnull((SELECT max(revision) id FROM AssetParameters ),0)+1), 0, 1, {NormaTo.ToString().Replace(',', '.')},{WarningTo.ToString().Replace(',', '.')}, {ErrorTo.ToString().Replace(',', '.')}, NULL, '{GetControlType(type)}')";
-        }
-        private static string UpdateControl()
-        {
-            /*
-            return "UPDATE [PPEntityCollections] SET [DisplayName] = @p0, [ExternalId] = @p1, [IsDeleted] = @p2, [Name] = @p3, [ObjectUID] = @p4, [Revision] = @p5, [Schema] = @p6, [SchemaRevision] = @p7
-            WHERE[Id] = @p8 AND[Revision] = @p9;
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM AssetParameters ),0)+1);" +
+                "INSERT INTO AssetParameters " +
+                "(BottomValue1, " +
+                "BottomValue2, " +
+                "BottomValue3, " +
+                "CreatedByUser, " +
+                "CreationTime, " +
+                "DisplayName, " +
+                "ExternalId, " +
+                "IsDeleted, " +
+                "IsDynamic, " +
+                "Name, " +
+                "ObjectUID, " +
+                "Revision, " +
+                "SpanCount, " +
+                "TenantId, " +
+                "TopValue1, " +
+                "TopValue2, " +
+                "TopValue3, " +
+                "ValueType) " +
 
-            ',N'@p8 bigint, @p0 nvarchar(4000),@p1 nvarchar(4000),@p2 bit, @p3 nvarchar(4000),@p4 uniqueidentifier, @p5 bigint,@p9 bigint, @p6 nvarchar(4000),@p7 bigint',@p8=5,@p0=N'AssetParameter',@p1=NULL,@p2=0,@p3=N'AssetParameter',@p4='FFC8BDCB - 2523 - 846B - 93B7 - 39F669257DA0',@p5=741,@p9=740,@p6=NULL,@p7=1";
-            */
-            throw new Exception("Не реализовано");
+                $"VALUES " +
+                
+                $"(N'{obj.ValueBottom1.Replace(',','.')}', " +
+                $"N'{obj.ValueBottom2.Replace(',', '.')}', " +
+                $"N'{obj.ValueBottom3.Replace(',', '.')}', " +
+                $"(isnull((SELECT top 1 id FROM PPUsers  where name = '{UserName}'),-1)) , " +
+                $"getdate(), " +
+                $"N'{obj.DisplayName}', " +
+                $"N'{obj.ObjectUID.ToString("D")}', " +
+                $"0, " +
+                $"0, " +
+                $"N'{obj.DisplayName}', " +
+                $"'{obj.ObjectUID.ToString("D")}', " +
+                $"@revision, " +
+                $"0, " +
+                $"1, " +
+                $"{obj.ValueTop1.Replace(',', '.')}, " +
+                $"{obj.ValueTop2.Replace(',', '.')}, " +
+                $"{obj.ValueTop3.Replace(',', '.')}, " +
+                $"'{GetControlType((ControlType)obj.ValueType)}'); " +
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = 5;";
+        }
+        private static string UpdateControl(Control obj, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM AssetParameters ),0)+1); " +
+                "UPDATE AssetParameters SET " +
+                $"BottomValue1 = N'{obj.ValueBottom1.Replace(',', '.')}', " +
+                $"BottomValue2 = N'{obj.ValueBottom2.Replace(',', '.')}', " +
+                $"BottomValue3 = N'{obj.ValueBottom3.Replace(',', '.')}', " +
+                $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = '{UserName}'),-1)), " +
+                "ModificationTime = getdate(), " +
+                $"DisplayName = N'{obj.DisplayName}', " +
+                $"Name = N'{obj.DisplayName}', " +
+                "Revision = @revision, " +
+                $"TopValue1 = {obj.ValueTop1.Replace(',', '.')}, " +
+                $"TopValue2 = {obj.ValueTop2.Replace(',', '.')}, " +
+                $"TopValue3 = {obj.ValueTop3.Replace(',', '.')}, " +
+                $"ValueType = '{GetControlType((ControlType)obj.ValueType)}' " +
+                $"WHERE ID = {obj.Id}; " +
+
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = 5;";
+        }
+        private static string DeleteControl(int ID, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM AssetParameters ),0)+1); " +
+                "UPDATE AssetParameters SET " +
+                $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = '{UserName}'),-1)), " +
+                "DeletionTime = getdate(), " +
+                "Revision = @revision, " +
+                "IsDeleted = 1 " +
+                $"WHERE ID = {ID}; " +
+
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = 5; ";
         }
         #endregion
 
@@ -280,6 +344,33 @@ namespace O2GEN.Helpers
                 "WHERE (IsDeleted <> 1) " +
                 $"{(ID == -1 ? "" : "AND Id = " + ID)} " +
                 "AND (TenantId = CAST(1 AS bigint)) order by DisplayName";
+        }
+
+        private static string UpdatePersonPosition(PersonPosition obj, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM PersonPositions ),0)+1); " +
+                "UPDATE PersonPositions SET " +
+                $"Name = N'{obj.Name}', " +
+                $"DisplayName = N'{obj.DisplayName}', " +
+                $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = '{UserName}'),-1)), " +
+                "ModificationTime = getdate(), " +
+                $"WHERE ID = {obj.Id}; " +
+
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = 77;";
+        }
+        private static string DeletePersonPosition(int ID, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM PersonPositions ),0)+1); " +
+                "UPDATE PersonPositions SET " +
+                $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = '{UserName}'),-1)), " +
+                "DeletionTime = getdate(), " +
+                "Revision = @revision, " +
+                "IsDeleted = 1 " +
+                $"WHERE ID = {ID}; " +
+
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = 77; ";
         }
         #endregion
 
@@ -862,6 +953,15 @@ namespace O2GEN.Helpers
             }
             return output;
         }
+
+        public static void UpdateControl(Control obj, string UserName, ILogger logger)
+        {
+            ExecuteScalar(UpdateControl(obj, UserName), logger);
+        }
+        public static void DeleteControl(int ID, string UserName, ILogger logger)
+        {
+            ExecuteScalar(DeleteControl(ID, UserName), logger);
+        }
         #endregion
 
         #region Маршруты
@@ -1115,6 +1215,15 @@ namespace O2GEN.Helpers
                 logger.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
             }
             return output;
+        }
+
+        public static void UpdatePersonPosition(PersonPosition obj, string UserName, ILogger logger)
+        {
+            ExecuteScalar(UpdatePersonPosition(obj, UserName), logger);
+        }
+        public static void DeletePersonPosition(int ID, string UserName, ILogger logger)
+        {
+            ExecuteScalar(DeletePersonPosition(ID, UserName), logger);
         }
         #endregion
 
