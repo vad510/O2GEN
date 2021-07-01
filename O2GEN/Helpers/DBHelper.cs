@@ -10,7 +10,7 @@ namespace O2GEN.Helpers
 {
     public static class DBHelper
     {
-        private static string DBConnection = $"Data Source={(Environment.UserName == "Michael"? "DESKTOP-JFNR95O\\SQLEXPRESS" : "DESKTOP-A17N4G7\\SQLEXPRESS01")};Initial Catalog=UFMDBLUK;Integrated Security=SSPI;";
+        private static string DBConnection = $"Data Source={(Environment.UserName == "Michael" ? "DESKTOP-JFNR95O\\SQLEXPRESS" : "DESKTOP-A17N4G7\\SQLEXPRESS01")};Initial Catalog=UFMDBLUK;Integrated Security=SSPI;";
         //private static string DBConnection = "Data Source=10.201.192.241;Initial Catalog=UFMDBLUK;User ID=sa;Password=Zz123456789;";
 
         private static string GetConnectionString()
@@ -23,7 +23,7 @@ namespace O2GEN.Helpers
 
         #region Тексты запросов
 
-        private static string GetZRP (DateTime From, DateTime To, int status)
+        private static string GetZRP(DateTime From, DateTime To, int status)
         {
             return "" +
                 $"declare @__start_2 datetime2(7)='{From.ToString("yyyy-MM-dd HH:mm:ss")}', @__finish_1 datetime2(7)='{To.ToString("yyyy-MM-dd HH:mm:ss")}'; " +
@@ -190,7 +190,7 @@ namespace O2GEN.Helpers
         /// <param name="Name"></param>
         /// <param name="ObjectUID"></param>
         /// <returns></returns>
-        private static string InsertToType(string DisplayName, string ExternalId , string Name, Guid ObjectUID)
+        private static string InsertToType(string DisplayName, string ExternalId, string Name, Guid ObjectUID)
         {
             return "INSERT INTO AssetParameterSpecie (DisplayName, ExternalId, IsDeleted, Name, ObjectUID, Revision, TenantId) " +
                 $"VALUES (N'{DisplayName}', N'{ObjectUID.ToString("D")}', 0, N'{Name}', '{ObjectUID.ToString("D")}', (isnull((SELECT max(revision) id FROM AssetParameterSpecies ),0)+1), 1);";
@@ -207,7 +207,7 @@ namespace O2GEN.Helpers
             return "SELECT Id, DisplayName, ObjectUID, ValueType, BottomValue1, TopValue1, BottomValue2, TopValue2, BottomValue3, TopValue3 " +
                 "FROM AssetParameters " +
                 "WHERE(IsDeleted <> 1) AND(TenantId = CAST(1 AS bigint)) " +
-                $"{(ID==-1?"": "AND Id = "+ID)} " +
+                $"{(ID == -1 ? "" : "AND Id = " + ID)} " +
                 "ORDER BY DisplayName";
         }
         /// <summary>
@@ -239,8 +239,8 @@ namespace O2GEN.Helpers
                 "ValueType) " +
 
                 $"VALUES " +
-                
-                $"(N'{obj.ValueBottom1.Replace(',','.')}', " +
+
+                $"(N'{obj.ValueBottom1.Replace(',', '.')}', " +
                 $"N'{obj.ValueBottom2.Replace(',', '.')}', " +
                 $"N'{obj.ValueBottom3.Replace(',', '.')}', " +
                 $"(isnull((SELECT top 1 id FROM PPUsers  where name = '{UserName}'),-1)) , " +
@@ -279,7 +279,7 @@ namespace O2GEN.Helpers
                 $"ValueType = '{GetControlType((ControlType)obj.ValueType)}' " +
                 $"WHERE ID = {obj.Id}; " +
 
-                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = 5;";
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.AssetParameter};";
         }
         private static string DeleteControl(int ID, string UserName)
         {
@@ -292,7 +292,7 @@ namespace O2GEN.Helpers
                 "IsDeleted = 1 " +
                 $"WHERE ID = {ID}; " +
 
-                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = 5; ";
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.AssetParameter}; ";
         }
         #endregion
 
@@ -321,7 +321,7 @@ namespace O2GEN.Helpers
         /// Классы объектов
         /// </summary>
         /// <returns></returns>
-        private static string SelectAssetClass(int ID= -1)
+        private static string SelectAssetClass(int ID = -1)
         {
             return "SELECT Id, DisplayName, ObjectUID, ParentId " +
                 "FROM AssetClass AS e " +
@@ -357,7 +357,7 @@ namespace O2GEN.Helpers
                 "ModificationTime = getdate(), " +
                 $"WHERE ID = {obj.Id}; " +
 
-                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = 77;";
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.PersonPosition};";
         }
         private static string DeletePersonPosition(int ID, string UserName)
         {
@@ -370,7 +370,7 @@ namespace O2GEN.Helpers
                 "IsDeleted = 1 " +
                 $"WHERE ID = {ID}; " +
 
-                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = 77; ";
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.PersonPosition}; ";
         }
         #endregion
 
@@ -386,6 +386,33 @@ namespace O2GEN.Helpers
                 "WHERE (IsDeleted <> 1) " +
                 $"{(ID == -1 ? "" : "AND Id = " + ID)} " +
                 "AND (TenantId = CAST(1 AS bigint)) order by DisplayName";
+        }
+
+        private static string UpdatePersonCategory(PersonCategory obj, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM PersonCategories ),0)+1); " +
+                "UPDATE PersonCategories SET " +
+                $"Name = N'{obj.Name}', " +
+                $"DisplayName = N'{obj.DisplayName}', " +
+                $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = '{UserName}'),-1)), " +
+                "ModificationTime = getdate(), " +
+                $"WHERE ID = {obj.Id}; " +
+
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.PersonCategory};";
+        }
+        private static string DeletePersonCategory(int ID, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM PersonCategories ),0)+1); " +
+                "UPDATE PersonCategories SET " +
+                $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = '{UserName}'),-1)), " +
+                "DeletionTime = getdate(), " +
+                "Revision = @revision, " +
+                "IsDeleted = 1 " +
+                $"WHERE ID = {ID}; " +
+
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.PersonCategory}; ";
         }
         #endregion
 
@@ -405,7 +432,7 @@ namespace O2GEN.Helpers
                 ") AS t1 ON e.AssetStateId = t1.Id " +
                 "LEFT JOIN AssetTypes AT on AT.Id = e.AssetTypeId " +
                 "WHERE ((e.IsDeleted <> 1) AND (e.TenantId = CAST(1 AS bigint))) " +
-                (DeptID!=-1?"AND e.DepartmentId =  {DeptID}":"") +
+                (DeptID != -1 ? "AND e.DepartmentId =  {DeptID}" : "") +
                 "ORDER BY e.DisplayName";
         }
         private static string SelectAsset(int ID)
@@ -442,8 +469,8 @@ namespace O2GEN.Helpers
                 "FROM Departments as D " +
                 "LEFT JOIN Departments as P on D.ParentId = P.id " +
                 "WHERE " +
-                $"{(ID>0?$"D.id = {ID} AND":"")} " +
-                $"{(IsChildOnly? $"D.ParentId IS NOT NULL AND" :"")} " +
+                $"{(ID > 0 ? $"D.id = {ID} AND" : "")} " +
+                $"{(IsChildOnly ? $"D.ParentId IS NOT NULL AND" : "")} " +
                 "(D.IsDeleted <> 1) AND(D.TenantId = CAST(1 AS bigint)) order by D.DisplayName";
         }
         #endregion
@@ -841,7 +868,7 @@ namespace O2GEN.Helpers
                         {
                             foreach (var row in dataReader.Select(row => row))
                             {
-                                output  = new TOType()
+                                output = new TOType()
                                 {
                                     Id = int.Parse(row["Id"].ToString()),
                                     Name = row["Name"].ToString(),
@@ -1057,7 +1084,7 @@ namespace O2GEN.Helpers
         /// </summary>
         /// <param name="logger"></param>
         /// <returns></returns>
-        public static List<AssetClass> GetAssetClasses(ILogger logger = null )
+        public static List<AssetClass> GetAssetClasses(ILogger logger = null)
         {
             string con = GetConnectionString();
 
@@ -1066,7 +1093,7 @@ namespace O2GEN.Helpers
                 logger.LogDebug("connection string is null or empty");
                 return null;
             }
-            
+
             List<AssetClass> output = new List<AssetClass>();
 
             try
@@ -1140,7 +1167,7 @@ namespace O2GEN.Helpers
         /// </summary>
         /// <param name="logger"></param>
         /// <returns></returns>
-        public static List<PersonPosition> GetPersonPositions(ILogger logger  = null)
+        public static List<PersonPosition> GetPersonPositions(ILogger logger = null)
         {
             string con = GetConnectionString();
 
@@ -1309,6 +1336,14 @@ namespace O2GEN.Helpers
             }
             return output;
         }
+        public static void UpdatePersonCategory(PersonCategory obj, string UserName, ILogger logger)
+        {
+            ExecuteScalar(UpdatePersonCategory(obj, UserName), logger);
+        }
+        public static void DeletePersonCategory(int ID, string UserName, ILogger logger)
+        {
+            ExecuteScalar(DeletePersonCategory(ID, UserName), logger);
+        }
         #endregion
 
         #region Объекты
@@ -1351,7 +1386,7 @@ namespace O2GEN.Helpers
                                     Description = row["Description"].ToString(),
                                     Maximo = row["ExternalId"].ToString(),
                                     Status = row["StateName"].ToString(),
-                                    ParentId = string.IsNullOrEmpty(row["ParentId"].ToString())? (int?)null: int.Parse(row["ParentId"].ToString()),
+                                    ParentId = string.IsNullOrEmpty(row["ParentId"].ToString()) ? (int?)null : int.Parse(row["ParentId"].ToString()),
                                     AssetTypeId = string.IsNullOrEmpty(row["AssetTypeId"].ToString()) ? (int?)null : int.Parse(row["AssetTypeId"].ToString())
                                 });
                             }
@@ -1363,7 +1398,7 @@ namespace O2GEN.Helpers
             {
                 logger.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
             }
-            while (all.Count>0)
+            while (all.Count > 0)
             {
                 if (all[0].ParentId == (int?)null)
                 {
@@ -1515,7 +1550,7 @@ namespace O2GEN.Helpers
                                     Id = int.Parse(row["Id"].ToString()),
                                     DisplayName = row["DisplayName"].ToString(),
                                     ObjectUID = new Guid(row["ObjectUID"].ToString()),
-                                    ParentId = (string.IsNullOrEmpty(row["ParentId"].ToString())? null:int.Parse(row["ParentId"].ToString()))
+                                    ParentId = (string.IsNullOrEmpty(row["ParentId"].ToString()) ? null : int.Parse(row["ParentId"].ToString()))
                                 });
                             }
                         }
@@ -1624,7 +1659,7 @@ namespace O2GEN.Helpers
                                     DisplayName = row["DisplayName"].ToString(),
                                     ObjectUID = new Guid(row["ObjectUID"].ToString()),
                                     ParentId = (string.IsNullOrEmpty(row["ParentId"].ToString()) ? null : int.Parse(row["ParentId"].ToString())),
-                                    Latitude = (string.IsNullOrEmpty(row["Latitude"].ToString())? 0: double.Parse(row["Latitude"].ToString())),
+                                    Latitude = (string.IsNullOrEmpty(row["Latitude"].ToString()) ? 0 : double.Parse(row["Latitude"].ToString())),
                                     Longitude = (string.IsNullOrEmpty(row["Longitude"].ToString()) ? 0 : double.Parse(row["Longitude"].ToString())),
                                     Name = row["Name"].ToString(),
                                     Organization = row["Organization"].ToString(),
@@ -1780,7 +1815,7 @@ namespace O2GEN.Helpers
             }
             return output;
         }
-        public static List<ResourceType> GetResourceTypes(ILogger logger=null)
+        public static List<ResourceType> GetResourceTypes(ILogger logger = null)
         {
             string con = GetConnectionString();
 
@@ -1908,7 +1943,7 @@ namespace O2GEN.Helpers
                                     Id = int.Parse(row["Id"].ToString()),
                                     PersonName = row["PersonName"].ToString(),
                                     DepartmentName = row["DepartmentName"].ToString(),
-                                    IsUser = row["IsUser"].ToString() !=  "0",
+                                    IsUser = row["IsUser"].ToString() != "0",
                                     ObjectUID = new Guid(row["ObjectUID"].ToString())
                                 });
                             }
@@ -2100,5 +2135,229 @@ namespace O2GEN.Helpers
         Started = 2,
         Ended = 3,
         Stoped = 4
+    }
+    /// <summary>
+    /// ID в сводной таблице для фиксирования обновлений.
+    /// </summary>
+    public enum RevEntry
+    {
+        Asset = 1,
+        AssetClass = 2,
+        AssetClassDefectTypeGroup = 3,
+        AssetClassParameter = 4,
+        AssetParameter = 5,
+        AssetParameterMeasure = 6,
+        AssetParameterPair = 7,
+        AssetParameterValue = 8,
+        AssetResponsible = 9,
+        AssetSort = 10,
+        AssetSpecies = 11,
+        AssetState = 12,
+        AssetType = 13,
+        Assignment = 14,
+        Attachment = 15,
+        Bindings = 16,
+        CallOrder = 17,
+        CallOrderSchedulingContainer = 18,
+        CallOrderStatus = 19,
+        CallOrderType = 20,
+        CheckList = 21,
+        CheckListItem = 22,
+        CheckListStatus = 23,
+        CLItemDictionaryValue = 24,
+        Defect = 25,
+        DefectMeasure = 26,
+        DefectMeasureGroup = 27,
+        DefectMeasureType = 28,
+        DefectStatus = 29,
+        DefectType = 30,
+        DefectTypeDTGroup = 31,
+        DefectTypeGroup = 32,
+        Department = 33,
+        ElementUI = 34,
+        Engineer = 35,
+        EngineerPPE = 36,
+        EngineerSkill = 37,
+        EngineerWorkClothing = 38,
+        EnvironmentState = 39,
+        Equipment = 40,
+        ESGroup = 41,
+        InspectionDocument = 42,
+        InspectionDocumentStatus = 43,
+        InspectionDocumentStatusTransition = 44,
+        InspectionDocumentType = 45,
+        InspectionProtocol = 46,
+        InspectionProtocolItem = 47,
+        InspectionProtocolStatus = 48,
+        InspectionProtocolStatusTransition = 49,
+        InspectionProtocolType = 50,
+        InspectionPurpose = 51,
+        Laboratory = 52,
+        LaboratoryMeteringType = 53,
+        LaboratoryStatus = 54,
+        LaboratoryType = 55,
+        Layout = 56,
+        License = 57,
+        LicenseType = 58,
+        MadeIn = 59,
+        Material = 60,
+        MaterialExpense = 61,
+        MaterialType = 62,
+        MeasureUnit = 63,
+        MeteringType = 64,
+        NavigationMenu = 65,
+        OperationLog = 66,
+        OperationLogEntry = 67,
+        OperationLogEntryAbbreviation = 68,
+        OperationLogEntryComment = 69,
+        OperationLogEntryTemplate = 70,
+        OperationLogEntryType = 71,
+        PermissionUI = 72,
+        Person = 73,
+        PersonCategory = 74,
+        PersonLicense = 75,
+        PersonPhoneNumber = 76,
+        PersonPosition = 77,
+        PersonType = 78,
+        PersonWorkRole = 79,
+        PhoneNumberType = 80,
+        PPAttachedData = 81,
+        PPAttachedEntity = 82,
+        PPCalendar = 83,
+        PPCalendarRule = 84,
+        PPE = 85,
+        PPEntityCollection = 86,
+        PPEType = 87,
+        PPExpressionPermission = 88,
+        PPGroup = 89,
+        PPGroupRole = 90,
+        PPObjectType = 91,
+        PPPermission = 92,
+        PPRole = 93,
+        PPUser = 94,
+        PPUserGroup = 95,
+        PPUserRole = 96,
+        Resource = 97,
+        ResourceAllocation = 98,
+        ResourceState = 99,
+        ResourceType = 100,
+        RoleUI = 101,
+        RoleUIDepartment = 102,
+        RoutineOperation = 103,
+        SchedulingContainer = 104,
+        SchedulingRequirement = 105,
+        SchedulingRequirementSkill = 106,
+        SCStatus = 107,
+        SCStatusTransition = 108,
+        SCType = 109,
+        Signature = 110,
+        Skill = 111,
+        SkillGroup = 112,
+        StatusReason = 113,
+        StatusTransition = 114,
+        Styles = 115,
+        Task = 116,
+        TaskAsset = 117,
+        TaskCause = 118,
+        TaskClass = 119,
+        TaskOperation = 120,
+        TaskPhoneNumber = 121,
+        TaskReason = 122,
+        TaskRepairType = 123,
+        TaskSkill = 124,
+        TaskSpecies = 125,
+        TaskStatus = 126,
+        TaskType = 127,
+        TaskTypeSkill = 128,
+        TaskTypeTaskCause = 129,
+        TaskWorkSheet = 130,
+        TechObjectType = 131,
+        Tenant = 132,
+        TimeBlock = 133,
+        Tracker = 134,
+        UserRoleUI = 135,
+        UserSetting = 136,
+        Vechical = 137,
+        VechicalClass = 138,
+        VechicalGroup = 139,
+        VechicalState = 140,
+        VechicalType = 141,
+        Warehouse = 142,
+        WarehousePosition = 143,
+        WarehouseType = 144,
+        WorkClothing = 145,
+        WorkClothingType = 146,
+        WorkCondition = 147,
+        WorkMethod = 148,
+        WorkOperation = 149,
+        WorkOperationMeasure = 150,
+        WorkPermissionEngineer = 151,
+        WorkPermit = 152,
+        WorkPermitCrewChange = 153,
+        WorkPermitStatus = 154,
+        WorkPermitStatusTransition = 155,
+        WorkPermitType = 156,
+        WorkplacePrepareStep = 157,
+        WorkRole = 158,
+        WorkSheet = 159,
+        WorkSheetMaterial = 160,
+        WorkSheetOperation = 161,
+        WorkSheetTaskReason = 162,
+        WPAdvancedBriefing = 163,
+        WPAuthorBriefing = 164,
+        WPDailyBriefing = 165,
+        WPResponsibleBriefing = 166,
+        WPSafetyAcceptorBriefing = 167,
+        WPWorkplaceBriefing = 168,
+        CallOrderCategory = 169,
+        CallOrderMethod = 170,
+        MaterialTransaction = 171,
+        MTPosition = 172,
+        MTRGroupPlanning = 173,
+        MTStatus = 174,
+        MTType = 175,
+        DepartmentWarehouse = 176,
+        SCReason = 177,
+        AssetParameterSet = 178,
+        AssetParameterSetRecord = 179,
+        AssetTopology = 180,
+        AuditInfo = 181,
+        CompoundType = 182,
+        Disconnection = 183,
+        EmergencyPreparedness = 184,
+        GenerateDocNumber = 185,
+        MaterialGroup = 186,
+        MaterialNomenclatureMaterial = 187,
+        SCTypeTaskType = 188,
+        TaskReasonsTaskRepairType = 189,
+        UnscheduledRequestReason = 190,
+        WorkPermissionEngineerLicense = 191,
+        AssetParameterSpecies = 192,
+        AssetParameterSpeciesPair = 193,
+        CallOrderDiscType = 194,
+        NonAvailableType = 195,
+        Waybill = 196,
+        WaybillCallOrder = 197,
+        WaybillPerson = 198,
+        WaybillPersonType = 199,
+        WaybillStatus = 200,
+        WaybillType = 201,
+        AssetClassInspectionProtocolType = 202,
+        AssetClassTaskReason = 203,
+        AssetParameterInspectionProtocolType = 204,
+        MeasurePosition = 205,
+        ParameterPosition = 206,
+        WorkSheetInspectionProtocolType = 207,
+        BrigadeTemplate = 208,
+        BrigadeTemplateRecord = 209,
+        InspectionProtocolSort = 210,
+        CallOrderChangeLog = 211,
+        DepartmentComparison = 212,
+        InspectionProtocolPurpose = 213,
+        IPItemReason = 214,
+        PersonPositionPersonPositionSNB = 215,
+        PersonPositionSNB = 216,
+        WorkPermitChangeLog = 217,
+        WorkPermitChangeLogEngineer = 218
     }
 }
