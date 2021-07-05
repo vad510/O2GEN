@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using O2GEN.Models;
 using O2GEN.Models.DeskModels;
 
 namespace O2GEN.Controllers
@@ -171,6 +172,16 @@ namespace O2GEN.Controllers
 
             if (res != null)
                 return PartialView("DepartmentEdit", res);
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult DepartmentsSave(Department Model)
+        {
+            if (Model.Id == -1)
+                Helpers.DBHelper.CreateDepartment(Model, User.Identity.Name, _logger);
+            else
+                Helpers.DBHelper.UpdateDepartment(Model, User.Identity.Name, _logger);
             return View();
         }
     }

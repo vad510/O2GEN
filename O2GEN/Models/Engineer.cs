@@ -15,6 +15,8 @@ namespace O2GEN.Models
         public string GivenName { get; set; }
         [DisplayName("Отчество")]
         public string MiddleName { get; set; }
+        public string DisplayName { get; set; }
+        public string AppointName { get; set; }
         public string PersonName { get; set; }
         public string DepartmentName { get; set; }
         public bool IsUser { get; set; }

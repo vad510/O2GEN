@@ -214,7 +214,7 @@ namespace O2GEN.Helpers
         /// Вставка Контроля
         /// </summary>
         /// <returns></returns>
-        private static string InsertControl(Control obj, string UserName)
+        private static string СreateControl(Control obj, string UserName)
         {
             return "DECLARE @revision bigint; " +
                 "set @revision = (isnull((SELECT max(revision) id FROM AssetParameters ),0)+1);" +
@@ -314,6 +314,74 @@ namespace O2GEN.Helpers
                 $"{(ID == -1 ? "" : "AND e.Id = " + ID)} " +
                 "ORDER BY e.DisplayName";
         }
+
+        /// <summary>
+        /// Создание маршрута
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string CreateAssetParameterSet(AssetParameterSet obj, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM AssetParameterSets ),0)+1); " +
+                "Insret into AssetParameterSets " +
+                "(DisplayName, " +
+                "DepartmentId, " +
+                "ObjectUID, " +
+                "CreatedByUser, " +
+                "CreationTime," +
+                "Revision)" +
+                "values " +
+                $"N'{obj.DisplayName}', " +
+                $"{obj.DepartmentID}, " +
+                $"{obj.ObjectUID}, " +
+                $"(isnull((SELECT top 1 id FROM PPUsers  where name = '{UserName}'),-1)), " +
+                "getdate(), " +
+                "Revision);" +
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.AssetParameterSet};";
+        }
+        /// <summary>
+        /// Обновление маршрута
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string UpdateAssetParameterSet(AssetParameterSet obj, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM AssetParameterSets ),0)+1); " +
+                "UPDATE AssetParameterSets SET " +
+                $"DisplayName = N'{obj.DisplayName}', " +
+                $"DepartmentId = {obj.DepartmentID}, " +
+                $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = '{UserName}'),-1)), " +
+                "ModificationTime = getdate(), " +
+                "Revision = @revision, " +
+                $"WHERE ID = {obj.Id}; " +
+
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.AssetParameterSet};";
+        }
+        /// <summary>
+        /// Удаление маршрута
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string DeleteAssetParameterSet(int ID, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM AssetParameterSets ),0)+1); " +
+                "UPDATE AssetParameterSets SET " +
+                $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = '{UserName}'),-1)), " +
+                "DeletionTime = getdate(), " +
+                "Revision = @revision, " +
+                "IsDeleted = 1 " +
+                $"WHERE ID = {ID}; " +
+
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.AssetParameterSet}; ";
+        }
+
+        #warning TODO AssetParameterSetRecords
         #endregion
 
         #region Классы объектов
@@ -345,7 +413,32 @@ namespace O2GEN.Helpers
                 $"{(ID == -1 ? "" : "AND Id = " + ID)} " +
                 "AND (TenantId = CAST(1 AS bigint)) order by DisplayName";
         }
-
+        /// <summary>
+        /// Создание должности
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string CreatePersonPosition(PersonPosition obj, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM PersonPositions ),0)+1); " +
+                "Insret into PersonPositions " +
+                "(Name, " +
+                "DisplayName, " +
+                "ObjectUID, " +
+                "CreatedByUser, " +
+                "CreationTime," +
+                "Revision)" +
+                "values " +
+                $"(N'{obj.Name}', " +
+                $"N'{obj.DisplayName}', " +
+                $"{obj.ObjectUID}, " +
+                $"(isnull((SELECT top 1 id FROM PPUsers  where name = '{UserName}'),-1)), " +
+                "getdate(), " +
+                "Revision);" +
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.PersonPosition};";
+        }
         private static string UpdatePersonPosition(PersonPosition obj, string UserName)
         {
             return "DECLARE @revision bigint; " +
@@ -387,7 +480,32 @@ namespace O2GEN.Helpers
                 $"{(ID == -1 ? "" : "AND Id = " + ID)} " +
                 "AND (TenantId = CAST(1 AS bigint)) order by DisplayName";
         }
-
+        /// <summary>
+        /// Создание категории персонала
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string CreatePersonCategory(PersonCategory obj, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM PersonCategories ),0)+1); " +
+                "Insret into PersonCategories " +
+                "(Name, " +
+                "DisplayName, " +
+                "ObjectUID, " +
+                "CreatedByUser, " +
+                "CreationTime," +
+                "Revision)" +
+                "values " +
+                $"(N'{obj.Name}', " +
+                $"N'{obj.DisplayName}', " +
+                $"{obj.ObjectUID}, " +
+                $"(isnull((SELECT top 1 id FROM PPUsers  where name = '{UserName}'),-1)), " +
+                "getdate(), " +
+                "Revision);" +
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.PersonCategory};";
+        }
         private static string UpdatePersonCategory(PersonCategory obj, string UserName)
         {
             return "DECLARE @revision bigint; " +
@@ -473,9 +591,163 @@ namespace O2GEN.Helpers
                 $"{(IsChildOnly ? $"D.ParentId IS NOT NULL AND" : "")} " +
                 "(D.IsDeleted <> 1) AND(D.TenantId = CAST(1 AS bigint)) order by D.DisplayName";
         }
+        /// <summary>
+        /// Создание подразделения
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string CreateDepartment(Department obj, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM Departments ),0)+1); " +
+                "Insret into Departments " +
+                "(ParentId, " +
+                "Name, " +
+                "DisplayName, " +
+                "Latitude, " +
+                "Longitude, " +
+                "TimeZone, " +
+                "Organization, " +
+                "ShortCode, " +
+                "ObjectUID, " +
+                "CreatedByUser, " +
+                "CreationTime," +
+                "Revision)" +
+                "values " +
+                $"(ParentId = {obj.ParentId}, "+
+                $"N'{obj.Name}', " +
+                $"N'{obj.DisplayName}', " +
+                $"{obj.Latitude}, " +
+                $"{obj.Longitude}, " +
+                $"N'{obj.TimeZone}', " +
+                $"N'{obj.Organization}', " +
+                $"N'{obj.ShortCode}', " +
+                $"{obj.ObjectUID}, " +
+                $"(isnull((SELECT top 1 id FROM PPUsers  where name = '{UserName}'),-1)), " +
+                "getdate(), " +
+                "Revision);" +
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.PersonCategory};";
+        }
+        /// <summary>
+        /// Обновление подразделения
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string UpdateDepartment(Department obj, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM Departments ),0)+1); " +
+                "UPDATE Departments SET " +
+                $"ParentId = {obj.ParentId}, " +
+                $"Name = N'{obj.Name}', " +
+                $"DisplayName = N'{obj.DisplayName}', " +
+                $"Latitude = {obj.Latitude}, " +
+                $"Longitude = {obj.Longitude}, " +
+                $"TimeZone = N'{obj.TimeZone}', " +
+                $"Organization = N'{obj.Organization}', " +
+                $"ShortCode = N'{obj.ShortCode}', " +
+                $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = '{UserName}'),-1)), " +
+                "ModificationTime = getdate(), " +
+                "Revision = @revision, " +
+                $"WHERE ID = {obj.Id}; " +
+
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.PersonCategory};";
+        }
+        /// <summary>
+        /// Удаление подразделения
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string DeleteDepartment(int ID, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM Departments ),0)+1); " +
+                "UPDATE Departments SET " +
+                $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = '{UserName}'),-1)), " +
+                "DeletionTime = getdate(), " +
+                "Revision = @revision, " +
+                "IsDeleted = 1 " +
+                $"WHERE ID = {ID}; " +
+
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.Department}; ";
+        }
         #endregion
 
         #region Бригады
+        /// <summary>
+        /// Типы бригады
+        /// </summary>
+        /// <returns></returns>
+        private static string SelectResourceTypes()
+        {
+            return "SELECT id, DisplayName, ObjectUID FROM ResourceTypes where IsDeleted <> 1 AND TenantId = CAST(1 AS bigint)";
+        }
+        /// <summary>
+        /// Состояние бригады
+        /// </summary>
+        /// <returns></returns>
+        private static string SelectResourceStates()
+        {
+            return "SELECT id, DisplayName, ObjectUID FROM ResourceStates where IsDeleted <> 1 AND TenantId = CAST(1 AS bigint)";
+        }
+        /// <summary>
+        /// Список работников внутри бригады
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <returns></returns>
+        private static string SelectResourceAllocations(int ID)
+        {
+            return $"SELECT Id, ObjectUID, EngineerId, ResourceId FROM ResourceAllocations where ResourceId = {ID} AND IsDeleted = 0 ";
+        }
+        /// <summary>
+        /// Привязка работника к  бригаде
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string CreateResourceAllocation(ResourceAllocations obj, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM ResourceAllocations ),0)+1); " +
+                "INSERT INTO ResourceAllocations " +
+                "(IdDeleted, " +
+                "Revision," +
+                "CreatedByUser, " +
+                "CreationTime, " +
+                "ObjectUID, " +
+                "EngineerId, " +
+                "ResourceId) " +
+                "values " +
+                "(0," +
+                "@revision, " +
+                $"(isnull((SELECT top 1 id FROM PPUsers  where name = '{UserName}'),-1)), " +
+                $"getdate(), " +
+                $"{obj.ObjectUID}, " +
+                $"{obj.EngineerID}, " +
+                $"{obj.ResourceID})" +
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.ResourceAllocation};";
+        }
+        /// <summary>
+        /// Удаление работникаиз бригады
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string DeleteResourceAllocation(int ID, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM ResourceAllocations ),0)+1); " +
+                "UPDATE ResourceAllocations SET " +
+                "IsDeleted = 1, " +
+                $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = '{UserName}'),-1)), " +
+                "DeletionTime = getdate(), " +
+                "ResouceId = NULL " +
+                $"WHERE ID = {ID}; " +
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.ResourceAllocation};";
+        }
         /// <summary>
         /// Бригады
         /// </summary>
@@ -487,13 +759,80 @@ namespace O2GEN.Helpers
                 $"{(ID > 0 ? $"e.id = {ID} AND" : "")} " +
                 "WHERE (IsDeleted <> 1) AND (TenantId = CAST(1 AS bigint)) order by DisplayName";
         }
-        private static string SelectResourceTypes()
+        /// <summary>
+        /// Создание бригады
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string CreateResource(Resource obj, string UserName)
         {
-            return "SELECT id, DisplayName, ObjectUID FROM ResourceTypes where IsDeleted <> 1 AND TenantId = CAST(1 AS bigint)";
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM Resources ),0)+1); " +
+                "INSERT INTO Resources " +
+                $"(DisplayName, " +
+                $"Latitude, " +
+                $"Longitude, " +
+                $"Address, " +
+                $"ResourceStateId, " +
+                $"CreatedByUser, " +
+                "CreationTime, " +
+                "ObjectUID, " +
+                "Revision)" +
+                "values" +
+                $"(N'{obj.DisplayName}'," +
+                $"{obj.Latitude}, " +
+                $"{obj.Longitude}, " +
+                $"N'{obj.Address}', " +
+                $"{obj.ResourceStateId}, " +
+                $"(isnull((SELECT top 1 id FROM PPUsers  where name = '{UserName}'),-1)), " +
+                $"getdate(), " +
+                $"{obj.ObjectUID}, " +
+                $"@revision); " +
+
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.Resource};";
         }
-        private static string SelectResourceStates()
+        /// <summary>
+        /// Обновление бригады
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string UpdateResource(Resource obj, string UserName)
         {
-            return "SELECT id, DisplayName, ObjectUID FROM ResourceStates where IsDeleted <> 1 AND TenantId = CAST(1 AS bigint)";
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM Resources ),0)+1); " +
+                "UPDATE Resources SET " +
+                "Revision = @revision, " +
+                $"DisplayName = N'{obj.DisplayName}', " +
+                $"Latitude = {obj.Latitude}, " +
+                $"Longitude = {obj.Longitude}, " +
+                $"Address = N'{obj.Address}', " +
+                $"ResourceStateId = {obj.ResourceStateId}, " +
+                $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = '{UserName}'),-1)), " +
+                "ModificationTime = getdate(), " +
+                $"WHERE ID = {obj.Id}; " +
+
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.Resource};";
+        }
+        /// <summary>
+        /// Удаление бригады
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string DeleteResource(int ID, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM Resources ),0)+1); " +
+                "UPDATE Resources SET " +
+                $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = '{UserName}'),-1)), " +
+                "DeletionTime = getdate(), " +
+                "Revision = @revision, " +
+                "IsDeleted = 1 " +
+                $"WHERE ID = {ID}; " +
+
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.Resource}; ";
         }
         #endregion
 
@@ -541,6 +880,183 @@ namespace O2GEN.Helpers
                 "AND(e.TenantId = CAST(1 AS bigint))) " +
                 "AND(e.PersonId IS NOT NULL ) ORDER BY PersonName";
         }
+        /// <summary>
+        /// Создание работника
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string CreateEngineer(Engineer obj, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM Engineers ),0)+1); " +
+                "INSERT INTO Engineers " +
+                $"(Name, " +
+                $"DisplayName, " +
+                $"PersonId, " +
+                $"CalendarId, " +
+                $"DepartmentId, " +
+                $"CreatedByUser, " +
+                "CreationTime, " +
+                "ObjectUID, " +
+                "Revision)" +
+                "values" +
+                $"(N'{obj.DisplayName}'," +
+                $"N'{obj.DisplayName}', " +
+                $"{obj.PersonId}, " +
+                $"N'{obj.CalendarId}', " +
+                $"{obj.DepartmentId}, " +
+                $"(isnull((SELECT top 1 id FROM PPUsers  where name = '{UserName}'),-1)), " +
+                $"getdate(), " +
+                $"{obj.ObjectUID}, " +
+                $"@revision); " +
+
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.Engineer};";
+        }
+        /// <summary>
+        /// Обновление работника
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string UpdateEngineer(Engineer obj, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM Engineers ),0)+1); " +
+                "UPDATE Engineers SET " +
+                "Revision = @revision, " +
+                $"Name = N'{obj.DisplayName}', " +
+                $"DisplayName = N'{obj.DisplayName}', " +
+                $"CalendarId = {obj.CalendarId}, " +
+                $"DepartmentId = {obj.DepartmentId}, " +
+                $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = '{UserName}'),-1)), " +
+                "ModificationTime = getdate(), " +
+                $"WHERE ID = {obj.Id}; " +
+
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.Engineer};";
+        }
+        /// <summary>
+        /// Удаление работника
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string DeleteEngineer(int ID, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM Engineers ),0)+1); " +
+                "UPDATE Engineers SET " +
+                $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = '{UserName}'),-1)), " +
+                "DeletionTime = getdate(), " +
+                "Revision = @revision, " +
+                "IsDeleted = 1 " +
+                $"WHERE ID = {ID}; " +
+
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.Engineer}; ";
+        }
+
+        /// <summary>
+        /// Список людей для вставки в бригады
+        /// </summary>
+        /// <returns></returns>
+        private static string SelectEngineersList()
+        {
+            return "SELECT e.Id, t1.Surname, t1.GivenName, t1.MiddleName, t1.DisplayName, PP.DisplayName as AppointName" +
+                "FROM Engineers AS e  " +
+                "LEFT JOIN Persons AS t1 ON e.PersonId = t1.Id  " +
+                "LEFT JOIN PersonPositions as PP on PP.Id = t1.PersonPositionId " +
+                "WHERE ((e.IsDeleted <> 1) " +
+                "AND(e.TenantId = CAST(1 AS bigint))) " +
+                "AND(e.PersonId IS NOT NULL )";
+        }
+        /// <summary>
+        /// Личная информация
+        /// </summary>
+        /// <returns></returns>
+        private static string SelectPerson(int ID)
+        {
+            return $"SELECT Id, Surname, GivenName, MiddleName, UserId, PersonPositionId, ObjectUID FROM Persons WHERE  Id = {ID}";
+        }
+        /// <summary>
+        /// Создание личной информации
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string CreatePerson(Person obj, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM Persons ),0)+1); " +
+                "INSERT INTO Persons " +
+                $"(DisplayName, " +
+                $"Surname, " +
+                $"GivenName, " +
+                $"MiddleName, " +
+                $"UserId, " +
+                $"PersonPositionId, " +
+                $"CreatedByUser, " +
+                "CreationTime, " +
+                "ObjectUID, " +
+                "Revision)" +
+                "values" +
+                $"(N'{obj.DisplayName}'," +
+                $"N'{obj.Surname}', " +
+                $"N'{obj.GivenName}', " +
+                $"N'{obj.MiddleName}', " +
+                $"{obj.UserId}, " +
+                $"N'{obj.PersonPositionId}', " +
+                $"(isnull((SELECT top 1 id FROM PPUsers  where name = '{UserName}'),-1)), " +
+                $"getdate(), " +
+                $"{obj.ObjectUID}, " +
+                $"@revision); " +
+
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.Person};";
+        }
+        /// <summary>
+        /// Обновление личной информации
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string UpdatePerson(Person obj, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM Persons ),0)+1); " +
+                "UPDATE Persons SET " +
+                "Revision = @revision, " +
+                $"DisplayName = N'{obj.DisplayName}', " +
+                $"Surname = N'{obj.Surname}', " +
+                $"GivenName = N'{obj.GivenName}', " +
+                $"MiddleName = N'{obj.MiddleName}', " +
+                $"PersonPositionId = {obj.PersonPositionId}, " +
+                $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = '{UserName}'),-1)), " +
+                "ModificationTime = getdate(), " +
+                $"WHERE ID = {obj.Id}; " +
+
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.Person};";
+        }
+        /// <summary>
+        /// Удаление личной информации
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string DeletePerson(int ID, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM Persons ),0)+1); " +
+                "UPDATE Persons SET " +
+                $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = '{UserName}'),-1)), " +
+                "DeletionTime = getdate(), " +
+                "Revision = @revision, " +
+                "IsDeleted = 1 " +
+                $"WHERE ID = {ID}; " +
+
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.Person}; ";
+        }
+
+
+
         #endregion
 
         #endregion
@@ -980,7 +1496,10 @@ namespace O2GEN.Helpers
             }
             return output;
         }
-
+        public static void CreateControl(Control obj, string UserName, ILogger logger)
+        {
+            ExecuteScalar(СreateControl(obj, UserName), logger);
+        }
         public static void UpdateControl(Control obj, string UserName, ILogger logger)
         {
             ExecuteScalar(UpdateControl(obj, UserName), logger);
@@ -1075,6 +1594,18 @@ namespace O2GEN.Helpers
                 logger.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
             }
             return output;
+        }
+        public static void CreateAssetParameterSet(AssetParameterSet obj, string UserName, ILogger logger)
+        {
+            ExecuteScalar(CreateAssetParameterSet(obj, UserName), logger);
+        }
+        public static void UpdateAssetParameterSet(AssetParameterSet obj, string UserName, ILogger logger)
+        {
+            ExecuteScalar(UpdateAssetParameterSet(obj, UserName), logger);
+        }
+        public static void DeleteAssetParameterSet(int ID, string UserName, ILogger logger)
+        {
+            ExecuteScalar(DeleteAssetParameterSet(ID, UserName), logger);
         }
         #endregion
 
@@ -1244,6 +1775,10 @@ namespace O2GEN.Helpers
             return output;
         }
 
+        public static void CreatePersonPosition(PersonPosition obj, string UserName, ILogger logger)
+        {
+            ExecuteScalar(CreatePersonPosition(obj, UserName), logger);
+        }
         public static void UpdatePersonPosition(PersonPosition obj, string UserName, ILogger logger)
         {
             ExecuteScalar(UpdatePersonPosition(obj, UserName), logger);
@@ -1335,6 +1870,10 @@ namespace O2GEN.Helpers
                 logger.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
             }
             return output;
+        }
+        public static void CreatePersonCategory(PersonCategory obj, string UserName, ILogger logger)
+        {
+            ExecuteScalar(CreatePersonCategory(obj, UserName), logger);
         }
         public static void UpdatePersonCategory(PersonCategory obj, string UserName, ILogger logger)
         {
@@ -1678,6 +2217,19 @@ namespace O2GEN.Helpers
             }
             return output;
         }
+
+        public static void CreateDepartment(Department obj, string UserName, ILogger logger)
+        {
+            ExecuteScalar(CreateDepartment(obj, UserName), logger);
+        }
+        public static void UpdateDepartment(Department obj, string UserName, ILogger logger)
+        {
+            ExecuteScalar(UpdateDepartment(obj, UserName), logger);
+        }
+        public static void DeleteDepartment(int ID, string UserName, ILogger logger)
+        {
+            ExecuteScalar(DeleteDepartment(ID, UserName), logger);
+        }
         #endregion
 
         #region Бригады
@@ -1774,6 +2326,18 @@ namespace O2GEN.Helpers
             }
             return output;
         }
+        public static void CreateResource(Resource obj, string UserName, ILogger logger)
+        {
+            ExecuteScalar(CreateResource(obj, UserName), logger);
+        }
+        public static void UpdateResource(Resource obj, string UserName, ILogger logger)
+        {
+            ExecuteScalar(UpdateResource(obj, UserName), logger);
+        }
+        public static void DeleteResource(int ID, string UserName, ILogger logger)
+        {
+            ExecuteScalar(DeleteResource(ID, UserName), logger);
+        }
         public static List<ResourceState> GetResourceStates(ILogger logger = null)
         {
             string con = GetConnectionString();
@@ -1814,6 +2378,57 @@ namespace O2GEN.Helpers
                 logger?.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
             }
             return output;
+        }
+        public static List<ResourceAllocations> GetResourceAllocations(int ResourceId, ILogger logger = null)
+        {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
+            List<ResourceAllocations> output = new List<ResourceAllocations>();
+            try
+            {
+                using (var connection = new SqlConnection(con))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectResourceAllocations(ResourceId), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output.Add(new ResourceAllocations()
+                                {
+                                    //Id, ObjectUID, EngineerId, ResourceId
+                                    Id = int.Parse(row["Id"].ToString()),
+                                    EngineerID = int.Parse(row["EngineerId"].ToString()),
+                                    ResourceID = int.Parse(row["ResourceId"].ToString()),
+                                    ObjectUID = new Guid(row["ObjectUID"].ToString())
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
+        public static void CreateResourceAllocation(ResourceAllocations obj, string UserName, ILogger logger)
+        {
+            ExecuteScalar(CreateResourceAllocation(obj, UserName), logger);
+        }
+        public static void DeleteResourceAllocation(int ID, string UserName, ILogger logger)
+        {
+            ExecuteScalar(DeleteResourceAllocation(ID, UserName), logger);
         }
         public static List<ResourceType> GetResourceTypes(ILogger logger = null)
         {
@@ -1957,6 +2572,55 @@ namespace O2GEN.Helpers
             }
             return output;
         }
+        /// <summary>
+        /// Список работников для заполнения.
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <returns></returns>
+        public static List<Engineer> GetEngineersList(ILogger logger)
+        {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
+            List<Engineer> output = new List<Engineer>();
+            try
+            {
+                using (var connection = new SqlConnection(con))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectEngineersList(), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output.Add(new Engineer()
+                                {
+                                    Id = int.Parse(row["Id"].ToString()),
+                                    Surname = row["Surname"].ToString(),
+                                    GivenName = row["GivenName"].ToString(),
+                                    MiddleName = row["MiddleName"].ToString(),
+                                    DisplayName = row["DisplayName"].ToString(),
+                                    AppointName = row["AppointName"].ToString()
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
 
         public static Engineer GetEngineer(int ID, ILogger logger)
         {
@@ -2008,6 +2672,77 @@ namespace O2GEN.Helpers
             }
             return output;
         }
+        public static void CreateEngineer(Engineer obj, string UserName, ILogger logger)
+        {
+            ExecuteScalar(CreateEngineer(obj, UserName), logger);
+        }
+        public static void UpdateEngineer(Engineer obj, string UserName, ILogger logger)
+        {
+            ExecuteScalar(UpdateEngineer(obj, UserName), logger);
+        }
+        public static void DeleteEngineer(int ID, string UserName, ILogger logger)
+        {
+            ExecuteScalar(DeleteEngineer(ID, UserName), logger);
+        }
+        public static Person GetPerson(int ID, ILogger logger)
+        {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
+            Person output = new Person();
+            try
+            {
+                using (var connection = new SqlConnection(con))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectPerson(ID), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output = new Person()
+                                {
+                                    Id = int.Parse(row["Id"].ToString()),
+                                    ObjectUID = new Guid(row["ObjectUID"].ToString()),
+                                    PersonPositionId = string.IsNullOrEmpty(row["PersonPositionId"].ToString()) ? (int?)null : int.Parse(row["PersonPositionId"].ToString()),
+                                    GivenName = row["GivenName"].ToString(),
+                                    MiddleName = row["MiddleName"].ToString(),
+                                    Surname = row["Surname"].ToString(),
+                                    UserId = int.Parse(row["UserId"].ToString())
+                                };
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
+        public static void CreatePerson(Person obj, string UserName, ILogger logger)
+        {
+            ExecuteScalar(CreatePerson(obj, UserName), logger);
+        }
+        public static void UpdatePerson(Person obj, string UserName, ILogger logger)
+        {
+            ExecuteScalar(UpdatePerson(obj, UserName), logger);
+        }
+        public static void DeletePerson(int ID, string UserName, ILogger logger)
+        {
+            ExecuteScalar(DeletePerson(ID, UserName), logger);
+        }
+
+
         #endregion
 
         #endregion

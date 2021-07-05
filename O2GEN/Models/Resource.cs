@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace O2GEN.Models
@@ -24,5 +25,7 @@ namespace O2GEN.Models
         public int? ResourceStateId { get; set; }
         [DisplayName("Подразделение")]
         public int? DepartmentId { get; set; }
+
+        public List<ResourceAllocations> Engeneers { get; set; } = new List<ResourceAllocations>(); 
     }
 }
