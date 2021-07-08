@@ -47,7 +47,7 @@
                                 <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#EmployeePositionEdit" data-url="@Url.Action("EmployeePositionEdit", new { id = item.Id })">
                                     <i class="fa fa-pen"></i>
                                 </button>
-                                <a href="#">
+                                <a href="@Url.Action("EmployeePositionDelete", new { id = item.Id })">
                                     <i class="fa fa-trash"></i>
                                 </a>
                             </div>

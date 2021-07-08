@@ -59,7 +59,7 @@
                                 <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#ControlEdit" data-url="@Url.Action("ControlEdit", new { id = item.Id })">
                                     <i class="fa fa-pen"></i>
                                 </button>
-                                <a href="#">
+                                <a href="@Url.Action("ControlDelete", new { id = item.Id })">
                                     <i class="fa fa-trash"></i>
                                 </a>
                             </div>

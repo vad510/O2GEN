@@ -34,6 +34,6 @@ namespace O2GEN.Models
 
 
 
-        public Guid ObjectUID { get; set; }
+        public Guid ObjectUID { get; set; } = Guid.NewGuid();
     }
 }

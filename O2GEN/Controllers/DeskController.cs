@@ -62,7 +62,7 @@ namespace O2GEN.Controllers
             return View();
         }
         [HttpGet]
-        public IActionResult mployeePositionCreate()
+        public IActionResult EmployeePositionCreate()
         {
             O2GEN.Models.PersonPosition model = new();
             return PartialView("EmployeePositionEdit", model);
@@ -73,6 +73,25 @@ namespace O2GEN.Controllers
             var res = Helpers.DBHelper.GetPersonPosition(id, _logger);
             if (res != null) return PartialView("EmployeePositionEdit", res);
             return View();
+        }
+        [HttpPost]
+        public IActionResult EmployeePositionUpdate(PersonPosition Model)
+        {
+            if (Model.Id == -1)
+            {
+                Helpers.DBHelper.CreatePersonPosition(Model, User.Identity.Name, _logger);
+            }
+            else
+            {
+                Helpers.DBHelper.UpdatePersonPosition(Model, User.Identity.Name, _logger);
+            }
+            return RedirectToAction("EmployeePosition");
+        }
+        [HttpGet]
+        public IActionResult EmployeePositionDelete(int Id)
+        {
+            Helpers.DBHelper.DeletePersonPosition(Id, User.Identity.Name, _logger);
+            return RedirectToAction("EmployeePosition");
         }
 
         public IActionResult ObjectClass()
@@ -119,7 +138,7 @@ namespace O2GEN.Controllers
             return View();
         }
         [HttpGet]
-        public IActionResult ControlsCreate()
+        public IActionResult ControlCreate()
         {
             O2GEN.Models.Control model = new();
             return PartialView("ControlEdit", model);
@@ -130,6 +149,25 @@ namespace O2GEN.Controllers
             var res = Helpers.DBHelper.GetControl(id, _logger);
             if (res != null) return PartialView("ControlEdit", res);
             return View();
+        }
+        [HttpPost]
+        public IActionResult ControlUpdate(Control Model)
+        {
+            if(Model.Id == -1)
+            {
+                Helpers.DBHelper.CreateControl(Model, User.Identity.Name, _logger);
+            }
+            else
+            {
+                Helpers.DBHelper.UpdateControl(Model, User.Identity.Name, _logger);
+            }
+            return RedirectToAction("Controls");
+        }
+        [HttpGet]
+        public IActionResult ControlDelete(int Id)
+        {
+            Helpers.DBHelper.DeleteControl(Id, User.Identity.Name, _logger);
+            return RedirectToAction("Controls");
         }
 
         public IActionResult TOTypes()
