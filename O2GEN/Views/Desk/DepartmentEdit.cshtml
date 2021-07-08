@@ -1,7 +1,7 @@
 ﻿@model O2GEN.Models.Department
 
 <div class="modal fade" id="DepartmentsEdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 @if (Model.Id == -1)
@@ -14,65 +14,60 @@
                 }
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
-            <div class="modal-body">
 
-                <div class="tab-content bg-light">
+            <form action="DepartmentUpdate" method="post">
+                <div class="modal-body">
+                    @Html.Hidden("Id", Model.Id)
+                    @Html.Hidden("ObjectUID", Model.ObjectUID)
 
-                    <div id="major-tab" class="tab-pane active">
-                        <div class="row-container color-black">
-
-                            <div class="row-div-two">
-                                <form action="CreateZpr">
-                                    <div class="form-group">
-
-                                        <div class="margin-between-above">
-                                            <label asp-for="Name"></label>
-                                            <input asp-for="Name" class="form-control" />
-                                            <span asp-validation-for="Name" class="text-danger"></span>
-                                        </div>
-                                        <div class="margin-between-above">
-                                            <label asp-for="DisplayName"></label>
-                                            <input asp-for="DisplayName" class="form-control" />
-                                            <span asp-validation-for="DisplayName" class="text-danger"></span>
-                                        </div>
-                                        <div class="margin-between-above">
-                                            <label asp-for="ParentName"></label>
-                                            <input asp-for="ParentName" class="form-control" />
-                                        </div>
-                                        <div class="margin-between-above">
-                                            <label asp-for="Organization"></label>
-                                            <input asp-for="Organization" class="form-control" />
-                                        </div>
-                                        <div class="margin-between-above">
-                                            <label asp-for="Latitude"></label>
-                                            <input asp-for="Latitude" class="form-control" />
-                                        </div>
-                                        <div class="margin-between-above">
-                                            <label asp-for="Longitude"></label>
-                                            <input asp-for="Longitude" class="form-control" />
-                                        </div>
-                                        <div class="margin-between-above">
-                                            <label asp-for="TimeZone"></label>
-                                            <input asp-for="TimeZone" class="form-control" />
-                                        </div>
-                                        <div class="margin-between-above">
-                                            <label asp-for="ShortCode"></label>
-                                            <input asp-for="ShortCode" class="form-control" />
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-
+                    <div class="form-group">
+                        <label asp-for="Name"></label>
+                        <input asp-for="Name" class="form-control" placeholder="Название" required />
                     </div>
-
-
+                    <div class="form-group">
+                        <label asp-for="DisplayName"></label>
+                        <input asp-for="DisplayName" class="form-control"  placeholder="Отображаемое название" required/>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ParentId"></label>
+                        <select asp-for="ParentId" class="form-control">
+                            <option value="null" selected disabled>Тип контроля</option>
+                            @foreach (var item in O2GEN.Helpers.DBHelper.GetDepartments(true))
+                            {
+                                if(item.Id!=Model.Id)
+                                {
+                                    #warning НУЖНО ИСКЛЮЧИТЬ ДОЧЕРНИЕ ЭЛЕМЕНТЫ
+                                    <option value="@item.Id">@item.DisplayName</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Organization"></label>
+                        <input asp-for="Organization" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Latitude"></label>
+                        <input asp-for="Latitude" type="number" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Longitude"></label>
+                        <input asp-for="Longitude" type="number" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="TimeZone"></label>
+                        <input asp-for="TimeZone" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ShortCode"></label>
+                        <input asp-for="ShortCode" class="form-control" />
+                    </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Отмена</button>
-                <button type="button" class="btn btn-outline-primary" action="@Url.Action("DepartmentsSave", Model)">Применить</button>
-            </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Применить</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

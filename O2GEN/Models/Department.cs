@@ -15,10 +15,11 @@ namespace O2GEN.Models
         [DisplayName("Отображаемое название")]
         public string DisplayName { get; set; }
         public List<Department> Childs { get; set; }
+        [DisplayName("Родительский участок")]
         public int? ParentId { get; set; }
         [DisplayName("Родительский участок")]
         public string ParentName { get; set; }
-        public Guid ObjectUID { get; set; }
+        public Guid ObjectUID { get; set; } = Guid.NewGuid();
         [DisplayName("Широта")]
         public double Latitude { get; set; }
         [DisplayName("Долгота")]

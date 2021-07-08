@@ -15,6 +15,6 @@ namespace O2GEN.Models
         [DisplayName("Подразделение")]
         public int? DepartmentID { get; set; }
         public string DepartmentName { get; set; }
-        public Guid ObjectUID { get; set; }
+        public Guid ObjectUID { get; set; } = Guid.NewGuid();
     }
 }

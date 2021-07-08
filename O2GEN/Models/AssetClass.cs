@@ -12,6 +12,6 @@ namespace O2GEN.Models
 
         [DisplayName("Название")]
         public string DisplayName { get; set; }
-        public Guid ObjectUID { get; set; }
+        public Guid ObjectUID { get; set; } = Guid.NewGuid();
     }
 }

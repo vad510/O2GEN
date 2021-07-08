@@ -17,13 +17,13 @@ namespace O2GEN.Models
         public string Status { get; set; }
         public string Description { get; set; }
         public List<Asset> Childs { get; set; }
-        public Guid ObjectUID { get; set; }
+        public Guid ObjectUID { get; set; } = Guid.NewGuid();
         [DisplayName("Родительский объект")]
         public int? ParentId { get; set; }
         [DisplayName("Класс объектов")]
-        public int? AssetTypeId { get; set; } = null;
+        public int? AssetClassId { get; set; } = null;
         [DisplayName("Тип объекта")]
-        public int? TypeID { get; set; }
+        public int? AssetSortId { get; set; }
         [DisplayName("Подразделение")]
         public int? DepartmentId { get; set; }
 

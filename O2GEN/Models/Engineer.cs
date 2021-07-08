@@ -20,7 +20,7 @@ namespace O2GEN.Models
         public string PersonName { get; set; }
         public string DepartmentName { get; set; }
         public bool IsUser { get; set; }
-        public Guid ObjectUID { get; set; }
+        public Guid ObjectUID { get; set; } = Guid.NewGuid();
         [DisplayName("Подразделение")]
         public int? DepartmentId { get; set; }
         [DisplayName("График")]

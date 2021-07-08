@@ -12,7 +12,7 @@ namespace O2GEN.Models
         public int Id { get; set; } = -1;
         [DisplayName("ФИО (Название)")]
         public string DisplayName { get; set; }
-        public Guid ObjectUID { get; set; }
+        public Guid ObjectUID { get; set; } = Guid.NewGuid();
         [DisplayName("Широта")]
         public double? Latitude { get; set; }
         [DisplayName("Долгота")]

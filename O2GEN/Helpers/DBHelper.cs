@@ -507,16 +507,18 @@ namespace O2GEN.Helpers
                 "(Name, " +
                 "DisplayName, " +
                 "ObjectUID, " +
-                "CreatedByUser, " +
-                "CreationTime," +
-                "Revision)" +
+                "ParentId, " +
+                "Revision, " +
+                "IsDeleted, " +
+                "TenantId)" +
                 "values " +
                 $"(N'{obj.Name}', " +
                 $"N'{obj.DisplayName}', " +
                 $"'{obj.ObjectUID.ToString("D")}', " +
-                $"(isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName)?"NULL":$"'{UserName}'")}),-1)), " +
-                "getdate(), " +
-                "Revision);" +
+                $"{(obj.ParentId == null ? "NULL" : obj.ParentId)}, " +
+                "@Revision, " +
+                "0, " +
+                "1);" +
                 $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.PersonCategory};";
         }
         private static string UpdatePersonCategory(PersonCategory obj, string UserName)
@@ -525,9 +527,8 @@ namespace O2GEN.Helpers
                 "set @revision = (isnull((SELECT max(revision) id FROM PersonCategories ),0)+1); " +
                 "UPDATE PersonCategories SET " +
                 $"Name = N'{obj.Name}', " +
-                $"DisplayName = N'{obj.DisplayName}', " +
-                $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName)?"NULL":$"'{UserName}'")}),-1)), " +
                 "ModificationTime = getdate(), " +
+                $"ParentId = {(obj.ParentId == null ? "NULL" : obj.ParentId)}, " +
                 $"WHERE ID = {obj.Id}; " +
 
                 $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.PersonCategory};";
@@ -537,8 +538,6 @@ namespace O2GEN.Helpers
             return "DECLARE @revision bigint; " +
                 "set @revision = (isnull((SELECT max(revision) id FROM PersonCategories ),0)+1); " +
                 "UPDATE PersonCategories SET " +
-                $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName)?"NULL":$"'{UserName}'")}),-1)), " +
-                "DeletionTime = getdate(), " +
                 "Revision = @revision, " +
                 "IsDeleted = 1 " +
                 $"WHERE ID = {ID}; " +
@@ -568,22 +567,115 @@ namespace O2GEN.Helpers
         }
         private static string SelectAsset(int ID)
         {
-            return "SELECT e.Id, e.DisplayName, e.Description, e.ExternalId, e.ObjectUID, e.ParentId,  t1.DisplayName as StateName, t1.ObjectUID, AT.Id as TypeID, e.DepartmentId " +
-                "FROM Assets AS e " +
-                "LEFT JOIN ( " +
-                "    SELECT e2.Id, e2.DisplayName, e2.ExternalId, e2.IsDeleted, e2.Name, e2.ObjectUID, e2.Revision, e2.TenantId " +
-                "    FROM AssetStates AS e2 " +
-                "    WHERE (e2.IsDeleted <> 1) AND (e2.TenantId = CAST(1 AS bigint)) " +
-                ") AS t1 ON e.AssetStateId = t1.Id " +
-                "LEFT JOIN AssetTypes AT on AT.Id = e.AssetTypeId " +
-                $"WHERE ((e.IsDeleted <> 1) AND (e.TenantId = CAST(1 AS bigint))) AND e.Id = {ID}" +
-                "ORDER BY e.DisplayName";
+            return "SELECT Id, DisplayName, ParentId, ObjectUID, DepartmentId, AssetSortId, AssetClassId, ExternalId " +
+                "FROM Assets " +
+                $"WHERE Id = {ID}";
+        }
+        /// <summary>
+        /// Создание объекта
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string CreateAsset(Asset obj, string UserName)
+        {
+            #warning Разобраться с тем что такое AssetSubtype
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM Assets ),0)+1); " +
+                "INSERT into Assets " +
+                "(ParentId, " +
+                "DisplayName, " +
+                "Name, " +
+                "DepartmentId, " +
+                "AssetSortId, " +
+                "AssetClassId, " +
+                "ExternalId, " +
+                "ObjectUID, " +
+                "CreatedByUser, " +
+                "CreationTime," +
+                "Revision, " +
+                "IsDeleted, " +
+                "TenantId, " +
+                "IsDangerous, " +
+                "OperationStart, " +
+                "MadeDate, " +
+                "AssetSubtype)" +
+                "values " +
+                $"({(obj.ParentId == null ? "NULL" : obj.ParentId)}, " +
+                $"N'{obj.DisplayName}', " +
+                $"N'{obj.DisplayName}', " +
+                $"{obj.DepartmentId}, " +
+                $"{obj.AssetSortId}, " +
+                $"{(obj.AssetClassId == null ? "NULL" : obj.AssetClassId)}, " +
+                $"N'{obj.Maximo}', " +
+                $"'{obj.ObjectUID.ToString("D")}', " +
+                $"(isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
+                "getdate(), " +
+                "@Revision, " +
+                "0, " +
+                "1, " +
+                "0, " +
+                "getdate(), " +
+                "getdate(), " +
+                "-1);" +
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.Asset};";
+        }
+        /// <summary>
+        /// Обновление объекта
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string UpdateAsset(Asset obj, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM Assets ),0)+1); " +
+                "UPDATE Assets SET " +
+                $"ParentId = {(obj.ParentId == null ? "NULL" : obj.ParentId)}, " +
+                $"DisplayName = N'{obj.DisplayName}', " +
+                $"Name = N'{obj.DisplayName}', " +
+                $"DepartmentId = {obj.DepartmentId}, " +
+                $"ExternalId = N'{obj.Maximo}', " +
+                $"AssetSortId = {obj.AssetSortId}, " +
+                $"AssetClassId = {(obj.AssetClassId == null ? "NULL" : obj.AssetClassId)}, " +
+                $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
+                "ModificationTime = getdate(), " +
+                "Revision = @revision " +
+                $"WHERE ID = {obj.Id}; " +
+
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.Asset};";
+        }
+        /// <summary>
+        /// Удаление объекта
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string DeleteAsset(int ID, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM Assets ),0)+1); " +
+                "UPDATE Assets SET " +
+                $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
+                "DeletionTime = getdate(), " +
+                "Revision = @revision, " +
+                "IsDeleted = 1 " +
+                $"WHERE ID = {ID}; " +
+
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.Asset}; ";
         }
 
         private static string SelectAssetTypes()
         {
             return "SELECT id, DisplayName, ObjectUID " +
                 "FROM AssetTypes " +
+                "where IsDeleted <> 1 " +
+                "AND TenantId = CAST(1 AS bigint)";
+        }
+        private static string SelectAssetSorts()
+        {
+            return "SELECT id, DisplayName, ObjectUID " +
+                "FROM AssetSorts " +
                 "where IsDeleted <> 1 " +
                 "AND TenantId = CAST(1 AS bigint)";
         }
@@ -624,11 +716,11 @@ namespace O2GEN.Helpers
                 "Organization, " +
                 "ShortCode, " +
                 "ObjectUID, " +
-                "CreatedByUser, " +
-                "CreationTime," +
-                "Revision)" +
+                "Revision," +
+                "IsDeleted, " +
+                "TenantId)" +
                 "values " +
-                $"(ParentId = {obj.ParentId}, "+
+                $"({(obj.ParentId == null ? "NULL" : obj.ParentId)}, "+
                 $"N'{obj.Name}', " +
                 $"N'{obj.DisplayName}', " +
                 $"{obj.Latitude}, " +
@@ -637,10 +729,10 @@ namespace O2GEN.Helpers
                 $"N'{obj.Organization}', " +
                 $"N'{obj.ShortCode}', " +
                 $"'{obj.ObjectUID.ToString("D")}', " +
-                $"(isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName)?"NULL":$"'{UserName}'")}),-1)), " +
-                "getdate(), " +
-                "Revision);" +
-                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.PersonCategory};";
+                "@Revision, " +
+                "0, " +
+                "1);" +
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.Department};";
         }
         /// <summary>
         /// Обновление подразделения
@@ -653,7 +745,7 @@ namespace O2GEN.Helpers
             return "DECLARE @revision bigint; " +
                 "set @revision = (isnull((SELECT max(revision) id FROM Departments ),0)+1); " +
                 "UPDATE Departments SET " +
-                $"ParentId = {obj.ParentId}, " +
+                $"ParentId = {(obj.ParentId == null? "NULL":obj.ParentId)}, " +
                 $"Name = N'{obj.Name}', " +
                 $"DisplayName = N'{obj.DisplayName}', " +
                 $"Latitude = {obj.Latitude}, " +
@@ -661,12 +753,10 @@ namespace O2GEN.Helpers
                 $"TimeZone = N'{obj.TimeZone}', " +
                 $"Organization = N'{obj.Organization}', " +
                 $"ShortCode = N'{obj.ShortCode}', " +
-                $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName)?"NULL":$"'{UserName}'")}),-1)), " +
-                "ModificationTime = getdate(), " +
-                "Revision = @revision, " +
+                "Revision = @revision " +
                 $"WHERE ID = {obj.Id}; " +
 
-                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.PersonCategory};";
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.Department};";
         }
         /// <summary>
         /// Удаление подразделения
@@ -679,8 +769,6 @@ namespace O2GEN.Helpers
             return "DECLARE @revision bigint; " +
                 "set @revision = (isnull((SELECT max(revision) id FROM Departments ),0)+1); " +
                 "UPDATE Departments SET " +
-                $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName)?"NULL":$"'{UserName}'")}),-1)), " +
-                "DeletionTime = getdate(), " +
                 "Revision = @revision, " +
                 "IsDeleted = 1 " +
                 $"WHERE ID = {ID}; " +
@@ -1837,7 +1925,8 @@ namespace O2GEN.Helpers
                                 {
                                     Id = int.Parse(row["Id"].ToString()),
                                     DisplayName = row["DisplayName"].ToString(),
-                                    ObjectUID = new Guid(row["ObjectUID"].ToString())
+                                    ObjectUID = new Guid(row["ObjectUID"].ToString()),
+                                    ParentId = string.IsNullOrEmpty(row["ParentId"].ToString()) ? (int?)null : int.Parse(row["ParentId"].ToString())
                                 });
                             }
                         }
@@ -1871,7 +1960,8 @@ namespace O2GEN.Helpers
                                     Id = int.Parse(row["Id"].ToString()),
                                     Name = row["Name"].ToString(),
                                     DisplayName = row["DisplayName"].ToString(),
-                                    ObjectUID = new Guid(row["ObjectUID"].ToString())
+                                    ObjectUID = new Guid(row["ObjectUID"].ToString()),
+                                    ParentId = string.IsNullOrEmpty(row["ParentId"].ToString()) ? (int?)null : int.Parse(row["ParentId"].ToString())
                                 };
                             }
                         }
@@ -1886,15 +1976,15 @@ namespace O2GEN.Helpers
         }
         public static void CreatePersonCategory(PersonCategory obj, string UserName, ILogger logger)
         {
-            ExecuteScalar(CreatePersonCategory(obj, UserName), logger);
+            ExecuteNonQuery(CreatePersonCategory(obj, UserName), logger);
         }
         public static void UpdatePersonCategory(PersonCategory obj, string UserName, ILogger logger)
         {
-            ExecuteScalar(UpdatePersonCategory(obj, UserName), logger);
+            ExecuteNonQuery(UpdatePersonCategory(obj, UserName), logger);
         }
         public static void DeletePersonCategory(int ID, string UserName, ILogger logger)
         {
-            ExecuteScalar(DeletePersonCategory(ID, UserName), logger);
+            ExecuteNonQuery(DeletePersonCategory(ID, UserName), logger);
         }
         #endregion
 
@@ -1938,8 +2028,7 @@ namespace O2GEN.Helpers
                                     Description = row["Description"].ToString(),
                                     Maximo = row["ExternalId"].ToString(),
                                     Status = row["StateName"].ToString(),
-                                    ParentId = string.IsNullOrEmpty(row["ParentId"].ToString()) ? (int?)null : int.Parse(row["ParentId"].ToString()),
-                                    AssetTypeId = string.IsNullOrEmpty(row["AssetTypeId"].ToString()) ? (int?)null : int.Parse(row["AssetTypeId"].ToString())
+                                    ParentId = string.IsNullOrEmpty(row["ParentId"].ToString()) ? (int?)null : int.Parse(row["ParentId"].ToString())
                                 });
                             }
                         }
@@ -1999,17 +2088,24 @@ namespace O2GEN.Helpers
                         {
                             foreach (var row in dataReader.Select(row => row))
                             {
+                                Debug.WriteLine(row["Id"].ToString());
+                                Debug.WriteLine(row["DisplayName"].ToString());
+                                Debug.WriteLine(row["ObjectUID"].ToString());
+                                Debug.WriteLine(row["ExternalId"].ToString());
+                                Debug.WriteLine(row["ParentId"].ToString());
+                                Debug.WriteLine(row["DepartmentId"].ToString());
+                                Debug.WriteLine(row["AssetClassId"].ToString());
+                                Debug.WriteLine(row["AssetSortId"].ToString());
                                 output = new Asset()
                                 {
                                     Id = int.Parse(row["Id"].ToString()),
                                     DisplayName = row["DisplayName"].ToString(),
                                     ObjectUID = new Guid(row["ObjectUID"].ToString()),
                                     Maximo = row["ExternalId"].ToString(),
-                                    Status = row["StateName"].ToString(),
                                     ParentId = string.IsNullOrEmpty(row["ParentId"].ToString()) ? (int?)null : int.Parse(row["ParentId"].ToString()),
                                     DepartmentId = string.IsNullOrEmpty(row["DepartmentId"].ToString()) ? (int?)null : int.Parse(row["DepartmentId"].ToString()),
-                                    TypeID = string.IsNullOrEmpty(row["TypeID"].ToString()) ? (int?)null : int.Parse(row["TypeID"].ToString()),
-
+                                    AssetClassId = string.IsNullOrEmpty(row["AssetClassId"].ToString()) ? (int?)null : int.Parse(row["AssetClassId"].ToString()),
+                                    AssetSortId = string.IsNullOrEmpty(row["AssetSortId"].ToString()) ? (int?)null : int.Parse(row["AssetSortId"].ToString())
                                 };
                             }
                         }
@@ -2021,6 +2117,18 @@ namespace O2GEN.Helpers
                 logger.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
             }
             return output;
+        }
+        public static void CreateAsset(Asset obj, string UserName, ILogger logger)
+        {
+            ExecuteNonQuery(CreateAsset(obj, UserName), logger);
+        }
+        public static void UpdateAsset(Asset obj, string UserName, ILogger logger)
+        {
+            ExecuteNonQuery(UpdateAsset(obj, UserName), logger);
+        }
+        public static void DeleteAsset(int ID, string UserName, ILogger logger)
+        {
+            ExecuteNonQuery(DeleteAsset(ID, UserName), logger);
         }
         public static List<AssetType> GetAssetTypes(ILogger logger = null)
         {
@@ -2047,6 +2155,47 @@ namespace O2GEN.Helpers
                             foreach (var row in dataReader.Select(row => row))
                             {
                                 output.Add(new AssetType()
+                                {
+                                    Id = int.Parse(row["Id"].ToString()),
+                                    DisplayName = row["DisplayName"].ToString(),
+                                    ObjectUID = new Guid(row["ObjectUID"].ToString())
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
+        public static List<AssetSort> GetAssetSorts(ILogger logger = null)
+        {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
+            List<AssetSort> output = new List<AssetSort>();
+            try
+            {
+                using (var connection = new SqlConnection(con))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectAssetSorts(), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output.Add(new AssetSort()
                                 {
                                     Id = int.Parse(row["Id"].ToString()),
                                     DisplayName = row["DisplayName"].ToString(),
@@ -2233,15 +2382,15 @@ namespace O2GEN.Helpers
 
         public static void CreateDepartment(Department obj, string UserName, ILogger logger)
         {
-            ExecuteScalar(CreateDepartment(obj, UserName), logger);
+            ExecuteNonQuery(CreateDepartment(obj, UserName), logger);
         }
         public static void UpdateDepartment(Department obj, string UserName, ILogger logger)
         {
-            ExecuteScalar(UpdateDepartment(obj, UserName), logger);
+            ExecuteNonQuery(UpdateDepartment(obj, UserName), logger);
         }
         public static void DeleteDepartment(int ID, string UserName, ILogger logger)
         {
-            ExecuteScalar(DeleteDepartment(ID, UserName), logger);
+            ExecuteNonQuery(DeleteDepartment(ID, UserName), logger);
         }
         #endregion
 

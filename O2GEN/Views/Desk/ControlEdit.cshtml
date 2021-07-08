@@ -1,9 +1,9 @@
 ﻿@model O2GEN.Models.Control
 
 <div class="modal fade" id="ControlEdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
-            <form action="ControlUpdate" method="post">
+            <form action="ControlUpdate" method="post" class="clearfix">
                 <div class="modal-header">
                     @if (Model.Id == -1)
                     {
@@ -16,69 +16,68 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 </div>
                 <div class="modal-body">
-
-                    <div class="tab-content bg-light">
-
-                        <div id="major-tab" class="tab-pane active">
-                            <div class="row-container color-black">
-
-                                <div class="row-div-two">
-                                    <div class="form-group">
-                                        @Html.Hidden("Id", Model.Id)
-                                        @Html.Hidden("ObjectUID", Model.ObjectUID)
-                                        <div class="margin-between-above">
-                                            <label asp-for="DisplayName"></label>
-                                            <input asp-for="DisplayName" class="form-control" />
-                                            <span asp-validation-for="DisplayName" class="text-danger"></span>
-                                        </div>
-                                        <div class="margin-between-above">
-                                            <label asp-for="ValueType"></label>
-                                            <select asp-for="ValueType" class="form-control">
-                                                <option value="0">@O2GEN.Helpers.DBHelper.GetControlTypeDisplay(0)</option>
-                                                <option value="1">@O2GEN.Helpers.DBHelper.GetControlTypeDisplay(1)</option>
-                                                <option value="2">@O2GEN.Helpers.DBHelper.GetControlTypeDisplay(2)</option>
-                                            </select>
-                                            <span asp-validation-for="DisplayName" class="text-danger"></span>
-                                        </div>
-
-                                        <label>Уставки</label>
-
-                                        <label>Норма</label>
-                                        <div class="margin-between-above">
-                                            <label asp-for="ValueBottom1"></label>
-                                            <input asp-for="ValueBottom1" class="form-control" />
-                                        </div>
-                                        <div class="margin-between-above">
-                                            <label asp-for="ValueTop1"></label>
-                                            <input asp-for="ValueTop1" class="form-control" />
-                                        </div>
-                                        <label>Отклонение:</label>
-                                        <div class="margin-between-above">
-                                            <label asp-for="ValueBottom2"></label>
-                                            <input asp-for="ValueBottom2" class="form-control" />
-                                        </div>
-                                        <div class="margin-between-above">
-                                            <label asp-for="ValueTop2"></label>
-                                            <input asp-for="ValueTop2" class="form-control" />
-                                        </div>
-                                        <label>Сильное отклонение:</label>
-                                        <div class="margin-between-above">
-                                            <label asp-for="ValueBottom3"></label>
-                                            <input asp-for="ValueBottom3" class="form-control" />
-                                        </div>
-                                        <div class="margin-between-above">
-                                            <label asp-for="ValueTop3"></label>
-                                            <input asp-for="ValueTop3" class="form-control" />
-                                        </div>
-                                    </div>
-                                </div>
+                    @Html.Hidden("Id", Model.Id)
+                    @Html.Hidden("ObjectUID", Model.ObjectUID)
+                    <div class="form-row">
+                        <div class="form-group col-md-6 is-invalid">
+                            <input asp-for="DisplayName" class="form-control" placeholder="Название" required />
+                            <span asp-validation-for="DisplayName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <select asp-for="ValueType" class="form-control" required>
+                                <option value="" selected disabled>Тип контроля</option>
+                                <option value="0">@O2GEN.Helpers.DBHelper.GetControlTypeDisplay(0)</option>
+                                <option value="1">@O2GEN.Helpers.DBHelper.GetControlTypeDisplay(1)</option>
+                                <option value="2">@O2GEN.Helpers.DBHelper.GetControlTypeDisplay(2)</option>
+                            </select>
+                            <span asp-validation-for="DisplayName" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div id="ContolDetails">
+                        <h4>Уставки</h4>
+                        <h5>Норма</h5>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label asp-for="ValueBottom1"></label>
+                                <input asp-for="ValueBottom1" type="number" class="form-control list-group-item-success" />
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label asp-for="ValueTop1"></label>
+                                <input asp-for="ValueTop1" type="number" class="form-control list-group-item-success" />
                             </div>
                         </div>
+                        <h5>Отклонение</h5>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label asp-for="ValueBottom2"></label>
+                                <input asp-for="ValueBottom2" type="number" class="form-control list-group-item-warning" />
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label asp-for="ValueTop2"></label>
+                                <input asp-for="ValueTop2" type="number" class="form-control list-group-item-warning" />
+                            </div>
+                        </div>
+                        <h5>Сильное отклонение</h5>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label asp-for="ValueBottom3"></label>
+                                <input asp-for="ValueBottom3" type="number" class="form-control list-group-item-danger" />
+
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label asp-for="ValueTop3"></label>
+                                <input asp-for="ValueTop3" type="number" class="form-control list-group-item-danger" />
+                            </div>
+                        </div>
+                        @if (ViewBag.ERR != null)
+                        {
+                            <small class="form-text text-muted">@ViewBag.ERR</small>
+                        }
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Отмена</button>
-                    <button type="submit" class="btn btn-outline-primary">Применить</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Применить</button>
                 </div>
             </form>
         </div>

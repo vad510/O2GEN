@@ -36,6 +36,22 @@ namespace O2GEN.Controllers
             return View();
         }
 
+        [HttpPost]
+        public IActionResult ObjectUpdate(Asset Model)
+        {
+            if (Model.Id == -1)
+                Helpers.DBHelper.CreateAsset(Model, User.Identity.Name, _logger);
+            else
+                Helpers.DBHelper.UpdateAsset(Model, User.Identity.Name, _logger);
+            return RedirectToAction("Objects");
+        }
+        [HttpGet]
+        public IActionResult ObjectDelete(int Id)
+        {
+            Helpers.DBHelper.DeleteAsset(Id, User.Identity.Name, _logger);
+            return RedirectToAction("Objects");
+        }
+
 
         public IActionResult EmployeeCategory()
         {
@@ -54,6 +70,22 @@ namespace O2GEN.Controllers
             var res = Helpers.DBHelper.GetPersonCategory(id, _logger);
             if (res != null) return PartialView("EmployeeCategoryEdit", res);
             return View();
+        }
+
+        [HttpPost]
+        public IActionResult EmployeeCategoryUpdate(PersonCategory Model)
+        {
+            if (Model.Id == -1)
+                Helpers.DBHelper.CreatePersonCategory(Model, User.Identity.Name, _logger);
+            else
+                Helpers.DBHelper.UpdatePersonCategory(Model, User.Identity.Name, _logger);
+            return RedirectToAction("EmployeeCategory");
+        }
+        [HttpGet]
+        public IActionResult EmployeeCategoryDelete(int Id)
+        {
+            Helpers.DBHelper.DeletePersonCategory(Id, User.Identity.Name, _logger);
+            return RedirectToAction("EmployeeCategory");
         }
 
         public IActionResult EmployeePosition()
@@ -153,7 +185,26 @@ namespace O2GEN.Controllers
         [HttpPost]
         public IActionResult ControlUpdate(Control Model)
         {
-            if(Model.Id == -1)
+            /*
+            if (Model.ValueType == 0 || Model.ValueType == 2)
+            {
+                string ERR = "";
+                if (double.Parse(Model.ValueBottom1.Replace(",", ".")) >= double.Parse(Model.ValueTop1.Replace(",", ".")))
+                    ERR +=  "Значение 'Норма от' должно быть меньше 'Норма до'. ";
+                if (double.Parse(Model.ValueTop1.Replace(",", ".")) >= double.Parse(Model.ValueBottom2.Replace(",", ".")))
+                    ERR +=  "Значение 'Норма до' должно быть меньше 'Отклонение до'. ";
+                if (double.Parse(Model.ValueBottom2.Replace(",", ".")) >= double.Parse(Model.ValueTop2.Replace(",", ".")))
+                    ERR += "Значение 'Отклонение от' должно быть меньше 'Норма до'. ";
+                if (double.Parse(Model.ValueTop2.Replace(",", ".")) >= double.Parse(Model.ValueBottom3.Replace(",", ".")))
+                    ERR +=  "Значение 'Сильное отклонение от' должно быть меньше 'Сильное отклонение до'. ";
+                if (!string.IsNullOrEmpty(ERR))
+                {
+                    ViewBag.ERR = ERR;
+                    return PartialView("ControlEdit", Model);
+                }
+            }
+            */
+            if (Model.Id == -1)
             {
                 Helpers.DBHelper.CreateControl(Model, User.Identity.Name, _logger);
             }
@@ -197,14 +248,14 @@ namespace O2GEN.Controllers
             return View();
         }
         [HttpGet]
-        public IActionResult DepartmentsCreate()
+        public IActionResult DepartmentCreate()
         {
-            O2GEN.Models.Department model = new();
+            Department model = new();
             return PartialView("DepartmentEdit", model);
         }
 
         [HttpGet]
-        public IActionResult DepartmentsEdit(int id)
+        public IActionResult DepartmentEdit(int id)
         {
             var res = Helpers.DBHelper.GetDepartment(id, _logger);
 
@@ -213,14 +264,20 @@ namespace O2GEN.Controllers
             return View();
         }
 
-        [HttpGet]
-        public IActionResult DepartmentsSave(Department Model)
+        [HttpPost]
+        public IActionResult DepartmentUpdate(Department Model)
         {
             if (Model.Id == -1)
                 Helpers.DBHelper.CreateDepartment(Model, User.Identity.Name, _logger);
             else
                 Helpers.DBHelper.UpdateDepartment(Model, User.Identity.Name, _logger);
-            return View();
+            return RedirectToAction("Departments");
+        }
+        [HttpGet]
+        public IActionResult DepartmentDelete(int Id)
+        {
+            Helpers.DBHelper.DeleteDepartment(Id, User.Identity.Name, _logger);
+            return RedirectToAction("Departments");
         }
     }
 }
