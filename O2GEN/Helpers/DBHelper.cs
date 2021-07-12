@@ -1621,6 +1621,14 @@ namespace O2GEN.Helpers
 
         public static Control GetControl(int ID, ILogger logger)
         {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
             Control output = new Control();
             try
             {
@@ -1726,6 +1734,14 @@ namespace O2GEN.Helpers
         }
         public static AssetParameterSet GetAssetParameterSet(int ID, ILogger logger)
         {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
             AssetParameterSet output = new AssetParameterSet();
             try
             {
