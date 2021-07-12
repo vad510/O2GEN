@@ -3,88 +3,121 @@
 <div class="modal fade" id="ResourceEdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                @if (Model.Id == -1)
-                {
-                    <h5>Новая запись</h5>
-                }
-                else
-                {
-                    <h5>Изменить запись №@Model.Id</h5>
-                }
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            </div>
-            <div class="modal-body">
-
-                <div class="tab-content bg-light">
-
-                    <div id="major-tab" class="tab-pane active">
-                        <div class="row-container color-black">
-                            <div class="row-div-two">
-                                <form action="CreateZpr">
-                                    <div class="form-group">
-
-                                        <div class="margin-between-above">
-                                            <label asp-for="DisplayName"></label>
-                                            <input asp-for="DisplayName" class="form-control" />
-                                            <span asp-validation-for="DisplayName" class="text-danger"></span>
-                                        </div>
-                                        <div class="margin-between-above">
-                                            <label asp-for="ResourceStateId"></label>
-                                            <select asp-for="ResourceStateId" class="form-control">
-                                                @foreach (ResourceState item in O2GEN.Helpers.DBHelper.GetResourceStates())
-                                                {
-                                                    <option value="@item.Id">@item.DisplayName</option>
-                                                }
-                                            </select>
-                                            <span asp-validation-for="ResourceStateId" class="text-danger"></span>
-                                        </div>
-                                        <div class="margin-between-above">
-                                            <label asp-for="ResourceTypeId"></label>
-                                            <select asp-for="ResourceTypeId" class="form-control">
-                                                @foreach (ResourceType item in O2GEN.Helpers.DBHelper.GetResourceTypes())
-                                                {
-                                                    <option value="@item.Id">@item.DisplayName</option>
-                                                }
-                                            </select>
-                                            <span asp-validation-for="ResourceTypeId" class="text-danger"></span>
-                                        </div>
-                                        <div class="margin-between-above">
-                                            <label asp-for="DepartmentId"></label>
-                                            <select asp-for="DepartmentId" class="form-control">
-                                                @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments())
-                                                {
-                                                    <option value="@item.Id">@item.DisplayName</option>
-                                                }
-                                            </select>
-                                            <span asp-validation-for="DepartmentId" class="text-danger"></span>
-                                        </div>
-                                        <div class="margin-between-above">
-                                            <label asp-for="Address"></label>
-                                            <input asp-for="Address" class="form-control" />
-                                        </div>
-                                        <div class="margin-between-above">
-                                            <label asp-for="Latitude"></label>
-                                            <input asp-for="Latitude" class="form-control" />
-                                        </div>
-                                        <div class="margin-between-above">
-                                            <label asp-for="Longitude"></label>
-                                            <input asp-for="Longitude" class="form-control" />
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
+            <form action="ResourceUpdate" method="post">
+                <div class="modal-header">
+                    @if (Model.Id == -1)
+                    {
+                        <h5>Новая запись</h5>
+                    }
+                    else
+                    {
+                        <h5>Изменить запись №@Model.Id</h5>
+                    }
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <div id="Selected" style="visibility:collapse;"></div>
+                    @Html.Hidden("Id", Model.Id)
+                    @Html.Hidden("ObjectUID", Model.ObjectUID)
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label asp-for="DisplayName"></label>
+                            <input asp-for="DisplayName" class="form-control" required/>
+                            <span asp-validation-for="DisplayName" class="text-danger"></span>
                         </div>
+                        <div class="form-group col-md-6">
+                            <label asp-for="ResourceTypeId"></label>
+                            <select asp-for="ResourceTypeId" class="form-control">
+                                <option value="null" selected disabled>Выбрать</option>
+                                @foreach (ResourceType item in O2GEN.Helpers.DBHelper.GetResourceTypes())
+                                {
+                                    <option value="@item.Id">@item.DisplayName</option>
+                                }
+                            </select>
+                            <span asp-validation-for="ResourceTypeId" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ResourceStateId"></label>
+                        <select asp-for="ResourceStateId" class="form-control" required>
+                            <option value="null" selected disabled>Выбрать</option>
+                            @foreach (ResourceState item in O2GEN.Helpers.DBHelper.GetResourceStates())
+                            {
+                                <option value="@item.Id">@item.DisplayName</option>
+                            }
+                        </select>
+                        <span asp-validation-for="ResourceStateId" class="text-danger"></span>
+                    </div>
 
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label asp-for="DepartmentId"></label>
+                            <select asp-for="DepartmentId" class="form-control" required>
+                                <option value="null" selected disabled>Выбрать</option>
+                                @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments())
+                                {
+                                    <option value="@item.Id">@item.DisplayName</option>
+                                }
+                            </select>
+                            <span asp-validation-for="DepartmentId" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label asp-for="Address"></label>
+                            <input asp-for="Address" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label asp-for="Latitude"></label>
+                            <input asp-for="Latitude" class="form-control" type="number" />
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label asp-for="Longitude"></label>
+                            <input asp-for="Longitude" class="form-control" type="number" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-5">
+                            <input class="form-control" id="myInput1" formtarget="_blank" type="text" placeholder="Search..">
+                            <select multiple class="form-control" formtarget="_blank" id="SelectList1">
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <button type="button" class="btn btn-light" id="right">Вправо</button>
+                            <br />
+                            <button type="button" class="btn btn-light" id="left">Влево</button>
+                        </div>
+                        <div class="form-group col-md-5">
+                            <input class="form-control" id="myInput2" type="text" placeholder="Search..">
+                            <select multiple class="form-control" formtarget="_blank" id="SelectList2">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </div>
                     </div>
 
 
+                    @*С Поиском
+                    <select class="selectpicker" data-live-search="true">
+                        <option>Mustard</option>
+                        <option>Ketchup</option>
+                        <option>Relish</option>
+                    </select>*@
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Отмена</button>
-                <button type="button" class="btn btn-outline-primary">Применить</button>
-            </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Применить</button>
+                </div>
+            </form>
+
         </div>
     </div>
 </div>

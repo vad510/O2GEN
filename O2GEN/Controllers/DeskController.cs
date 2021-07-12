@@ -185,25 +185,25 @@ namespace O2GEN.Controllers
         [HttpPost]
         public IActionResult ControlUpdate(Control Model)
         {
-            /*
+
             if (Model.ValueType == 0 || Model.ValueType == 2)
             {
                 string ERR = "";
                 if (double.Parse(Model.ValueBottom1.Replace(",", ".")) >= double.Parse(Model.ValueTop1.Replace(",", ".")))
-                    ERR +=  "Значение 'Норма от' должно быть меньше 'Норма до'. ";
+                    ERR += "Значение 'Норма от' должно быть меньше 'Норма до'. ";
                 if (double.Parse(Model.ValueTop1.Replace(",", ".")) >= double.Parse(Model.ValueBottom2.Replace(",", ".")))
-                    ERR +=  "Значение 'Норма до' должно быть меньше 'Отклонение до'. ";
+                    ERR += "Значение 'Норма до' должно быть меньше 'Отклонение до'. ";
                 if (double.Parse(Model.ValueBottom2.Replace(",", ".")) >= double.Parse(Model.ValueTop2.Replace(",", ".")))
                     ERR += "Значение 'Отклонение от' должно быть меньше 'Норма до'. ";
                 if (double.Parse(Model.ValueTop2.Replace(",", ".")) >= double.Parse(Model.ValueBottom3.Replace(",", ".")))
-                    ERR +=  "Значение 'Сильное отклонение от' должно быть меньше 'Сильное отклонение до'. ";
+                    ERR += "Значение 'Сильное отклонение от' должно быть меньше 'Сильное отклонение до'. ";
                 if (!string.IsNullOrEmpty(ERR))
                 {
                     ViewBag.ERR = ERR;
                     return PartialView("ControlEdit", Model);
                 }
             }
-            */
+
             if (Model.Id == -1)
             {
                 Helpers.DBHelper.CreateControl(Model, User.Identity.Name, _logger);

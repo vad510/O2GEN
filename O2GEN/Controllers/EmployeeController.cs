@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using O2GEN.Models;
 using O2GEN.Models.EmployeeModels;
 using O2GEN.Models.HomeModels;
 using System.Linq;
@@ -67,9 +68,29 @@ namespace O2GEN.Controllers
             return View();
         }
 
+        [HttpPost]
+        public IActionResult EngineerUpdate(Engineer Model)
+        {
+            if (Model.Id == -1)
+                Helpers.DBHelper.CreateEngineer(Model, User.Identity.Name, _logger);
+            else
+                Helpers.DBHelper.UpdateEngineer(Model, User.Identity.Name, _logger);
+            return RedirectToAction("Engineers");
+        }
+        [HttpGet]
+        public IActionResult EngineerDelete(int Id)
+        {
+            Helpers.DBHelper.DeleteEngineer(Id, User.Identity.Name, _logger);
+            return RedirectToAction("Engineers");
+        }
+
         public IActionResult Roles()
         {
             ViewBag.Roles = Helpers.DBHelper.GetPPRoles(_logger);
+            return View();
+        }
+        public IActionResult Calendar()
+        {
             return View();
         }
 
@@ -79,20 +100,10 @@ namespace O2GEN.Controllers
             return View();
         }
 
-        public IActionResult Calendar()
-        {
-            return View();
-        }
-
-        public IActionResult Department()
-        {
-            ViewBag.Departments = Helpers.DBHelper.GetResources(_logger);
-            return View();
-        }
         [HttpGet]
         public IActionResult ResourceCreate()
         {
-            O2GEN.Models.Resource model = new();
+            Resource model = new();
             return PartialView("ResourceEdit", model);
         }
         [HttpGet]
@@ -103,15 +114,20 @@ namespace O2GEN.Controllers
             return View();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id">element clicked</param>
-        /// <returns></returns>
-        [HttpGet]
-        public IActionResult EditDepartment(int id)
+        [HttpPost]
+        public IActionResult ResourceUpdate(Resource Model)
         {
-            return PartialView("_DepartmentEdit", dps.DepartmentHeadModels.FirstOrDefault());
+            if (Model.Id == -1)
+                Helpers.DBHelper.CreateResource(Model, User.Identity.Name, _logger);
+            else
+                Helpers.DBHelper.UpdateResource(Model, User.Identity.Name, _logger);
+            return RedirectToAction("Resources");
+        }
+        [HttpGet]
+        public IActionResult ResourceDelete(int Id)
+        {
+            Helpers.DBHelper.DeleteResource(Id, User.Identity.Name, _logger);
+            return RedirectToAction("Resources");
         }
     }
 }
