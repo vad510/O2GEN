@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using O2GEN.Models;
 using O2GEN.Models.DeskModels;
+using System.Diagnostics;
 
 namespace O2GEN.Controllers
 {
@@ -169,12 +170,14 @@ namespace O2GEN.Controllers
             ViewBag.Controls = Helpers.DBHelper.GetControls(_logger);
             return View();
         }
+
         [HttpGet]
         public IActionResult ControlCreate()
         {
-            O2GEN.Models.Control model = new();
+            Control model = new();
             return PartialView("ControlEdit", model);
         }
+
         [HttpGet]
         public IActionResult ControlEdit(int id)
         {
@@ -182,38 +185,48 @@ namespace O2GEN.Controllers
             if (res != null) return PartialView("ControlEdit", res);
             return View();
         }
+
         [HttpPost]
         public IActionResult ControlUpdate(Control Model)
         {
-            /*
-            if (Model.ValueType == 0 || Model.ValueType == 2)
+            if (!ModelState.IsValid)
             {
-                string ERR = "";
-                if (double.Parse(Model.ValueBottom1.Replace(",", ".")) >= double.Parse(Model.ValueTop1.Replace(",", ".")))
-                    ERR +=  "Значение 'Норма от' должно быть меньше 'Норма до'. ";
-                if (double.Parse(Model.ValueTop1.Replace(",", ".")) >= double.Parse(Model.ValueBottom2.Replace(",", ".")))
-                    ERR +=  "Значение 'Норма до' должно быть меньше 'Отклонение до'. ";
-                if (double.Parse(Model.ValueBottom2.Replace(",", ".")) >= double.Parse(Model.ValueTop2.Replace(",", ".")))
-                    ERR += "Значение 'Отклонение от' должно быть меньше 'Норма до'. ";
-                if (double.Parse(Model.ValueTop2.Replace(",", ".")) >= double.Parse(Model.ValueBottom3.Replace(",", ".")))
-                    ERR +=  "Значение 'Сильное отклонение от' должно быть меньше 'Сильное отклонение до'. ";
-                if (!string.IsNullOrEmpty(ERR))
-                {
-                    ViewBag.ERR = ERR;
-                    return PartialView("ControlEdit", Model);
-                }
+                Debug.Write("Model state not valid");
+                //
+                return PartialView("ControlEdit", Model);
             }
-            */
-            if (Model.Id == -1)
-            {
-                Helpers.DBHelper.CreateControl(Model, User.Identity.Name, _logger);
-            }
-            else
-            {
-                Helpers.DBHelper.UpdateControl(Model, User.Identity.Name, _logger);
-            }
-            return RedirectToAction("Controls");
+            Debug.Write("Model state is valid");
+            return RedirectToAction("Controls", "Desk");
+
+            //if (Model.ValueType == 0 || Model.ValueType == 2)
+            //{
+            //    string ERR = "";
+            //    if (double.Parse(Model.ValueBottom1.Replace(",", ".")) >= double.Parse(Model.ValueTop1.Replace(",", ".")))
+            //        ERR += "Значение 'Норма от' должно быть меньше 'Норма до'. ";
+            //    if (double.Parse(Model.ValueTop1.Replace(",", ".")) >= double.Parse(Model.ValueBottom2.Replace(",", ".")))
+            //        ERR += "Значение 'Норма до' должно быть меньше 'Отклонение до'. ";
+            //    if (double.Parse(Model.ValueBottom2.Replace(",", ".")) >= double.Parse(Model.ValueTop2.Replace(",", ".")))
+            //        ERR += "Значение 'Отклонение от' должно быть меньше 'Норма до'. ";
+            //    if (double.Parse(Model.ValueTop2.Replace(",", ".")) >= double.Parse(Model.ValueBottom3.Replace(",", ".")))
+            //        ERR += "Значение 'Сильное отклонение от' должно быть меньше 'Сильное отклонение до'. ";
+            //    if (!string.IsNullOrEmpty(ERR))
+            //    {
+            //        ViewBag.ERR = ERR;
+            //        return PartialView("ControlEdit", Model);
+            //    }
+            //}
+
+            //if (Model.Id == -1)
+            //{
+            //    Helpers.DBHelper.CreateControl(Model, User.Identity.Name, _logger);
+            //}
+            //else
+            //{
+            //    Helpers.DBHelper.UpdateControl(Model, User.Identity.Name, _logger);
+            //}
+            //return RedirectToAction("Controls");
         }
+
         [HttpGet]
         public IActionResult ControlDelete(int Id)
         {
@@ -226,12 +239,14 @@ namespace O2GEN.Controllers
             ViewBag.TOTypes = Helpers.DBHelper.GetTOTypes(_logger);
             return View();
         }
+
         [HttpGet]
         public IActionResult TOTypeCreate()
         {
             O2GEN.Models.TOType model = new();
             return PartialView("TOTypeEdit", model);
         }
+
         [HttpGet]
         public IActionResult TOTypeEdit(int id)
         {
@@ -247,6 +262,7 @@ namespace O2GEN.Controllers
             ViewBag.Departments = Helpers.DBHelper.GetDepartments(logger: _logger);
             return View();
         }
+
         [HttpGet]
         public IActionResult DepartmentCreate()
         {
@@ -273,6 +289,7 @@ namespace O2GEN.Controllers
                 Helpers.DBHelper.UpdateDepartment(Model, User.Identity.Name, _logger);
             return RedirectToAction("Departments");
         }
+
         [HttpGet]
         public IActionResult DepartmentDelete(int Id)
         {

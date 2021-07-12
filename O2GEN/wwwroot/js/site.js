@@ -35,8 +35,10 @@
 ////    }
 ////};
 
+let placeholder = document.getElementById("placeholder");
+
 ﻿(function prepareLists() {
-    var treeViewitems = document.getElementsByClassName("caret");
+     const treeViewitems = document.getElementsByClassName("caret");
 
     for (var i = 0; i < treeViewitems.length; i++) {
         treeViewitems[i].addEventListener("click", function () {
@@ -55,51 +57,31 @@ var ready = function (action) {
 };
 
 ready(function () {
-    var elems = document.querySelectorAll('[data-toggle="modal-toggler"]');
+
+    const elems = document.querySelectorAll('[data-toggle="modal-toggler"]');
+
     for (var i = 0; i < elems.length; i++) {
         console.log("buttons founded: " + i);
         elems[i].addEventListener('click', btnClick);
     }
+
+    placeholder = document.getElementById("placeholder");
 });
 
 function btnClick() {
     if (document.readyState != "complete")
         return;
-    var placeholder = document.getElementById("placeholder");
+    placeholder = document.getElementById("placeholder");
     if (placeholder == undefined) {
         return;
     }
-    var url = this.getAttribute("data-url");
-    //if (self.fetch) {
-    //    getDataWithFetch(url).then(function (response) {
-    //        tryCreateModal(placeholder, response);
-    //    });
-    //}
-    //else {
-    //}
+    const url = this.getAttribute("data-url");
 
     getDataWithXmlHttpRequest(url, tryCreateModal, placeholder);
-}
-
-//function getDataWithFetch(url) {
-//    return __awaiter(this, void 0, void 0, function () {
-//        var response;
-//        return __generator(this, function (_a) {
-//            switch (_a.label) {
-//                case 0: return [4, fetch(url)];
-//                case 1:
-//                    response = _a.sent();
-//                    if (!response.ok) return [3, 3];
-//                    return [4, response.text()];
-//                case 2: return [2, _a.sent()];
-//                case 3: return [2];
-//            }
-//        });
-//    });
-//}
+};
 
 function getDataWithXmlHttpRequest(url, callback, placeholder) {
-    var xhr = new XMLHttpRequest();
+    const xhr = new XMLHttpRequest();
     xhr.onloadstart = function (e) {
     };
     xhr.onload = function (e) {
@@ -114,7 +96,123 @@ function getDataWithXmlHttpRequest(url, callback, placeholder) {
 
 function tryCreateModal(placeholder, response) {
     placeholder.innerHTML = response;
-    var div = placeholder.querySelector(".modal");
-    var modal = new bootstrap.Modal(div);
+    const div = placeholder.querySelector(".modal");
+    const modal = new bootstrap.Modal(div);
     modal.show();
+
+    /////////////////  JQuery working example for validate modal ///////////////
+    //placeholder = $(placeholder);
+
+    //placeholder.on('click', '[data-save="modal"]', function (event) {
+    //event.preventDefault();
+
+    //var form = $(this).parents('.modal').find('form');
+    //var actionUrl = form.attr('action');
+    //var dataToSend = form.serialize();
+
+    //$.post(actionUrl, dataToSend).done(function (data) {
+    //    var newBody = $('.modal-body', data);
+    //    $(placeholder).find('.modal-body').replaceWith(newBody).clone();
+
+    //    var isValid = newBody.find('[name="IsValid"]').val() == 'True';
+    //    if (isValid) {
+    //        $(placeholder).find('.modal').modal('hide');
+    //    }
+    //});
+    //});
+    //return;
+    //////////////////  end of JQuery example  /////////////////////
+
+    const btn = placeholder.querySelector('[data-save="modal"]');
+
+    btn.addEventListener('click', function (event) {
+        event.preventDefault();
+
+        const modal = placeholder.querySelector('.modal');
+
+        const form = modal.querySelector('form');
+        const url = form.action;
+        const dataToSend2 = new FormData(form);
+
+        const xhr = new XMLHttpRequest();
+
+        xhr.onload = function (e) {
+            TryValidate(xhr.response);
+        }
+
+        xhr.open('post', url);
+        xhr.send(dataToSend2);
+    })
 }
+
+function TryValidate(response) {
+
+    if (placeholder != null) {
+
+        console.log(response);
+
+        const div = document.createElement('div');
+        div.innerHTML = response;
+
+        const newBody = div.querySelector('.modal-body');
+        const oldBody = placeholder.querySelector('.modal-body');
+
+        if (oldBody == null) {
+
+            const modal = placeholder.querySelector('.modal');
+
+            if (modal != null) {
+                console.log("Found existing modal");
+
+                tryRemoveModals();
+            }
+
+            console.log("No body of modal for placeholder is found");
+            return;
+        }
+
+        oldBody.replaceWith(newBody);
+
+        const errors = placeholder.querySelectorAll(".field-validation-error");
+
+        if (errors.length > 0) {
+            console.log("we have errors")
+        }
+        else {
+            console.log("no errors");
+            tryRemoveModals();
+        }
+    }
+}
+
+
+function tryRemoveModals() {
+    const modals = document.getElementsByClassName('modal');
+
+    for (let i = 0; i < modals.length; i++) {
+        modals[i].classList.remove('show');
+        modals[i].setAttribute('aria-hidden', 'true');
+        modals[i].setAttribute('style', 'display:none');
+    }
+
+    const modalOverlays = document.getElementsByClassName('modal-backdrop');
+
+    for (let i = 0; i < modalOverlays.length; i++) {
+        document.body.removeChild(modalOverlays[i]);
+    }
+}
+
+//function getParents(el, parentSelector) {
+//    if (parentSelector === undefined) {
+//        parentSelector = document;
+//    }
+//    var parents = [];
+//    var p = el.parentNode;
+//    while (p !== parentSelector) {
+//        var o = p;
+//        parents.push(o);
+//        p = o.parentNode;
+//    }
+//    parents.push(parentSelector);
+//    return parents;
+//}
