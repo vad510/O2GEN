@@ -220,6 +220,7 @@ function TryValidate(response) {
     else {
         console.log("no errors");
         tryRemoveModals();
+        window.location.reload(true);
     }
 }
 
