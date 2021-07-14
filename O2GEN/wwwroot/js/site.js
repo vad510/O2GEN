@@ -77,15 +77,15 @@ function btnClick() {
     }
     const url = this.getAttribute("data-url");
 
-    getDataWithXmlHttpRequest(url, tryCreateModal, placeholder);
+    getDataWithXmlHttpRequest(url, placeholder);
 };
 
-function getDataWithXmlHttpRequest(url, callback, placeholder) {
+function getDataWithXmlHttpRequest(url, placeholder) {
     const xhr = new XMLHttpRequest();
     xhr.onloadstart = function (e) {
     };
     xhr.onload = function (e) {
-        callback(placeholder, xhr.response);
+        tryCreateModal(placeholder, xhr.response);
     };
     xhr.onerror = function (e) {
         console.log(e);
@@ -180,47 +180,46 @@ function tryCreateModal(placeholder, response) {
 
         xhr.open('post', url);
         xhr.send(dataToSend2);
-    })
+    });
 }
 
 function TryValidate(response) {
 
-    if (placeholder != null) {
+    if (placeholder == null)
+        throw new Error("Null reference exception");
 
-        console.log(response);
+    //console.log(response);
 
-        const div = document.createElement('div');
-        div.innerHTML = response;
+    const div = document.createElement('div');
+    div.innerHTML = response;
 
-        const newBody = div.querySelector('.modal-body');
-        const oldBody = placeholder.querySelector('.modal-body');
+    const newBody = div.querySelector('.modal-body');
+    const oldBody = placeholder.querySelector('.modal-body');
 
-        if (oldBody == null) {
+    if (oldBody == null) {
 
-            const modal = placeholder.querySelector('.modal');
+        const modal = placeholder.querySelector('.modal');
 
-            if (modal != null) {
-                console.log("Found existing modal");
+        if (modal != null) {
+            console.log("Found existing modal");
 
-                tryRemoveModals();
-            }
-
-            console.log("No body of modal for placeholder is found");
-            return;
-        }
-
-        oldBody.replaceWith(newBody);
-
-        const errors = placeholder.querySelectorAll(".field-validation-error");
-
-        if (errors.length > 0) {
-            console.log("we have errors")
-        }
-        else {
-            console.log("no errors");
             tryRemoveModals();
-            window.location.reload(true);
         }
+
+        console.log("No body of modal for placeholder is found");
+        return;
+    }
+
+    oldBody.replaceWith(newBody);
+
+    const errors = placeholder.querySelectorAll(".field-validation-error");
+
+    if (errors.length > 0) {
+        console.log("we have errors");
+    }
+    else {
+        console.log("no errors");
+        tryRemoveModals();
     }
 }
 
