@@ -24,24 +24,26 @@ namespace O2GEN.Models
         public string DisplayValueType { get; set; }
 
         [DisplayName("от")]
-        [DoubleCompareAttribute("ValueTop1", ErrorMessage = "Значение 'Норма от' должно быть меньше 'Норма до'")]
         public string ValueBottom1 { get; set; } = "-999999999999";
 
         [DisplayName("до")]
+        [DoubleCompareAttribute("ValueBottom1", "ValueType", ErrorMessage = "Значение 'Норма от' должно быть меньше 'Норма до'")]
         public string ValueTop1 { get; set; } = "999999999999";
 
         [DisplayName("от")]
-        [DoubleCompareAttribute("ValueTop2", ErrorMessage = "Значение 'Норма от' должно быть меньше 'Норма до'")]
+        [DoubleCompareAttribute("ValueTop1", "ValueType", ErrorMessage = "Значение 'Норма до' должно быть меньше 'Отклонение от'")]
         public string ValueBottom2 { get; set; } = "-999999999999";
 
         [DisplayName("до")]
+        [DoubleCompareAttribute("ValueBottom2", "ValueType", ErrorMessage = "Значение 'Значение 'Отклонение от' должно быть меньше 'Отклонение до'")]
         public string ValueTop2 { get; set; } = "999999999999";
 
         [DisplayName("от")]
-        [DoubleCompareAttribute("ValueTop3", ErrorMessage = "Значение 'Норма от' должно быть меньше 'Норма до'")]
+        [DoubleCompareAttribute("ValueTop2", "ValueType", ErrorMessage = "Значение 'Значение 'Отклонение до' должно быть меньше 'Сильное отклонение от'")]
         public string ValueBottom3 { get; set; } = "-999999999999";
 
         [DisplayName("до")]
+        [DoubleCompareAttribute("ValueBottom3", "ValueType", ErrorMessage = "Значение 'Значение 'Сильное отклонение от' должно быть меньше 'Сильное отклонение до'")]
         public string ValueTop3 { get; set; } = "999999999999";
 
 

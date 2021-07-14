@@ -146,6 +146,23 @@ namespace O2GEN.Controllers
             return View();
         }
 
+        [HttpPost]
+        public IActionResult ObjectClassUpdate(AssetClass Model)
+        {
+            if (Model.Id == -1)
+                Helpers.DBHelper.CreateAssetClass(Model, User.Identity.Name, _logger);
+            else
+                Helpers.DBHelper.UpdateAssetClass(Model, User.Identity.Name, _logger);
+            return RedirectToAction("ObjectClass");
+        }
+
+        [HttpGet]
+        public IActionResult ObjectClassDelete(int Id)
+        {
+            Helpers.DBHelper.DeleteAssetClass(Id, User.Identity.Name, _logger);
+            return RedirectToAction("ObjectClass");
+        }
+
         public IActionResult Route()
         {
             ViewBag.Routes = Helpers.DBHelper.GetAssetParameterSets(_logger);
@@ -214,7 +231,7 @@ namespace O2GEN.Controllers
                 return PartialView("ControlEdit", Model);
             }
             Debug.Write("Model state is valid");
-            return RedirectToAction("Controls", "Desk");
+            //return RedirectToAction("Controls", "Desk");
 
             if (Model.Id == -1)
             {

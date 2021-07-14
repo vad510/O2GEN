@@ -93,13 +93,51 @@ function getDataWithXmlHttpRequest(url, callback, placeholder) {
     xhr.open('get', url);
     xhr.send();
 }
-
+function sortHidden() {
+    var list = $('#Selected').children();
+    for (var i = 0; i < list.length; i++) {
+        list[i].id = 'Parameters[' + i + ']';
+        list[i].name = 'Parameters[' + i + ']';
+    }
+}
 function tryCreateModal(placeholder, response) {
     placeholder.innerHTML = response;
     const div = placeholder.querySelector(".modal");
     const modal = new bootstrap.Modal(div);
     modal.show();
 
+    $("#myInput1").on("keyup", function () {
+        var value = $(this).val().toLowerCase();
+        $("#SelectList1 option").filter(function () {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
+    $("#myInput2").on("keyup", function () {
+        var value = $(this).val().toLowerCase();
+        $("#SelectList2 option").filter(function () {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
+    $("#right").click(function () {
+        var elem = $('#SelectList1').find(":selected");
+        if (elem != null) {
+            $('#SelectList1').find(":selected").remove();
+            for (var i = 0; i < elem.length; i++) {
+                $('#SelectList2').append(elem[i]);
+                $('#Selected').append('<input id="prodId" name="prodId" type="hidden" value="' + elem[i].value + '">');
+            }
+            sortHidden();
+        }
+    });
+    $("#left").click(function () {
+        var elem = $('#SelectList2').find(":selected");
+        if (elem != null) {
+            $('#SelectList2').find(":selected").remove();
+            $('#SelectList1').append(elem);
+            $("#Selected>input[value='" + elem.val() + "']").remove();
+            sortHidden();
+        }
+    });
     /////////////////  JQuery working example for validate modal ///////////////
     //placeholder = $(placeholder);
 

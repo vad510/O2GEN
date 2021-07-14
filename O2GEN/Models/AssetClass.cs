@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace O2GEN.Models
@@ -13,5 +14,6 @@ namespace O2GEN.Models
         [DisplayName("Название")]
         public string DisplayName { get; set; }
         public Guid ObjectUID { get; set; } = Guid.NewGuid();
+        public List<int> Parameters { get; set; } = new List<int>();
     }
 }

@@ -414,6 +414,134 @@ namespace O2GEN.Helpers
                 "AND (TenantId = CAST(1 AS bigint)) " +
                 "order by DisplayName";
         }
+        /// <summary>
+        /// Создание класса объектов
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string CreateAssetClass(AssetClass obj, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM AssetClass ),0)+1); " +
+                "DECLARE @InsertedPId TABLE(id int); " +
+                "INSERT INTO AssetClass " +
+                $"(Name, " +
+                $"DisplayName, " +
+                $"CreatedByUser, " +
+                "CreationTime, " +
+                "ObjectUID, " +
+                "Revision, " +
+                "TenantId, " +
+                "IsDeleted)" +
+                "output inserted.Id into @InsertedPId " +
+                "values" +
+                $"(N'{obj.DisplayName}', " +
+                $"N'{obj.DisplayName}', " +
+                $"(isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
+                $"getdate(), " +
+                $"'{obj.ObjectUID.ToString("D")}', " +
+                $"@revision, " +
+                $"1, " +
+                $"0); " +
+
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.AssetClass};" +
+                $"SELECT TOP 1 id FROM @InsertedPId;";
+        }
+        /// <summary>
+        /// Обновление класса объектов
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string UpdateAssetClass(AssetClass obj, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM AssetClass ),0)+1); " +
+                "UPDATE AssetClass SET " +
+                "Revision = @revision, " +
+                $"Name = N'{obj.DisplayName}', " +
+                $"DisplayName = N'{obj.DisplayName}', " +
+                $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
+                "ModificationTime = getdate() " +
+                $"WHERE ID = {obj.Id}; " +
+
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.AssetClass};";
+        }
+        /// <summary>
+        /// Удаление класса объектов
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string DeleteAssetClass(int ID, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM AssetClass ),0)+1); " +
+                "UPDATE AssetClass SET " +
+                $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
+                "DeletionTime = getdate(), " +
+                "Revision = @revision, " +
+                "IsDeleted = 1 " +
+                $"WHERE ID = {ID}; " +
+
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.AssetClass}; ";
+        }
+        /// <summary>
+        /// Связанный контроль
+        /// </summary>
+        /// <param name="AssetClassId"></param>
+        /// <returns></returns>
+        private static string SelectAssetClassParameters(int AssetClassId)
+        {
+            return "SELECT Id, ObjectUID, AssetClassId, AssetParameterId " +
+                "FROM AssetClassParameter " +
+                "WHERE (IsDeleted <> 1) " +
+                $"AND AssetClassId = {AssetClassId}";
+        }
+        /// <summary>
+        /// Создание класса объектов
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string CreateAssetClassParameter(AssetClassParameter obj, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM AssetClassParameter ),0)+1); " +
+                "INSERT INTO AssetClassParameter " +
+                $"(AssetClassId, " +
+                $"AssetParameterId, " +
+                "ObjectUID, " +
+                "Revision, " +
+                "IsDeleted)" +
+                "values" +
+                $"({obj.AssetClassId}, " +
+                $"{obj.AssetParameterId}, " +
+                $"'{obj.ObjectUID.ToString("D")}', " +
+                $"@revision, " +
+                $"0); " +
+
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.AssetClassParameter};";
+        }
+        /// <summary>
+        /// Удаление класса объектов
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string DeleteAssetClassParameter(int ID, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM AssetClassParameter ),0)+1); " +
+                "UPDATE AssetClassParameter SET " +
+                "Revision = @revision, " +
+                "IsDeleted = 1 " +
+                $"WHERE ID = {ID}; " +
+
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.AssetClassParameter}; ";
+        }
+
         #endregion
 
         #region Должность
@@ -1574,7 +1702,7 @@ namespace O2GEN.Helpers
         /// </summary>
         /// <param name="logger"></param>
         /// <returns></returns>
-        public static List<Control> GetControls(ILogger logger)
+        public static List<Control> GetControls(ILogger logger = null)
         {
             string con = GetConnectionString();
 
@@ -1863,6 +1991,10 @@ namespace O2GEN.Helpers
                         }
                     }
                 }
+                foreach (var item in GetAssetClassParameters(output.Id, logger))
+                {
+                    output.Parameters.Add(item.AssetParameterId);
+                }
             }
             catch (Exception ex)
             {
@@ -1870,6 +2002,93 @@ namespace O2GEN.Helpers
             }
             return output;
         }
+
+        public static void CreateAssetClass(AssetClass obj, string UserName, ILogger logger)
+        {
+            var idnew= ExecuteScalar(CreateAssetClass(obj, UserName), logger);
+
+            foreach (var item in obj.Parameters)
+            {
+                CreateAssetClassParameter(new AssetClassParameter() { AssetClassId = int.Parse(idnew), AssetParameterId = item }, UserName, logger);
+            }
+        }
+        public static void UpdateAssetClass(AssetClass obj, string UserName, ILogger logger)
+        {
+            ExecuteNonQuery(UpdateAssetClass(obj, UserName), logger);
+            var currPar = GetAssetClassParameters(obj.Id);
+            foreach (var item in obj.Parameters)
+            {
+                if (currPar.Find(x => x.AssetParameterId == item) == null)
+                    CreateAssetClassParameter(new AssetClassParameter() { AssetClassId = obj.Id, AssetParameterId = item },UserName, logger);
+            }
+            foreach (var item in currPar)
+            {
+                if (!obj.Parameters.Contains(item.AssetParameterId))
+                    DeleteAssetClassParameter(item.Id, UserName, logger);
+            }
+        }
+        public static void DeleteAssetClass(int ID, string UserName, ILogger logger)
+        {
+            ExecuteNonQuery(DeleteAssetClass(ID, UserName), logger);
+        }
+        /// <summary>
+        /// Контроли в классах объектов
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <returns></returns>
+        public static List<AssetClassParameter> GetAssetClassParameters(int AssetClassId, ILogger logger = null)
+        {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
+            List<AssetClassParameter> output = new List<AssetClassParameter>();
+
+            try
+            {
+                using (var connection = new SqlConnection(con))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectAssetClassParameters(AssetClassId), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output.Add(new AssetClassParameter()
+                                {
+                                    Id = int.Parse(row["Id"].ToString()),
+                                    AssetClassId = int.Parse(row["AssetClassId"].ToString()),
+                                    AssetParameterId = int.Parse(row["AssetParameterId"].ToString()),
+                                    ObjectUID= new Guid(row["ObjectUID"].ToString())
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
+        public static void CreateAssetClassParameter(AssetClassParameter obj, string UserName, ILogger logger)
+        {
+            ExecuteNonQuery(CreateAssetClassParameter(obj, UserName), logger);
+        }
+        public static void DeleteAssetClassParameter(int ID, string UserName, ILogger logger)
+        {
+            ExecuteNonQuery(DeleteAssetClassParameter(ID, UserName), logger);
+        }
+
+
         #endregion
 
         #region Должность

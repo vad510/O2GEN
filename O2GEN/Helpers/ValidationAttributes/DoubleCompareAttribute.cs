@@ -7,10 +7,12 @@ namespace O2GEN.Helpers.ValidationAttributes
     public class DoubleCompareAttribute : ValidationAttribute
     {
         private readonly string _toCompareWith;
+        private readonly string _optionProperty;
 
-        public DoubleCompareAttribute(string toCompare)
+        public DoubleCompareAttribute(string toCompare, string option)
         {
             _toCompareWith = toCompare;
+            _optionProperty = option;
         }
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
@@ -20,6 +22,7 @@ namespace O2GEN.Helpers.ValidationAttributes
             var currentValue = (string)value;
 
             var property = validationContext.ObjectType.GetProperty(_toCompareWith);
+            var optionProperty = validationContext.ObjectType.GetProperty(_optionProperty);
 
             if (property == null)
             {
@@ -28,9 +31,20 @@ namespace O2GEN.Helpers.ValidationAttributes
             }
 
             var toValidateWith = (string)property.GetValue(validationContext.ObjectInstance);
+            var optionValue = (int?)optionProperty.GetValue(validationContext.ObjectInstance);
 
-            if (double.Parse(currentValue.Replace(",", ".")) >= double.Parse(toValidateWith.Replace(",", ".")))
-                return new ValidationResult(ErrorMessage);
+            switch (optionValue)
+            {
+                case 0:
+                    case 2:
+                    {
+                        if (double.Parse(currentValue.Replace(",", ".")) <= double.Parse(toValidateWith.Replace(",", ".")))
+                            return new ValidationResult(ErrorMessage);
+                    }
+                    break;
+                default:
+                    break;
+            }
 
             return ValidationResult.Success;
         }

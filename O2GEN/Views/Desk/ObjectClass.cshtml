@@ -47,7 +47,8 @@
                                 <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#ObjectClassEdit" data-url="@Url.Action("ObjectClassEdit", new { id = item.Id })">
                                     <i class="fa fa-pen"></i>
                                 </button>
-                                <a href="#">
+
+                                <a href="@Url.Action("ObjectClassDelete", new { id = item.Id })">
                                     <i class="fa fa-trash"></i>
                                 </a>
                             </div>

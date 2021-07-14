@@ -41,10 +41,12 @@
                             <div class="form-group col-md-6">
                                 <label asp-for="ValueBottom1"></label>
                                 <input asp-for="ValueBottom1" type="number" class="form-control list-group-item-success" />
+                                <span asp-validation-for="ValueBottom1" class="text-danger"></span>
                             </div>
                             <div class="form-group col-md-6">
                                 <label asp-for="ValueTop1"></label>
                                 <input asp-for="ValueTop1" type="number" class="form-control list-group-item-success" />
+                                <span asp-validation-for="ValueTop1" class="text-danger"></span>
                             </div>
                         </div>
                         <h5>Отклонение</h5>
@@ -52,10 +54,12 @@
                             <div class="form-group col-md-6">
                                 <label asp-for="ValueBottom2"></label>
                                 <input asp-for="ValueBottom2" type="number" class="form-control list-group-item-warning" />
+                                <span asp-validation-for="ValueBottom2" class="text-danger"></span>
                             </div>
                             <div class="form-group col-md-6">
                                 <label asp-for="ValueTop2"></label>
                                 <input asp-for="ValueTop2" type="number" class="form-control list-group-item-warning" />
+                                <span asp-validation-for="ValueTop2" class="text-danger"></span>
                             </div>
                         </div>
                         <h5>Сильное отклонение</h5>
@@ -63,18 +67,20 @@
                             <div class="form-group col-md-6">
                                 <label asp-for="ValueBottom3"></label>
                                 <input asp-for="ValueBottom3" type="number" class="form-control list-group-item-danger" />
+                                <span asp-validation-for="ValueBottom3" class="text-danger"></span>
 
-                                </div>
-                                <div class="form-group col-md-6">
-                                    <label asp-for="ValueTop3"></label>
-                                    <input asp-for="ValueTop3" type="number" class="form-control list-group-item-danger" />
-                                </div>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label asp-for="ValueTop3"></label>
+                                <input asp-for="ValueTop3" type="number" class="form-control list-group-item-danger" />
+                                <span asp-validation-for="ValueTop3" class="text-danger"></span>
+                            </div>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
-                        <button type="submit" class="btn btn-primary" data-save="modal">Применить</button>
+                        <button type="button" class="btn btn-primary" data-save="modal">Применить</button>
                     </div>
                 </form>
             </div>
