@@ -15,8 +15,8 @@ namespace O2GEN.Helpers
 
         private static string GetConnectionString()
         {
-            if (Environment.UserName == "E")
-                return string.Empty;
+            //if (Environment.UserName == "Е")
+            //    return string.Empty;
 
             return DBConnection;
         }

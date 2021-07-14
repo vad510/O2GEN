@@ -277,7 +277,31 @@ namespace O2GEN.Controllers
         public IActionResult Departments()
         {
             ViewBag.Departments = Helpers.DBHelper.GetDepartments(logger: _logger);
-            return View();
+
+            ControlListModel model = new ControlListModel();
+            model.ControlModels = new System.Collections.Generic.List<ControlModel>();
+            for (var i = 0; i < 10; i++)
+            {
+                var ms = new ControlModel()
+                {
+                    Name = "Name"
+                };
+
+                ms.Childs = new System.Collections.Generic.List<ControlModel>();
+
+                model.ControlModels.Add(ms);
+
+                for (var j = 0; j < 5; j++)
+                {
+                    ms.Childs.Add(new ControlModel()
+                    {
+                        Name = "NNN"
+                    });
+                }
+
+            }
+
+            return View(model);
         }
 
         [HttpGet]

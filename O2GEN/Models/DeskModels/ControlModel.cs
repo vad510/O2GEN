@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace O2GEN.Models.DeskModels
 {
@@ -12,5 +13,7 @@ namespace O2GEN.Models.DeskModels
 
         [DisplayName("")]
         public string Edit{ get; set; }
+
+        public List<ControlModel> Childs { get; set; }
     }
 }

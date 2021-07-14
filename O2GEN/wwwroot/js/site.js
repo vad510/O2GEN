@@ -42,8 +42,12 @@ let placeholder = document.getElementById("placeholder");
 
     for (var i = 0; i < treeViewitems.length; i++) {
         treeViewitems[i].addEventListener("click", function () {
-            this.parentElement.querySelector(".nested").classList.toggle("active");
-            this.classList.toggle("caret-down");
+            var clickedTr = this.closest('tr');
+
+            while (clickedTr.nextElementSibling.matches('.nested')) {
+                clickedTr = clickedTr.nextElementSibling;
+                clickedTr.classList.toggle('active');
+            }
         });
     }
 })();
@@ -93,6 +97,7 @@ function getDataWithXmlHttpRequest(url, placeholder) {
     xhr.open('get', url);
     xhr.send();
 }
+
 function sortHidden() {
     var list = $('#Selected').children();
     for (var i = 0; i < list.length; i++) {
@@ -100,6 +105,7 @@ function sortHidden() {
         list[i].name = 'Parameters[' + i + ']';
     }
 }
+
 function tryCreateModal(placeholder, response) {
     placeholder.innerHTML = response;
     const div = placeholder.querySelector(".modal");
