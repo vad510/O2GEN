@@ -105,6 +105,15 @@ function sortHidden() {
         list[i].name = 'Parameters[' + i + ']';
     }
 }
+function ControlDetVis() {
+    var value = $('#ValueType').val();
+    if (value == '2' || value == '0') {
+        $('#ContolDetails').fadeIn();
+    }
+    else {
+        $('#ContolDetails').fadeOut();
+    }
+}
 
 function tryCreateModal(placeholder, response) {
     placeholder.innerHTML = response;
@@ -187,6 +196,7 @@ function tryCreateModal(placeholder, response) {
         xhr.open('post', url);
         xhr.send(dataToSend2);
     });
+    ControlDetVis();
 }
 
 function TryValidate(response) {

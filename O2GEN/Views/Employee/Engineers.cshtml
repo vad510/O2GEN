@@ -51,9 +51,9 @@
                         </p>
                     </th>
 
-                    <th>
-                        <p>
-
+                    <th width="300">
+                        <p class="text-center">
+                            Изменить/Удалить
                         </p>
                     </th>
 
@@ -82,17 +82,16 @@
                         </td>
 
                         <td>
-                            <div>
-                                <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#EngineerEdit" data-url="@Url.Action("EngineerEdit", new { id = item.Id })">
+
+                            <div class="d-flex justify-content-center">
+                                <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#EngineerEdit" data-url="@Url.Action("EngineerEdit", new { id = item.Id })">
                                     <i class="fa fa-pen"></i>
                                 </button>
-
-                                <a href="@Url.Action("EngineerDelete", new { id = item.Id })">
+                                <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("EngineerDelete", new { id = item.Id })">
                                     <i class="fa fa-trash"></i>
-                                </a>
+                                </button>
                             </div>
                         </td>
-
                     </tr>
                 }
             </tbody>

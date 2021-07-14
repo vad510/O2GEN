@@ -21,38 +21,32 @@
                             Отображаемое название
                         </p>
                     </th>
-
-                    <th>
-                        <p>
-
+                    <th width="300">
+                        <p class="text-center">
+                            Изменить/Удалить
                         </p>
                     </th>
-
                 </tr>
-
             </thead>
             <tbody>
                 @foreach (var item in ViewBag.EmployeeCategories)
                 {
                     <tr>
-
                         <td>
                             <p>
                                 @item.DisplayName
                             </p>
                         </td>
-
                         <td>
-                            <div class="fa-container-links-centered">
-                                <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#EmployeeCategoryEdit" data-url="@Url.Action("EmployeeCategoryEdit", new { id = item.Id })">
+                            <div class="d-flex justify-content-center">
+                                <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#EmployeeCategoryEdit" data-url="@Url.Action("EmployeeCategoryEdit", new { id = item.Id })">
                                     <i class="fa fa-pen"></i>
                                 </button>
-                                <a href="@Url.Action("EmployeeCategoryDelete", new { id = item.Id })">
+                                <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("EmployeeCategoryDelete", new { id = item.Id })">
                                     <i class="fa fa-trash"></i>
-                                </a>
+                                </button>
                             </div>
                         </td>
-
                     </tr>
                 }
             </tbody>

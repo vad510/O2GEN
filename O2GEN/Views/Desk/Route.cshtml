@@ -28,9 +28,9 @@
                         </p>
                     </th>
 
-                    <th>
-                        <p>
-
+                    <th width="300">
+                        <p class="text-center">
+                            Изменить/Удалить
                         </p>
                     </th>
 
@@ -40,32 +40,33 @@
             <tbody>
                 @foreach (var item in ViewBag.Routes)
                 {
-                    <tr>
+                <tr>
 
-                        <td>
-                            <p>
-                                @item.DisplayName
-                            </p>
-                        </td>
+                    <td>
+                        <p>
+                            @item.DisplayName
+                        </p>
+                    </td>
 
-                        <td>
-                            <p>
-                                @item.DepartmentName
-                            </p>
-                        </td>
+                    <td>
+                        <p>
+                            @item.DepartmentName
+                        </p>
+                    </td>
 
-                        <td>
-                            <div class="fa-container-links-centered">
-                                <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#RouteEdit" data-url="@Url.Action("RouteEdit", new { id = item.Id })">
-                                    <i class="fa fa-pen"></i>
-                                </button>
-                                <a href="#">
-                                    <i class="fa fa-trash"></i>
-                                </a>
-                            </div>
-                        </td>
 
-                    </tr>
+                    <td>
+                        <div class="d-flex justify-content-center">
+                            <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#RouteEdit" data-url="@Url.Action("RouteEdit", new { id = item.Id })">
+                                <i class="fa fa-pen"></i>
+                            </button>
+                            <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("RouteDelete", new { id = item.Id })">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+
+                </tr>
                 }
             </tbody>
         </table>
