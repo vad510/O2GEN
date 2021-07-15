@@ -41,7 +41,7 @@
                             <div class="d-flex justify-content-center">
                                 <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#DepartmentsEdit" data-url="@Url.Action("DepartmentEdit", new { id = item.Id })">
                                     <i class="fa fa-pen"></i>
-                                  </button>
+                                </button>
                                 <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("DepartmentDelete", new { id = item.Id })">
                                     <i class="fa fa-trash"></i>
                                 </button>
@@ -79,3 +79,88 @@
 
 
 </section>
+
+@* MOCK *@
+<!--<section class="component-section">
+    <div id="placeholder"></div>
+    <div class="row-container-left bg-blue with-padding">
+        <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#DepartmentEdit" data-url="@Url.Action("DepartmentCreate")">
+            <i class="fa fa-plus color-white"></i>
+            <p class="color-white">Создать</p>
+        </button>
+    </div>
+
+    <div class="margin-between-above">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        <p>
+                            Отображаемое название
+                        </p>
+                    </th>
+
+                    <th>
+                        <p>
+                            Тип
+                        </p>
+                    </th>
+
+                    <th>
+                        <p>
+
+                        </p>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>-->
+                @*ViewBag.Departments*@
+                <!--@foreach (var item in Model.ControlModels)
+                {
+                    <tr class="parent">
+                        <td>
+                            <span class="caret">@item.Name</span>
+
+                        </td>
+
+                        <td>
+                            <div class="fa-container-links-centered">
+                                <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#DepartmentsEdit">
+                                        <i class="fa fa-pen"></i>
+                                </button>
+                                <a>
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+
+                    </tr>
+
+                    @if (item.Childs != null && item.Childs.Count > 0)
+                    {
+                        foreach (var child in item.Childs)
+                        {
+                            <tr class="nested">
+                                <td>
+                                    <span>@child.Name</span>
+                                </td>
+
+                                <td>
+                                    <div class="fa-container-links-centered">
+                                        <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#DepartmentsEdit">
+                                                <i class="fa fa-pen"></i>
+                                            </button>
+                                        
+                                        <a>
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</section>-->

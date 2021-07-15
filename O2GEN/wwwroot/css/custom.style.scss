@@ -311,12 +311,14 @@ input:-webkit-autofill:focus {
     color: black;
     display: inline-block;
     margin-right: 6px;
+    transition: all .2s ease-in-out;
 }
 
 .caret-down::before {
     -ms-transform: rotate(90deg); /* IE 9 */
     -webkit-transform: rotate(90deg); /* Safari */
     transform: rotate(45deg);
+    transition: all .2s ease-in-out;
 }
 
 .nested {
@@ -325,12 +327,15 @@ input:-webkit-autofill:focus {
 }
 
 .active {
-    display: table-row;
+    /*display: table-row;*/
 
-    td {
+/*    td {
         width:100%;
-    }
-    
+    }*/
+}
+
+.active-table {
+    display: table-row;
 }
 
 .with-padding {

@@ -298,9 +298,7 @@ namespace O2GEN.Controllers
                         Name = "NNN"
                     });
                 }
-
             }
-
             return View(model);
         }
 

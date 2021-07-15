@@ -230,23 +230,29 @@ input:-webkit-autofill:focus {
   content: "\25B6";
   color: black;
   display: inline-block;
-  margin-right: 6px; }
+  margin-right: 6px;
+  transition: all .2s ease-in-out; }
 
 .caret-down::before {
   -ms-transform: rotate(90deg);
   /* IE 9 */
   -webkit-transform: rotate(90deg);
   /* Safari */
-  transform: rotate(45deg); }
+  transform: rotate(45deg);
+  transition: all .2s ease-in-out; }
 
 .nested {
   display: none;
   list-style: none; }
 
 .active {
+  /*display: table-row;*/
+  /*    td {
+        width:100%;
+    }*/ }
+
+.active-table {
   display: table-row; }
-  .active td {
-    width: 100%; }
 
 .with-padding {
   padding: 7px; }

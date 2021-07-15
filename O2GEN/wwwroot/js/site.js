@@ -42,11 +42,14 @@ let placeholder = document.getElementById("placeholder");
 
     for (var i = 0; i < treeViewitems.length; i++) {
         treeViewitems[i].addEventListener("click", function () {
+
+            this.classList.toggle('caret-down');
+
             var clickedTr = this.closest('tr');
 
             while (clickedTr.nextElementSibling.matches('.nested')) {
                 clickedTr = clickedTr.nextElementSibling;
-                clickedTr.classList.toggle('active');
+                clickedTr.classList.toggle('active-table');
             }
         });
     }
