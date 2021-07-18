@@ -182,9 +182,17 @@
                             </li>
 
                             <li class="li-text-white">
-                                <div class="input-group date col-auto" id="datetimepicker2" data-target-input="nearest">
-                                    <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker2" id="itdtp2" style="width:150px;" />
-                                    <div class="input-group-append" data-target="#datetimepicker2" data-toggle="datetimepicker">
+                                <div class="input-group date col-auto" id="datetimepickerFROM" data-target-input="nearest">
+                                    <input type="text" class="form-control datetimepicker-input" data-target="#datetimepickerFROM" id="DTPFROM" style="width:150px;" />
+                                    <div class="input-group-append" data-target="#datetimepickerFROM" data-toggle="datetimepicker">
+                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="li-text-white">
+                                <div class="input-group date col-auto" id="datetimepickerTO" data-target-input="nearest">
+                                    <input type="text" class="form-control datetimepicker-input" data-target="#datetimepickerTO" id="DTPTO" style="width:150px;" />
+                                    <div class="input-group-append" data-target="#datetimepickerTO" data-toggle="datetimepicker">
                                         <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                     </div>
                                 </div>
@@ -228,7 +236,7 @@
         }
 
         function InitializeDatePicker() {
-            $('#datetimepicker2').datetimepicker({
+            $('#datetimepickerFROM').datetimepicker({
                 defaultDate: moment().subtract(2, 'days'),
                 locale: 'ru',
                 icons: {
@@ -236,9 +244,23 @@
                     date: "fa fa-calendar-alt",
                     up: "fa fa-arrow-up",
                     down: "fa fa-arrow-down"
-                },
-                maxDate: moment()
+                }
             });
+            $('#datetimepickerFROM').datetimepicker('maxDate', moment());
+            var d = new Date(moment().subtract(2, 'days'));
+            $('#datetimepickerFROM').datetimepicker('date', new Date(d.getFullYear(), d.getMonth(), d.getDate()));
+
+            $('#datetimepickerTO').datetimepicker({
+                defaultDate: moment().subtract(2, 'days'),
+                locale: 'ru',
+                icons: {
+                    time: "fa fa-clock",
+                    date: "fa fa-calendar-alt",
+                    up: "fa fa-arrow-up",
+                    down: "fa fa-arrow-down"
+                }
+            });
+            $('#datetimepickerTO').datetimepicker('maxDate', moment());
         }
 
         function InitializeMenu() {

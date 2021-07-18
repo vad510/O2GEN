@@ -23,6 +23,7 @@ namespace O2GEN.Helpers
 
         #region Тексты запросов
 
+        #region Обходы
         private static string GetZRP(DateTime From, DateTime To, int status)
         {
             return "" +
@@ -91,50 +92,81 @@ namespace O2GEN.Helpers
         private static string GetZRP(int ID)
         {
             return "" +
-                "SELECT[e].[Id], [e].[CloseTime], [e].[StartTime], [t0].[Id] as [ObjId], [t0].[DisplayName] as [ObjName], [t0].[ObjectUID],  [t5].[Id] as [TypeId], [t5].[DisplayName] as [TypeName], [t6].[Id] as [StatusId], [t6].[DisplayName] as [StatusName], [t7].[AppointmentFinish], [t7].[AppointmentStart], [t8].[Name] as [RouteName], [t10].[DisplayName] as [ResName], t0.Id as DepartmentID , t10.Id as ResourceId " +
-                "FROM[SchedulingContainers] AS[e] " +
-                "LEFT JOIN( " +
-                "    SELECT[e0].* " +
-                "   FROM[SCReasons] AS[e0] " +
-                "    WHERE([e0].[IsDeleted] <> 1) AND([e0].[TenantId] = CAST(1 AS bigint)) " +
-                ") AS[t] ON[e].[SCReasonId] = [t].[Id] " +
-                "LEFT JOIN( " +
-                "    SELECT[e1].* " +
-                "   FROM[Departments] AS[e1] " +
-                "    WHERE([e1].[IsDeleted] <> 1) AND([e1].[TenantId] = CAST(1 AS bigint)) " +
-                ") AS[t0] ON[e].[DepartmentId] = [t0].[Id] " +
-                "LEFT JOIN( " +
-                "    SELECT[e6].* " +
-                "   FROM[SCTypes] AS[e6] " +
-                "    WHERE([e6].[IsDeleted] <> 1) AND([e6].[TenantId] = CAST(1 AS bigint)) " +
-                ") AS[t5] ON[e].[SCTypeId] = [t5].[Id] " +
-                "LEFT JOIN( " +
-                "    SELECT[e7].* " +
-                "   FROM[SCStatuses] AS[e7] " +
-                "    WHERE([e7].[IsDeleted] <> 1) AND([e7].[TenantId] = CAST(1 AS bigint)) " +
-                ") AS[t6] ON[e].[SCStatusId] = [t6].[Id] " +
-                "LEFT JOIN( " +
-                "    SELECT[e8].* " +
-                "   FROM[SchedulingRequirements] AS[e8] " +
-                "    WHERE[e8].[IsDeleted] <> 1 " +
-                ") AS[t7] ON[e].[RequirementId] = [t7].[Id] " +
-                "LEFT JOIN( " +
-                "    SELECT[e8].* " +
-                "   FROM[InspectionDocuments] AS[e8] " +
-                "    WHERE([e8].[IsDeleted] <> 1)  " +
-                ") AS[t8] on[e].[Id] = [t8].[TaskId] " +
-                "LEFT JOIN( " +
-                "    SELECT[e9].* " +
-                "   FROM[Assignments] AS[e9] " +
-                "    WHERE([e9].[IsDeleted] <> 1)  " +
-                ") AS[t9] on[t9].[SchedulingContainerId] = [e].[Id] " +
-                "LEFT JOIN( " +
-                "    SELECT[e10].* " +
-                "   FROM[Resources] AS[e10] " +
-                "    WHERE([e10].[IsDeleted] <> 1) AND([e10].[TenantId] = CAST(1 AS bigint)) " +
-                ") AS[t10] ON[t9].[ResourceId] = [t10].[Id] " +
-                $"WHERE [e].[Id] = {ID} AND (([e].[IsDeleted] <> 1) AND([e].[TenantId] = CAST(1 AS bigint))) ";
+                "SELECT [e].[Id], [e].[ObjectUID], [e].[StartTime], [e].[CloseTime], [e].[DepartmentId], [e].[SCTypeId], [e].[SCStatusId], [SR].[RequirementResourceId], [IDoc].[Name] " +
+                "FROM [SchedulingContainers] AS[e] " +
+                "LEFT JOIN [SchedulingRequirements] AS[SR] ON [SR].[IsDeleted] <> 1 AND [e].[RequirementId] = [SR].[Id] " +
+                "LEFT JOIN [Tasks] AS [T] ON [T].[IsDeleted] <> 1 AND [e].[Id] = [T].[SchedulingContainerId] " +
+                "LEFT JOIN [InspectionDocuments] AS [IDoc] ON [IDoc].[IsDeleted] <> 1 AND [T].[Id] = [IDoc].[TaskId] " +
+                $"WHERE [e].[Id] = {ID} AND [e].[IsDeleted] <> 1 AND [e].[TenantId] = CAST(1 AS bigint) ";
         }
+
+        /// <summary>
+        /// Вставка Контроля
+        /// </summary>
+        /// <returns></returns>
+        private static string CreateZRP(ZRP obj, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM AssetParameters ),0)+1);" +
+                "INSERT INTO AssetParameters " +
+                "(CreatedByUser, " +
+                "CreationTime, " +
+                "ExternalId, " +
+                "IsDeleted, " +
+                "IsDynamic, " +
+                "ObjectUID, " +
+                "Revision) " +
+
+                $"VALUES " +
+
+                $"((isnull((SELECT top 1 id FROM PPUsers  where name =  {(string.IsNullOrEmpty(UserName) ? "NULL" : $"{(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}")}),-1)) , " +
+                $"getdate(), " +
+                $"N'{(obj.ObjectUID == null ? "NULL" : obj.ObjectUID?.ToString("D"))}', " +
+                $"0, " +
+                $"0, " +
+                $"'{(obj.ObjectUID == null ? "NULL" : obj.ObjectUID?.ToString("D"))}', " +
+                $"@revision); " +
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = 5;";
+        }
+        private static string UpdateZRP(ZRP obj, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM AssetParameters ),0)+1); " +
+                "UPDATE AssetParameters SET " +
+                $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"{(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}")}),-1)), " +
+                "ModificationTime = getdate(), " +
+                "Revision = @revision, " +
+                $"WHERE ID = {obj.Id}; " +
+
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.AssetParameter};";
+        }
+        private static string DeleteZRP(int ID, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM AssetParameters ),0)+1); " +
+                "UPDATE AssetParameters SET " +
+                $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
+                "DeletionTime = getdate(), " +
+                "Revision = @revision, " +
+                "IsDeleted = 1 " +
+                $"WHERE ID = {ID}; " +
+
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.AssetParameter}; ";
+        }
+
+        private static string GetInspectionProtocols(int SchedContID)
+        {
+            return "select IPs.Id, " +
+            "IPs.ObjectUID,  " +
+            "IPs.Name,  " +
+            "CONCAT(IPI.Name, ' - ', AP.DisplayName) AS ItemName " +
+            "from InspectionProtocolItems AS IPI " +
+            "inner join InspectionProtocols AS IPs on IPI.InspectionProtocolId = IPs.Id " +
+            "inner join AssetParameterValues AS APV on IPI.AssetParameterValueId = APV.Id " +
+            "inner join AssetParameters AS AP on AP.Id = APV.AssetParameterId " +
+            $"WHERE InspectionDocumentId in (select id from InspectionDocuments where TaskId in (select id from Tasks where SchedulingContainerId = {SchedContID})) AND IPI.IsDeleted <> 1 ";
+        }
+        #endregion
 
         #region Статусы
         /// <summary>
@@ -1387,10 +1419,10 @@ namespace O2GEN.Helpers
                                     EndTime = Convert.ToDateTime(row["AppointmentFinish"]),
                                     ObjId = int.Parse(row["ObjId"].ToString()),
                                     ObjName = row["ObjName"].ToString(),
-                                    TypeId = int.Parse(row["TypeId"].ToString()),
-                                    TypeName = row["TypeName"].ToString(),
-                                    StatusId = int.Parse(row["StatusId"].ToString()),
-                                    StatusName = row["StatusName"].ToString(),
+                                    SCTypeId = int.Parse(row["TypeId"].ToString()),
+                                    SCTypeName = row["TypeName"].ToString(),
+                                    SCStatusId = int.Parse(row["StatusId"].ToString()),
+                                    SCStatusName = row["StatusName"].ToString(),
                                     RouteName = row["RouteName"].ToString(),
                                     ResName = row["ResName"].ToString()
                                 });
@@ -1434,20 +1466,81 @@ namespace O2GEN.Helpers
                                 output = new ZRP()
                                 {
                                     Id = int.Parse(row["Id"].ToString()),
-                                    StartTime = Convert.ToDateTime(row["AppointmentStart"]),
-                                    EndTime = Convert.ToDateTime(row["AppointmentFinish"]),
-                                    ObjId = int.Parse(row["ObjId"].ToString()),
-                                    ObjName = row["ObjName"].ToString(),
-                                    TypeId = int.Parse(row["TypeId"].ToString()),
-                                    TypeName = row["TypeName"].ToString(),
-                                    StatusId = int.Parse(row["StatusId"].ToString()),
-                                    StatusName = row["StatusName"].ToString(),
-                                    RouteName = row["RouteName"].ToString(),
-                                    ResName = row["ResName"].ToString(),
-                                    DepartmentID = string.IsNullOrEmpty(row["DepartmentID"].ToString()) ? (int?)null : int.Parse(row["DepartmentID"].ToString()),
-                                    ResourceId = string.IsNullOrEmpty(row["ResourceId"].ToString()) ? (int?)null : int.Parse(row["ResourceId"].ToString()),
+                                    StartTime = Convert.ToDateTime(row["StartTime"]),
+                                    EndTime = Convert.ToDateTime(row["CloseTime"]),
+                                    SCTypeId = int.Parse(row["SCTypeId"].ToString()),
+                                    SCStatusId = int.Parse(row["SCStatusId"].ToString()),
+                                    RouteName = row["Name"].ToString(),
+                                    DepartmentID = int.Parse(row["DepartmentId"].ToString()),
+                                    ResourceId = int.Parse(row["RequirementResourceId"].ToString()),
+                                    ObjectUID = string.IsNullOrEmpty(row["ObjectUID"].ToString())?null:new Guid(row["ObjectUID"].ToString())
 
                                 };
+                            }
+                        }
+                    }
+                }
+                output.InsProt = GetInspectionProtocols(output.Id, logger);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Ошибка на запросе данных БР");
+            }
+            return output;
+        }
+
+        public static void CreateZRP(ZRP obj, string UserName, ILogger logger)
+        {
+            ExecuteNonQuery(CreateZRP(obj, UserName), logger);
+        }
+        public static void UpdateZRP(ZRP obj, string UserName, ILogger logger)
+        {
+            ExecuteNonQuery(UpdateZRP(obj, UserName), logger);
+        }
+        public static void DeleteZRP(int ID, string UserName, ILogger logger)
+        {
+            ExecuteNonQuery(DeleteZRP(ID, UserName), logger);
+        }
+        public static List<InspectionProtocol> GetInspectionProtocols(int ShedContID, ILogger logger)
+        {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
+            List<InspectionProtocol> output = new List<InspectionProtocol>();
+
+            try
+            {
+                using (var connection = new SqlConnection(con))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(GetInspectionProtocols(ShedContID), connection))
+                    {
+                        InspectionProtocol Tmp = null;
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                Tmp = output.Find(x => x.Id == int.Parse(row["Id"].ToString()));
+                                if (Tmp == null)
+                                {
+                                    Tmp = new InspectionProtocol()
+                                    {
+                                        Id = int.Parse(row["Id"].ToString()),
+                                        ObjectUID = string.IsNullOrEmpty(row["ObjectUID"].ToString()) ? null : new Guid(row["ObjectUID"].ToString()),
+                                        Name = row["Name"].ToString()
+                                    };
+                                    output.Add(Tmp);
+                                }
+                                Tmp.Items.Add(new InspectionProtocolItem() {
+                                    Name = row["ItemName"].ToString()
+                                });
                             }
                         }
                     }
@@ -2562,6 +2655,7 @@ namespace O2GEN.Helpers
             }
             while (all.Count > 0)
             {
+                #warning Не работает дальше второго слоя
                 if (all[0].ParentId == (int?)null)
                 {
                     output.Add(all[0]);

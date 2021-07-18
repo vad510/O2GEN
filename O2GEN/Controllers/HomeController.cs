@@ -54,6 +54,21 @@ namespace O2GEN.Controllers
                 return PartialView("ZRPEdit", res);
             return View();
         }
+        [HttpPost]
+        public IActionResult ZRPUpdate(ZRP Model)
+        {
+            if (Model.Id == -1)
+                Helpers.DBHelper.CreateZRP(Model, User.Identity.Name, _logger);
+            else
+                Helpers.DBHelper.UpdateZRP(Model, User.Identity.Name, _logger);
+            return RedirectToAction("Index");
+        }
+        [HttpGet]
+        public IActionResult ZRPDelete(int Id)
+        {
+            Helpers.DBHelper.DeleteZRP(Id, User.Identity.Name, _logger);
+            return RedirectToAction("Index");
+        }
 
         public IActionResult ControlValueReports()
         {

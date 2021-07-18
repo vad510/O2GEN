@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace O2GEN.Models
@@ -7,6 +8,7 @@ namespace O2GEN.Models
     public class ZRP
     {
         public int Id { get; set; } = -1;
+        public Guid? ObjectUID { get; set; } = Guid.NewGuid();
         /// <summary>
         /// Дата начала
         /// </summary>
@@ -25,16 +27,16 @@ namespace O2GEN.Models
         public string ObjName { get; set; }
 
         [DisplayName("Тип обхода")]
-        public int TypeId { get; set; }
+        public int SCTypeId { get; set; }
         /// <summary>
         /// Тип Обхода
         /// </summary>
         [DisplayName("Тип обхода")]
-        public string TypeName { get; set; }
+        public string SCTypeName { get; set; }
         [DisplayName("Статус обхода")]
-        public int StatusId { get; set; }
+        public int SCStatusId { get; set; }
         [DisplayName("Статус обхода")]
-        public string StatusName { get; set; }
+        public string SCStatusName { get; set; }
         /// <summary>
         /// Обход
         /// </summary>
@@ -53,5 +55,7 @@ namespace O2GEN.Models
 
         [DisplayName("Подразделение")]
         public int? DepartmentID { get; set; }
+
+        public List<InspectionProtocol> InsProt { get; set; } = new List<InspectionProtocol>();
     }
 }

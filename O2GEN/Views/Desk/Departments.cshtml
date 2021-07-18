@@ -2,6 +2,35 @@
 @{
     ViewData["Title"] = "Участки";
 }
+@functions
+{
+    void Test(Department item)
+    {
+    <tr class="@((item.Childs!=null && item.Childs.Count>0) ? "parent":"") @(item.ParentId != null ? "nested":"")">
+        <td>
+            <span class="caret"><span class="badge badge-info mr-1">@item.Childs?.Count</span>@item.DisplayName</span>
+        </td>
+
+        <td>
+            <div class="d-flex justify-content-center">
+                <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#DepartmentsEdit" data-url="@Url.Action("DepartmentEdit", new { id = item.Id })">
+                    <i class="fa fa-pen"></i>
+                </button>
+                <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("DepartmentDelete", new { id = item.Id })">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </div>
+        </td>
+    </tr>
+        if(item.Childs!= null)
+        {
+            foreach(var Child in item.Childs)
+            {
+                Test(Child);
+            }
+        }
+    }
+}
 <section class="component-section">
 
     <div id="placeholder"></div>
@@ -32,44 +61,45 @@
             <tbody>
                 @foreach (var item in ViewBag.Departments)
                 {
-                    <tr class="parent">
-                        <td>
-                            <span class="caret"><span class="badge badge-info mr-1">@item.Childs?.Count</span>@item.DisplayName</span>
-                        </td>
+                @*Test(item);*@
+                <tr class="@(item.Childs ?? "parent") @(item.ParentId ?? "nested")">
+                    <td>
+                        <span class="caret"><span class="badge badge-info mr-1">@item.Childs?.Count</span>@item.DisplayName</span>
+                    </td>
 
-                        <td>
-                            <div class="d-flex justify-content-center">
-                                <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#DepartmentsEdit" data-url="@Url.Action("DepartmentEdit", new { id = item.Id })">
-                                    <i class="fa fa-pen"></i>
-                                </button>
-                                <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("DepartmentDelete", new { id = item.Id })">
-                                    <i class="fa fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
+                    <td>
+                        <div class="d-flex justify-content-center">
+                            <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#DepartmentsEdit" data-url="@Url.Action("DepartmentEdit", new { id = item.Id })">
+                                <i class="fa fa-pen"></i>
+                            </button>
+                            <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("DepartmentDelete", new { id = item.Id })">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
 
-                    </tr>
+                </tr>
 
-                    @if (item.Childs != null && item.Childs.Count > 0)
+                @if (item.Childs != null && item.Childs.Count > 0)
                     {
                         foreach (var child in item.Childs)
                         {
-                            <tr class="nested">
-                                <td>
-                                    <span>@child.DisplayName</span>
-                                </td>
+                        <tr class="nested">
+                            <td>
+                                <span>@child.DisplayName</span>
+                            </td>
 
-                                <td>
-                                    <div class="d-flex justify-content-center">
-                                        <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#DepartmentsEdit" data-url="@Url.Action("DepartmentEdit", new { id = child.Id })">
-                                            <i class="fa fa-pen"></i>
-                                        </button>
-                                        <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("DepartmentDelete", new { id = child.Id })">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#DepartmentsEdit" data-url="@Url.Action("DepartmentEdit", new { id = child.Id })">
+                                        <i class="fa fa-pen"></i>
+                                    </button>
+                                    <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("DepartmentDelete", new { id = child.Id })">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
                         }
                     }
                 }
@@ -79,6 +109,7 @@
 
 
 </section>
+
 
 @* MOCK *@
 <!--<section class="component-section">
@@ -114,8 +145,8 @@
                 </tr>
             </thead>
             <tbody>-->
-                @*ViewBag.Departments*@
-                <!--@foreach (var item in Model.ControlModels)
+@*ViewBag.Departments*@
+<!--@foreach (var item in Model.ControlModels)
                 {
                     <tr class="parent">
                         <td>
@@ -150,7 +181,7 @@
                                         <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#DepartmentsEdit">
                                                 <i class="fa fa-pen"></i>
                                             </button>
-                                        
+
                                         <a>
                                             <i class="fa fa-trash"></i>
                                         </a>

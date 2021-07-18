@@ -97,31 +97,22 @@
                     {
                         <tr>
                             <td><p>@item.ObjName</p></td>
-                            <td><p>@item.StatusName</p></td>
-                            <td><p>@item.TypeName</p></td>
+                            <td><p>@item.SCStatusName</p></td>
+                            <td><p>@item.SCTypeName</p></td>
                             <td><p>@item.RouteName</p></td>
                             <td><p>@item.ResName</p></td>
                             <td><p>@item.StartTime.ToString()</p></td>
                             <td><p>@item.EndTime.ToString()</p></td>
                             <td><p> </p></td>
                             <td>
-                                <div class="row-container">
-                                    <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPEdit", new { id = item.Id })">
+                                <div class="d-flex justify-content-center">
+                                    <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPEdit", new { id = item.Id })">
                                         <i class="fa fa-pen"></i>
                                     </button>
-                                    <button class="transparent-btn">
-
+                                    <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("ZRPDelete", new { id = item.Id })">
                                         <i class="fa fa-trash"></i>
                                     </button>
                                 </div>
-                                @*<div class="fa-container-links-centered">
-                                        <a href="#">
-                                            <i class="fa fa-pen"></i>
-                                        </a>
-                                        <a href="#">
-                                            <i class="fa fa-trash"></i>
-                                        </a>
-                                    </div>*@
                             </td>
                         </tr>
                     }
@@ -186,31 +177,22 @@
                     {
                         <tr>
                             <td><p>@item.ObjName</p></td>
-                            <td><p>@item.StatusName</p></td>
-                            <td><p>@item.TypeName</p></td>
+                            <td><p>@item.SCStatusName</p></td>
+                            <td><p>@item.SCTypeName</p></td>
                             <td><p>@item.RouteName</p></td>
                             <td><p>@item.ResName</p></td>
                             <td><p>@item.StartTime.ToString()</p></td>
                             <td><p>@item.EndTime.ToString()</p></td>
                             <td><p> </p></td>
                             <td>
-                                <div class="row-container">
-                                    <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#editZpr" data-url="@Url.Action("EditZpr", new { id = item.Id })">
+                                <div class="d-flex justify-content-center">
+                                    <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPEdit", new { id = item.Id })">
                                         <i class="fa fa-pen"></i>
                                     </button>
-                                    <button class="transparent-btn">
-
+                                    <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("ZRPDelete", new { id = item.Id })">
                                         <i class="fa fa-trash"></i>
                                     </button>
                                 </div>
-                                @*<div class="fa-container-links-centered">
-                                    <a href="#">
-                                        <i class="fa fa-pen"></i>
-                                    </a>
-                                    <a href="#">
-                                        <i class="fa fa-trash"></i>
-                                    </a>
-                                </div>*@
                             </td>
                         </tr>
                     }
@@ -276,31 +258,22 @@
                     {
                         <tr>
                             <td><p>@item.ObjName</p></td>
-                            <td><p>@item.StatusName</p></td>
-                            <td><p>@item.TypeName</p></td>
+                            <td><p>@item.SCStatusName</p></td>
+                            <td><p>@item.SCTypeName</p></td>
                             <td><p>@item.RouteName</p></td>
                             <td><p>@item.ResName</p></td>
                             <td><p>@item.StartTime.ToString()</p></td>
                             <td><p>@item.EndTime.ToString()</p></td>
                             <td><p> </p></td>
                             <td>
-                                <div class="row-container">
-                                    <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#editZpr" data-url="@Url.Action("EditZpr", new { id = item.Id })">
+                                <div class="d-flex justify-content-center">
+                                    <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPEdit", new { id = item.Id })">
                                         <i class="fa fa-pen"></i>
                                     </button>
-                                    <button class="transparent-btn">
-
+                                    <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("ZRPDelete", new { id = item.Id })">
                                         <i class="fa fa-trash"></i>
                                     </button>
                                 </div>
-                                @*<div class="fa-container-links-centered">
-                                    <a href="#">
-                                        <i class="fa fa-pen"></i>
-                                    </a>
-                                    <a href="#">
-                                        <i class="fa fa-trash"></i>
-                                    </a>
-                                </div>*@
                             </td>
                         </tr>
                     }
