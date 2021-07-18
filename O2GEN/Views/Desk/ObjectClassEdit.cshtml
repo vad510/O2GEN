@@ -41,7 +41,10 @@
                             <select multiple class="form-control" formtarget="_blank" id="SelectList1" style="height: 400px">
                                 @foreach (var item in parameters)
                                 {
-                                    <option value="@item.Id">@item.DisplayName</option>
+                                    if (!Model.Parameters.Contains(item.Id))
+                                    {
+                                        <option value="@item.Id">@item.DisplayName</option>
+                                    }
                                 }
                             </select>
                         </div>

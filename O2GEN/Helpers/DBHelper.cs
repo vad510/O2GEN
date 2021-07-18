@@ -961,7 +961,7 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         private static string SelectResourceAllocations(int ID)
         {
-            return $"SELECT Id, ObjectUID, EngineerId, ResourceId FROM ResourceAllocations where ResourceId = {ID} AND IsDeleted = 0 ";
+            return $"SELECT Id, ObjectUID, EngineerId, ResourceId FROM ResourceAllocations where ResourceId = {ID} AND IsDeleted <> 1 ";
         }
         /// <summary>
         /// Привязка работника к  бригаде
@@ -974,7 +974,7 @@ namespace O2GEN.Helpers
             return "DECLARE @revision bigint; " +
                 "set @revision = (isnull((SELECT max(revision) id FROM ResourceAllocations ),0)+1); " +
                 "INSERT INTO ResourceAllocations " +
-                "(IdDeleted, " +
+                "(IsDeleted, " +
                 "Revision," +
                 "CreatedByUser, " +
                 "CreationTime, " +
@@ -992,7 +992,7 @@ namespace O2GEN.Helpers
                 $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.ResourceAllocation};";
         }
         /// <summary>
-        /// Удаление работникаиз бригады
+        /// Удаление работника из бригады
         /// </summary>
         /// <param name="ID"></param>
         /// <param name="UserName"></param>
@@ -1005,7 +1005,7 @@ namespace O2GEN.Helpers
                 "IsDeleted = 1, " +
                 $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName)?"NULL":$"'{UserName}'")}),-1)), " +
                 "DeletionTime = getdate(), " +
-                "ResouceId = NULL " +
+                "ResourceId = NULL " +
                 $"WHERE ID = {ID}; " +
                 $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.ResourceAllocation};";
         }
@@ -1030,6 +1030,7 @@ namespace O2GEN.Helpers
         {
             return "DECLARE @revision bigint; " +
                 "set @revision = (isnull((SELECT max(revision) id FROM Resources ),0)+1); " +
+                "DECLARE @InsertedPId TABLE(id int); " +
                 "INSERT INTO Resources " +
                 $"(DisplayName, " +
                 $"Latitude, " +
@@ -1043,6 +1044,7 @@ namespace O2GEN.Helpers
                 "TenantId, " +
                 "IsDeleted, " +
                 "DepartmentId)" +
+                "output inserted.Id into @InsertedPId " +
                 "values" +
                 $"(N'{obj.DisplayName}'," +
                 $"{obj.Latitude}, " +
@@ -1057,7 +1059,8 @@ namespace O2GEN.Helpers
                 $"0, " +
                 $"{obj.DepartmentId}); " +
 
-                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.Resource};";
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.Resource};" +
+                $"SELECT TOP 1 id FROM @InsertedPId;";
         }
         /// <summary>
         /// Обновление бригады
@@ -1285,7 +1288,7 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         private static string SelectEngineersList()
         {
-            return "SELECT e.Id, t1.Surname, t1.GivenName, t1.MiddleName, t1.DisplayName, PP.DisplayName as AppointName" +
+            return "SELECT e.Id, t1.Surname, t1.GivenName, t1.MiddleName, t1.DisplayName, PP.DisplayName as AppointName " +
                 "FROM Engineers AS e  " +
                 "LEFT JOIN Persons AS t1 ON e.PersonId = t1.Id  " +
                 "LEFT JOIN PersonPositions as PP on PP.Id = t1.PersonPositionId " +
@@ -2873,6 +2876,10 @@ namespace O2GEN.Helpers
                         }
                     }
                 }
+                foreach (var item in GetResourceAllocations(output.Id, logger))
+                {
+                    output.Parameters.Add(item.EngineerID);
+                }
             }
             catch (Exception ex)
             {
@@ -2882,11 +2889,26 @@ namespace O2GEN.Helpers
         }
         public static void CreateResource(Resource obj, string UserName, ILogger logger)
         {
-            ExecuteNonQuery(CreateResource(obj, UserName), logger);
+            var idnew = ExecuteScalar(CreateResource(obj, UserName), logger);
+            foreach (var item in obj.Parameters)
+            {
+                CreateResourceAllocation(new ResourceAllocations() { ResourceID = int.Parse(idnew), EngineerID = item }, UserName, logger);
+            }
         }
         public static void UpdateResource(Resource obj, string UserName, ILogger logger)
         {
             ExecuteNonQuery(UpdateResource(obj, UserName), logger);
+            var currPar = GetResourceAllocations(obj.Id);
+            foreach (var item in obj.Parameters)
+            {
+                if (currPar.Find(x => x.EngineerID == item) == null)
+                    CreateResourceAllocation(new ResourceAllocations() { ResourceID = obj.Id, EngineerID = item }, UserName, logger);
+            }
+            foreach (var item in currPar)
+            {
+                if (!obj.Parameters.Contains(item.EngineerID))
+                    DeleteResourceAllocation(item.Id, UserName, logger);
+            }
         }
         public static void DeleteResource(int ID, string UserName, ILogger logger)
         {
@@ -2978,11 +3000,11 @@ namespace O2GEN.Helpers
         }
         public static void CreateResourceAllocation(ResourceAllocations obj, string UserName, ILogger logger)
         {
-            ExecuteScalar(CreateResourceAllocation(obj, UserName), logger);
+            ExecuteNonQuery(CreateResourceAllocation(obj, UserName), logger);
         }
         public static void DeleteResourceAllocation(int ID, string UserName, ILogger logger)
         {
-            ExecuteScalar(DeleteResourceAllocation(ID, UserName), logger);
+            ExecuteNonQuery(DeleteResourceAllocation(ID, UserName), logger);
         }
         public static List<ResourceType> GetResourceTypes(ILogger logger = null)
         {
@@ -3131,13 +3153,13 @@ namespace O2GEN.Helpers
         /// </summary>
         /// <param name="logger"></param>
         /// <returns></returns>
-        public static List<Engineer> GetEngineersList(ILogger logger)
+        public static List<Engineer> GetEngineersList(ILogger logger=null)
         {
             string con = GetConnectionString();
 
             if (string.IsNullOrEmpty(con))
             {
-                logger.LogDebug("connection string is null or empty");
+                logger?.LogDebug("connection string is null or empty");
                 return null;
             }
 
@@ -3171,7 +3193,7 @@ namespace O2GEN.Helpers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+                logger?.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
             }
             return output;
         }

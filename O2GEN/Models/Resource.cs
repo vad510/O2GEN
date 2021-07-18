@@ -25,7 +25,9 @@ namespace O2GEN.Models
         public int? ResourceStateId { get; set; }
         [DisplayName("Подразделение")]
         public int? DepartmentId { get; set; }
-
-        public List<ResourceAllocations> Engeneers { get; set; } = new List<ResourceAllocations>(); 
+        /// <summary>
+        /// Список Emngineer.Id для текущей сущности
+        /// </summary>
+        public List<int> Parameters { get; set; } = new List<int>(); 
     }
 }

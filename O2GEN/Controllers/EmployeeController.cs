@@ -124,9 +124,9 @@ namespace O2GEN.Controllers
             return RedirectToAction("Resources");
         }
         [HttpGet]
-        public IActionResult ResourceDelete(int Id)
+        public IActionResult ResourceDelete(int id)
         {
-            Helpers.DBHelper.DeleteResource(Id, User.Identity.Name, _logger);
+            Helpers.DBHelper.DeleteResource(id, User.Identity.Name, _logger);
             return RedirectToAction("Resources");
         }
     }

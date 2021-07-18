@@ -61,8 +61,7 @@
             <tbody>
                 @foreach (var item in ViewBag.Departments)
                 {
-                @*Test(item);*@
-                <tr class="@(item.Childs ?? "parent") @(item.ParentId ?? "nested")">
+                <tr class="parent">
                     <td>
                         <span class="caret"><span class="badge badge-info mr-1">@item.Childs?.Count</span>@item.DisplayName</span>
                     </td>
