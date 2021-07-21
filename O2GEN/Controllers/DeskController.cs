@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using O2GEN.Models;
 using O2GEN.Models.DeskModels;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace O2GEN.Controllers
@@ -262,23 +263,47 @@ namespace O2GEN.Controllers
 
             ControlListModel model = new ControlListModel();
             model.ControlModels = new System.Collections.Generic.List<ControlModel>();
-            for (var i = 0; i < 10; i++)
+            for (var i = 0; i < 5; i++)
             {
-                var ms = new ControlModel()
+                var first = new ControlModel()
                 {
-                    Name = "Name"
+                    Name = "1 lvl"
                 };
 
-                ms.Childs = new System.Collections.Generic.List<ControlModel>();
+                first.Childs = new System.Collections.Generic.List<ControlModel>();
 
-                model.ControlModels.Add(ms);
+                model.ControlModels.Add(first);
 
-                for (var j = 0; j < 5; j++)
+                for (var j = 0; j < 2; j++)
                 {
-                    ms.Childs.Add(new ControlModel()
+                    ControlModel second = new ControlModel()
                     {
-                        Name = "NNN"
-                    });
+                        Name = "2 lvl"
+                    };
+
+                    second.Childs = new System.Collections.Generic.List<ControlModel>();
+
+                    first.Childs.Add(second);
+
+                    for (var s = 0; s < 2; s++)
+                    {
+                        ControlModel third = new ControlModel()
+                        {
+                            Name = "3 lvl"
+                        };
+                        third.Childs = new List<ControlModel>();
+
+                        second.Childs.Add(third);
+
+                        for (var o = 0; o < 2; o++)
+                        {
+                            ControlModel fourth = new ControlModel
+                            {
+                                Name = "4 lvl"
+                            };
+                            third.Childs.Add(fourth);
+                        }
+                    }
                 }
             }
             return View(model);

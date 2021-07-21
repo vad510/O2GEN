@@ -2,116 +2,193 @@
 @{
     ViewData["Title"] = "Участки";
 }
-@functions
-{
-    void Test(Department item)
-    {
-    <tr class="@((item.Childs!=null && item.Childs.Count>0) ? "parent":"") @(item.ParentId != null ? "nested":"")">
-        <td>
-            <span class="caret"><span class="badge badge-info mr-1">@item.Childs?.Count</span>@item.DisplayName</span>
-        </td>
 
-        <td>
-            <div class="d-flex justify-content-center">
-                <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#DepartmentsEdit" data-url="@Url.Action("DepartmentEdit", new { id = item.Id })">
-                    <i class="fa fa-pen"></i>
-                </button>
-                <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("DepartmentDelete", new { id = item.Id })">
-                    <i class="fa fa-trash"></i>
-                </button>
-            </div>
-        </td>
-    </tr>
-        if(item.Childs!= null)
+@functions{
+    void Test(O2GEN.Models.Department child, int depth)
+    {
+        if (child == null)
+            return;
+
+        if (child.Childs != null)
         {
-            foreach(var Child in item.Childs)
+            <tr class="parent nested" data-level="@depth">
+                <td>
+                    <span class="caret">@child.DisplayName</span>
+                </td>
+
+                <td>
+                    <div class="d-flex justify-content-center">
+                        <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#DepartmentsEdit" data-url="@Url.Action("DepartmentEdit", new { id = child.Id })">
+                            <i class="fa fa-pen"></i>
+                        </button>
+                        <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("DepartmentDelete", new { id = child.Id })">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+
+            foreach (var item in child.Childs)
             {
-                Test(Child);
+                if (item.Childs != null)
+                {
+                    Test(item, depth + 1);
+                }
+                else
+                {
+                    <tr class="nested" data-level="@(depth + 1)">
+                        <td>
+                            <span>@item.DisplayName</span>
+                        </td>
+
+                        <td>
+                            <div class="d-flex justify-content-center">
+                                <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#DepartmentsEdit" data-url="@Url.Action("DepartmentEdit", new { id = item.Id })">
+                                    <i class="fa fa-pen"></i>
+                                </button>
+                                <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("DepartmentDelete", new { id = item.Id })">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
             }
+        }
+        else
+        {
+            <tr class="nested" data-level="@(depth)">
+                <td>
+                    <span>@child.DisplayName</span>
+                </td>
+
+                <td>
+                    <div class="d-flex justify-content-center">
+                        <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#DepartmentsEdit" data-url="@Url.Action("DepartmentEdit", new { id = child.Id })">
+                            <i class="fa fa-pen"></i>
+                        </button>
+                        <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("DepartmentDelete", new { id = child.Id })">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
         }
     }
 }
-<section class="component-section">
 
-    <div id="placeholder"></div>
-    <div class="row-container-left bg-blue with-padding">
-        <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#DepartmentEdit" data-url="@Url.Action("DepartmentCreate")">
-            <i class="fa fa-plus color-white"></i>
-            <p class="color-white">Создать</p>
-        </button>
-    </div>
+@*@functions
+    {
+        void Test(Department item)
+        {
+        <tr class="@((item.Childs!=null && item.Childs.Count>0) ? "parent":"") @(item.ParentId != null ? "nested":"")">
+            <td>
+                <span class="caret"><span class="badge badge-info mr-1">@item.Childs?.Count</span>@item.DisplayName</span>
+            </td>
 
-    <div class="margin-between-above">
-        <table class="table table-bordered table-hover">
-            <thead>
-                <tr>
-                    <th>
-                        <p>
-                            Отображаемое название
-                        </p>
-                    </th>
-
-                    <th width="300">
-                        <p class="text-center">
-                            Изменить/Удалить
-                        </p>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in ViewBag.Departments)
+            <td>
+                <div class="d-flex justify-content-center">
+                    <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#DepartmentsEdit" data-url="@Url.Action("DepartmentEdit", new { id = item.Id })">
+                        <i class="fa fa-pen"></i>
+                    </button>
+                    <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("DepartmentDelete", new { id = item.Id })">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+            if(item.Childs!= null)
+            {
+                foreach(var Child in item.Childs)
                 {
-                <tr class="parent">
-                    <td>
-                        <span class="caret"><span class="badge badge-info mr-1">@item.Childs?.Count</span>@item.DisplayName</span>
-                    </td>
+                    Test(Child);
+                }
+            }
+        }
+    }
+    <section class="component-section">
 
-                    <td>
-                        <div class="d-flex justify-content-center">
-                            <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#DepartmentsEdit" data-url="@Url.Action("DepartmentEdit", new { id = item.Id })">
-                                <i class="fa fa-pen"></i>
-                            </button>
-                            <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("DepartmentDelete", new { id = item.Id })">
-                                <i class="fa fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
+        <div id="placeholder"></div>
+        <div class="row-container-left bg-blue with-padding">
+            <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#DepartmentEdit" data-url="@Url.Action("DepartmentCreate")">
+                <i class="fa fa-plus color-white"></i>
+                <p class="color-white">Создать</p>
+            </button>
+        </div>
 
-                </tr>
+        <div class="margin-between-above">
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>
+                            <p>
+                                Отображаемое название
+                            </p>
+                        </th>
 
-                @if (item.Childs != null && item.Childs.Count > 0)
+                        <th width="300">
+                            <p class="text-center">
+                                Изменить/Удалить
+                            </p>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in ViewBag.Departments)
                     {
-                        foreach (var child in item.Childs)
-                        {
-                        <tr class="nested">
-                            <td>
-                                <span>@child.DisplayName</span>
-                            </td>
+                    <tr class="parent">
+                        <td>
+                            <span class="caret"><span class="badge badge-info mr-1">@item.Childs?.Count</span>@item.DisplayName</span>
+                        </td>
 
-                            <td>
-                                <div class="d-flex justify-content-center">
-                                    <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#DepartmentsEdit" data-url="@Url.Action("DepartmentEdit", new { id = child.Id })">
-                                        <i class="fa fa-pen"></i>
-                                    </button>
-                                    <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("DepartmentDelete", new { id = child.Id })">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
+                        <td>
+                            <div class="d-flex justify-content-center">
+                                <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#DepartmentsEdit" data-url="@Url.Action("DepartmentEdit", new { id = item.Id })">
+                                    <i class="fa fa-pen"></i>
+                                </button>
+                                <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("DepartmentDelete", new { id = item.Id })">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+
+                    </tr>
+
+                    @if (item.Childs != null && item.Childs.Count > 0)
+                        {
+                            foreach (var child in item.Childs)
+                            {
+                            <tr class="nested">
+                                <td>
+                                    <span>@child.DisplayName</span>
+                                </td>
+
+                                <td>
+                                    <div class="d-flex justify-content-center">
+                                        <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#DepartmentsEdit" data-url="@Url.Action("DepartmentEdit", new { id = child.Id })">
+                                            <i class="fa fa-pen"></i>
+                                        </button>
+                                        <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("DepartmentDelete", new { id = child.Id })">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            }
                         }
                     }
-                }
-            </tbody>
-        </table>
-    </div>
+                </tbody>
+            </table>
+        </div>
 
 
-</section>
+    </section>*@
+
+
 
 
 @* MOCK *@
-<!--<section class="component-section">
+<section class="component-section">
     <div id="placeholder"></div>
     <div class="row-container-left bg-blue with-padding">
         <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#DepartmentEdit" data-url="@Url.Action("DepartmentCreate")">
@@ -143,54 +220,57 @@
                     </th>
                 </tr>
             </thead>
-            <tbody>-->
-@*ViewBag.Departments*@
-<!--@foreach (var item in Model.ControlModels)
+            <tbody>
+                @*ViewBag.Departments*@
+                @foreach (var item in ViewBag.Departments)
                 {
-                    <tr class="parent">
-                        <td>
-                            <span class="caret">@item.Name</span>
+                    int depth = 0;
 
-                        </td>
 
-                        <td>
-                            <div class="fa-container-links-centered">
-                                <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#DepartmentsEdit">
-                                        <i class="fa fa-pen"></i>
-                                </button>
-                                <a>
-                                    <i class="fa fa-trash"></i>
-                                </a>
-                            </div>
-                        </td>
-
-                    </tr>
-
-                    @if (item.Childs != null && item.Childs.Count > 0)
+                    if (item.Childs == null)
                     {
-                        foreach (var child in item.Childs)
-                        {
-                            <tr class="nested">
-                                <td>
-                                    <span>@child.Name</span>
-                                </td>
+                        <tr data-level="@depth">
+                            <td>
+                                <span>@(string.IsNullOrEmpty(item.DisplayName) ? "Empty name" : item.DisplayName)</span>
+                            </td>
 
-                                <td>
-                                    <div class="fa-container-links-centered">
-                                        <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#DepartmentsEdit">
-                                                <i class="fa fa-pen"></i>
-                                            </button>
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#DepartmentsEdit" data-url="@Url.Action("DepartmentEdit", new { id = item.Id })">
+                                        <i class="fa fa-pen"></i>
+                                    </button>
+                                    <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("DepartmentDelete", new { id = item.Id })">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr class="parent" data-level="@depth">
+                            <td>
+                                <span class="caret">@item.DisplayName</span>
 
-                                        <a>
-                                            <i class="fa fa-trash"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
+                            </td>
+
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#DepartmentsEdit" data-url="@Url.Action("DepartmentEdit", new { id = item.Id })">
+                                        <i class="fa fa-pen"></i>
+                                    </button>
+                                    <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("DepartmentDelete", new { id = item.Id })">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        foreach (var element in item.Childs)
+                            Test(element, depth + 1);
                     }
                 }
             </tbody>
         </table>
     </div>
-</section>-->
+</section>

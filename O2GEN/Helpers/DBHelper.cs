@@ -18,6 +18,9 @@ namespace O2GEN.Helpers
             //if (Environment.UserName == "Е")
             //    return string.Empty;
 
+            if (Environment.UserName == "Е")
+                return "Server=DESKTOP-IO142CD\\SQLEXPRESS;Initial Catalog=UFMDBLUK;Integrated Security=SSPI";
+
             return DBConnection;
         }
 
