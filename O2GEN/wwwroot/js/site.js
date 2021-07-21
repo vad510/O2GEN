@@ -37,7 +37,7 @@
 
 let placeholder = document.getElementById("placeholder");
 
-﻿(function prepareLists() {
+﻿function prepareLists() {
      const treeViewitems = document.getElementsByClassName("caret");
 
     for (var i = 0; i < treeViewitems.length; i++) {
@@ -53,7 +53,7 @@ let placeholder = document.getElementById("placeholder");
             }
         });
     }
-})();
+}
 
 var ready = function (action) {
     if (document.readyState != "loading")
@@ -73,6 +73,7 @@ ready(function () {
     }
 
     placeholder = document.getElementById("placeholder");
+    prepareLists();
 });
 
 function btnClick() {
@@ -123,7 +124,7 @@ function tryCreateModal(placeholder, response) {
     const div = placeholder.querySelector(".modal");
     const modal = new bootstrap.Modal(div);
     modal.show();
-
+    prepareLists();
     $("#myInput1").on("keyup", function () {
         var value = $(this).val().toLowerCase();
         $("#SelectList1 option").filter(function () {

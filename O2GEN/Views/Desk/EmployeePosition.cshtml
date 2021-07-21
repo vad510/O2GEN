@@ -44,7 +44,8 @@
                                 <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#EmployeePositionEdit" data-url="@Url.Action("EmployeePositionEdit", new { id = item.Id })">
                                     <i class="fa fa-pen"></i>
                                 </button>
-                                <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("EmployeePositionDelete", new { id = item.Id })">
+
+                                <button type="submit" class="btn btn-danger ml-1" onclick="location.href='@Url.Action("EmployeePositionDelete", new { id = item.Id })'">
                                     <i class="fa fa-trash"></i>
                                 </button>
                             </div>

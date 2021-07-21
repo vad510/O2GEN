@@ -69,7 +69,8 @@
                                     <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#ControlEdit" data-url="@Url.Action("ControlEdit", new { id = item.Id })">
                                         <i class="fa fa-pen"></i>
                                     </button>
-                                    <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("ControlDelete", new { id = item.Id })">
+
+                                    <button type="submit" class="btn btn-danger ml-1" onclick="location.href='@Url.Action("ControlDelete", new { id = item.Id })'">
                                         <i class="fa fa-trash"></i>
                                     </button>
                                 </div>

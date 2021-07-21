@@ -87,7 +87,7 @@
                                 <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#EngineerEdit" data-url="@Url.Action("EngineerEdit", new { id = item.Id })">
                                     <i class="fa fa-pen"></i>
                                 </button>
-                                <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("EngineerDelete", new { id = item.Id })">
+                                <button type="submit" class="btn btn-danger ml-1" onclick="location.href='@Url.Action("EngineerDelete", new { id = item.Id })'">
                                     <i class="fa fa-trash"></i>
                                 </button>
                             </div>

@@ -106,52 +106,236 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         private static string CreateZRP(ZRP obj, string UserName)
         {
-            return "DECLARE @revision bigint; " +
-                "set @revision = (isnull((SELECT max(revision) id FROM AssetParameters ),0)+1);" +
-                "INSERT INTO AssetParameters " +
-                "(CreatedByUser, " +
-                "CreationTime, " +
-                "ExternalId, " +
-                "IsDeleted, " +
-                "IsDynamic, " +
-                "ObjectUID, " +
-                "Revision) " +
+            //SchedulingRequirements
+            //Tasks
+            //  InspectionDocuments
+            //      InspectionProtocols
+            //          InspectionProtocolItems
+            //              AssetParameterValues
+            //  SchedulingContainers
 
-                $"VALUES " +
 
-                $"((isnull((SELECT top 1 id FROM PPUsers  where name =  {(string.IsNullOrEmpty(UserName) ? "NULL" : $"{(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}")}),-1)) , " +
-                $"getdate(), " +
-                $"N'{(obj.ObjectUID == null ? "NULL" : obj.ObjectUID?.ToString("D"))}', " +
-                $"0, " +
-                $"0, " +
-                $"'{(obj.ObjectUID == null ? "NULL" : obj.ObjectUID?.ToString("D"))}', " +
-                $"@revision); " +
-                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = 5;";
+
+            return "DECLARE @SRRev bigint, @SCRev bigint, @TRev bigint, @IDRev bigint, @IPRev bigint, @IPIRev bigint, @APVRev bigint; " +
+
+            "SET @SRRev = (isnull((SELECT max(revision) id FROM SchedulingRequirements), 0) + 1); " +
+            "SET @SCRev = (isnull((SELECT max(revision) id FROM SchedulingContainers), 0) + 1); " +
+            "SET @TRev = (isnull((SELECT max(revision) id FROM Tasks), 0) + 1); " +
+            "SET @IDRev = (isnull((SELECT max(revision) id FROM InspectionDocuments), 0) + 1); " +
+            "SET @IPRev = (isnull((SELECT max(revision) id FROM InspectionProtocols), 0) + 1); " +
+            "SET @IPIRev = (isnull((SELECT max(revision) id FROM InspectionProtocolItems), 0) + 1); " +
+            "SET @APVRev = (isnull((SELECT max(revision) id FROM AssetParameterValues), 0) + 1); " +
+
+            "DECLARE @SRId TABLE(id bigint); " +
+            "DECLARE @SCId TABLE(id bigint); " +
+            "DECLARE @TId TABLE(id bigint); " +
+            "DECLARE @IDId TABLE(id bigint); " +
+            "DECLARE @IPId TABLE(id bigint); " +
+            "DECLARE @IPIId TABLE(id bigint); " +
+            "DECLARE @APVId TABLE(id bigint); " +
+
+            "INSERT INTO SchedulingRequirements " +
+            "(IsDeleted, " +
+            "Revision, " +
+            "CreatedByUser, " +
+            "CreationTime, " +
+            "ObjectUID, " +
+            "DepartmentId, " +
+            "RequirementResourceId, " +
+            "EarlyStart, " +
+            "DueDate, " +
+            "AppointmentStart, " +
+            "AppointmentFinish) " +
+            "OUTPUT inserted.Id into @SRId " +
+            "VALUES " +
+            "(0, " +
+            "@SRRev, " +
+            $"(isnull((SELECT top 1 id FROM PPUsers  where name = { (string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
+            "getdate(), " +
+            $"'{Guid.NewGuid().ToString("D")}', " +
+            $"{ obj.DepartmentID}, " +
+            $"{ obj.ResourceId}, " +
+            $"'{ obj.StartTime.ToString("yyyy-MM-dd HH:mm:ss")}', " +
+            $"'{ obj.EndTime.ToString("yyyy-MM-dd HH:mm:ss")}', " +
+            $"'{ obj.StartTime.ToString("yyyy-MM-dd HH:mm:ss")}', " +
+            $"'{ obj.EndTime.ToString("yyyy-MM-dd HH:mm:ss")}'); " +
+
+            "INSERT INTO SchedulingContainers " +
+            "(IsDeleted, " +
+            "Revision, " +
+            "CreatedByUser, " +
+            "CreationTime, " +
+            "ObjectUID, " +
+            "SCStatusId, " +
+            "SCTypeId, " +
+            "RequirementId, " +
+            "TenantId, " +
+            "StartTime, " +
+            "CloseTime, " +
+            "DepartmentId) " +
+            "OUTPUT inserted.Id into @SCId " +
+            "VALUES " +
+            "(0, " +
+            "@SCRev, " +
+            $"(isnull((SELECT top 1 id FROM PPUsers  where name = { (string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
+            "getdate(), " +
+            $"'{Guid.NewGuid().ToString("D")}', " +
+            $"{ obj.SCStatusId}, " +
+            $"{ obj.SCTypeId}, " +
+            "(SELECT TOP 1 id FROM @SRId), " +
+            "1, " +
+            $"'{ obj.StartTime.ToString("yyyy-MM-dd HH:mm:ss")}', " +
+            $"'{ obj.EndTime.ToString("yyyy-MM-dd HH:mm:ss")}', " +
+            $"{ obj.DepartmentID}); " +
+
+            "INSERT INTO Tasks " +
+            "(IsDeleted, " +
+            "Revision, " +
+            "CreatedByUser, " +
+            "CreationTime, " +
+            "ObjectUID, " +
+            "SchedulingContainerId, " +
+            "TaskStatusId, " +
+            "TenantId, " +
+            "SR_Duration, " +
+            "UseContractor, " +
+            "UseContractorVehicle) " +
+            "OUTPUT inserted.Id into @TId " +
+            "VALUES " +
+            "(0, " +
+            "@TRev, " +
+            $"(isnull((SELECT top 1 id FROM PPUsers  where name = { (string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
+            "getdate(), " +
+            $"'{Guid.NewGuid().ToString("D")}', " +
+            "(SELECT TOP 1 id FROM @SCId), " +
+            "1, " +
+            "1, " +
+            $"{ obj.EndTime.Subtract(obj.StartTime).TotalMilliseconds}, " +
+            "0, " +
+            "0); " +
+
+            "INSERT INTO InspectionDocuments " +
+            "(IsDeleted, " +
+            "Revision, " +
+            "CreatedByUser, " +
+            "CreationTime, " +
+            "CreationDateTime, " +
+            "ObjectUID, " +
+            "Name, " +
+            "DepartmentId, " +
+            "TaskId) " +
+            "OUTPUT inserted.Id into @TId " +
+            "VALUES " +
+            "(0, " +
+            "@IDRev, " +
+            $"(isnull((SELECT top 1 id FROM PPUsers  where name = { (string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
+            "getdate(), " +
+            "getdate(), " +
+            $"'{Guid.NewGuid().ToString("D")}', " +
+            $"N'{obj.RouteName}', " +
+            "(SELECT TOP 1 id FROM @TId)); " +
+            $"UPDATE PPEntityCollections SET Revision = @SRRev WHERE ID = {(int)RevEntry.SchedulingRequirement}; " +
+            $"UPDATE PPEntityCollections SET Revision = @SCRev WHERE ID = {(int)RevEntry.SchedulingContainer}; " +
+            $"UPDATE PPEntityCollections SET Revision = @TRev WHERE ID = {(int)RevEntry.Task}; " +
+            $"UPDATE PPEntityCollections SET Revision = @IDRev WHERE ID = {(int)RevEntry.InspectionDocument}; ";
         }
         private static string UpdateZRP(ZRP obj, string UserName)
         {
-            return "DECLARE @revision bigint; " +
-                "set @revision = (isnull((SELECT max(revision) id FROM AssetParameters ),0)+1); " +
-                "UPDATE AssetParameters SET " +
-                $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"{(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}")}),-1)), " +
-                "ModificationTime = getdate(), " +
-                "Revision = @revision, " +
-                $"WHERE ID = {obj.Id}; " +
+            return "DECLARE @SRRev bigint, @SCRev bigint, @TRev bigint, @IDRev bigint, @IPRev bigint, @IPIRev bigint, @APVRev bigint; " +
 
-                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.AssetParameter};";
+            "SET @SRRev = (isnull((SELECT max(revision) id FROM SchedulingRequirements), 0) + 1); " +
+            "SET @SCRev = (isnull((SELECT max(revision) id FROM SchedulingContainers), 0) + 1); " +
+            "SET @TRev = (isnull((SELECT max(revision) id FROM Tasks), 0) + 1); " +
+            "SET @IDRev = (isnull((SELECT max(revision) id FROM InspectionDocuments), 0) + 1); " +
+            "SET @IPRev = (isnull((SELECT max(revision) id FROM InspectionProtocols), 0) + 1); " +
+            "SET @IPIRev = (isnull((SELECT max(revision) id FROM InspectionProtocolItems), 0) + 1); " +
+            "SET @APVRev = (isnull((SELECT max(revision) id FROM AssetParameterValues), 0) + 1); " +
+
+            "UPDATE SchedulingRequirements SET " +
+            $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"{(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}")}),-1)), " +
+            "ModificationTime = getdate(), " +
+            "Revision = @SRRev, " +
+            $"EarlyStart = '{obj.StartTime.ToString("yyyy-MM-dd HH:mm:ss")}', " +
+            $"DueDate = '{obj.EndTime.ToString("yyyy-MM-dd HH:mm:ss")}', " +
+            $"AppointmentStart = '{obj.StartTime.ToString("yyyy-MM-dd HH:mm:ss")}', " +
+            $"AppointmentFinish = '{obj.EndTime.ToString("yyyy-MM-dd HH:mm:ss")}' " +
+            $"WHERE ID in (SELECT RequirementId FROM SchedulingContainers WHERE ID = {obj.Id}); " +
+
+            "UPDATE SchedulingContainers SET " +
+            $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"{(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}")}),-1)), " +
+            "ModificationTime = getdate(), " +
+            "Revision = @SCRev, " +
+            $"SCStatusId = {obj.SCStatusId}, " +
+            $"SCTypeId = {obj.SCTypeId}, " +
+            $"StartTime = '{obj.StartTime.ToString("yyyy-MM-dd HH:mm:ss")}', " +
+            $"CloseTime = '{obj.EndTime.ToString("yyyy-MM-dd HH:mm:ss")}', " +
+            $"DepartmentId = {obj.DepartmentID} " +
+            $"WHERE ID = {obj.Id}; " +
+
+            "UPDATE Tasks SET " +
+            $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"{(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}")}),-1)), " +
+            "ModificationTime = getdate(), " +
+            "Revision = @TRev, " +
+            $"SR_Duration = {obj.EndTime.Subtract(obj.StartTime).TotalMilliseconds} " +
+            $"WHERE SchedulingContainerId = {obj.Id}; " +
+
+            "UPDATE InspectionDocuments SET " +
+            $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"{(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}")}),-1)), " +
+            "ModificationTime = getdate(), " +
+            "Revision = @IDRev, " +
+            $"Name = N'{obj.RouteName}', " +
+            $"DepartmentId = {obj.DepartmentID} " +
+            $"WHERE TaskId in (SELECT Id FROM Tasks WHERE SchedulingContainerId = {obj.Id}); " +
+
+
+            $"UPDATE PPEntityCollections SET Revision = @SRRev WHERE ID = {(int)RevEntry.SchedulingRequirement}; " +
+            $"UPDATE PPEntityCollections SET Revision = @SCRev WHERE ID = {(int)RevEntry.SchedulingContainer}; " +
+            $"UPDATE PPEntityCollections SET Revision = @TRev WHERE ID = {(int)RevEntry.Task}; " +
+            $"UPDATE PPEntityCollections SET Revision = @IDRev WHERE ID = {(int)RevEntry.InspectionDocument}; ";
         }
         private static string DeleteZRP(int ID, string UserName)
         {
-            return "DECLARE @revision bigint; " +
-                "set @revision = (isnull((SELECT max(revision) id FROM AssetParameters ),0)+1); " +
-                "UPDATE AssetParameters SET " +
-                $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
-                "DeletionTime = getdate(), " +
-                "Revision = @revision, " +
-                "IsDeleted = 1 " +
-                $"WHERE ID = {ID}; " +
 
-                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.AssetParameter}; ";
+
+            return "DECLARE @SRRev bigint, @SCRev bigint, @TRev bigint, @IDRev bigint, @IPRev bigint, @IPIRev bigint, @APVRev bigint; " +
+
+            "SET @SRRev = (isnull((SELECT max(revision) id FROM SchedulingRequirements), 0) + 1); " +
+            "SET @SCRev = (isnull((SELECT max(revision) id FROM SchedulingContainers), 0) + 1); " +
+            "SET @TRev = (isnull((SELECT max(revision) id FROM Tasks), 0) + 1); " +
+            "SET @IDRev = (isnull((SELECT max(revision) id FROM InspectionDocuments), 0) + 1); " +
+            "SET @IPRev = (isnull((SELECT max(revision) id FROM InspectionProtocols), 0) + 1); " +
+            "SET @IPIRev = (isnull((SELECT max(revision) id FROM InspectionProtocolItems), 0) + 1); " +
+            "SET @APVRev = (isnull((SELECT max(revision) id FROM AssetParameterValues), 0) + 1); " +
+
+            "UPDATE SchedulingRequirements SET " +
+            $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"{(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}")}),-1)), " +
+            "DeletionTime = getdate(), " +
+            "Revision = @SRRev " +
+            $"WHERE ID in (SELECT RequirementId FROM SchedulingContainers WHERE ID = {ID}); " +
+
+            "UPDATE SchedulingContainers SET " +
+            $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"{(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}")}),-1)), " +
+            "DeletionTime = getdate(), " +
+            "Revision = @SCRev " +
+            $"WHERE ID = {ID}; " +
+
+            "UPDATE Tasks SET " +
+            $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"{(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}")}),-1)), " +
+            "DeletionTime = getdate(), " +
+            "Revision = @TRev " +
+            $"WHERE SchedulingContainerId = {ID}; " +
+
+            "UPDATE InspectionDocuments SET " +
+            $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"{(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}")}),-1)), " +
+            "DeletionTime = getdate(), " +
+            "Revision = @IDRev " +
+            $"WHERE TaskId in (SELECT Id FROM Tasks WHERE SchedulingContainerId = {ID}); " +
+
+
+            $"UPDATE PPEntityCollections SET Revision = @SRRev WHERE ID = {(int)RevEntry.SchedulingRequirement}; " +
+            $"UPDATE PPEntityCollections SET Revision = @SCRev WHERE ID = {(int)RevEntry.SchedulingContainer}; " +
+            $"UPDATE PPEntityCollections SET Revision = @TRev WHERE ID = {(int)RevEntry.Task}; " +
+            $"UPDATE PPEntityCollections SET Revision = @IDRev WHERE ID = {(int)RevEntry.InspectionDocument}; ";
         }
 
         private static string GetInspectionProtocols(int SchedContID)
