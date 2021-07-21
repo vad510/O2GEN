@@ -56,6 +56,13 @@ namespace O2GEN.Models
         [DisplayName("Подразделение")]
         public int? DepartmentID { get; set; }
 
+        [DisplayName("Переодичность обхода")]
+        public string Period { get; set; }
+        /// <summary>
+        /// Не думаю что имеет смысл в передаче, у нас будет список AssetParameter
+        /// </summary>
+        [DisplayName("Маршрут")]
+        public int? AssetParameterSetId { get; set; }
         public List<InspectionProtocol> InsProt { get; set; } = new List<InspectionProtocol>();
     }
 }

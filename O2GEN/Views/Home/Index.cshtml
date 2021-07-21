@@ -1,4 +1,4 @@
-﻿@model O2GEN.Models.ReportModel
+﻿@model O2GEN.Models.ZRPFilter
 
 @* Home *@
 
@@ -23,6 +23,73 @@
                 </li>
             </ul>
         </div>*@
+    <div class="row-container-left bg-blue">
+        <form action="Index" method="post">
+
+            <input asp-for="From" style="display:none" />
+            <input asp-for="To" style="display:none" />
+            <ul class="ul-list-left-aligned">
+                <li class="li-text-white">
+                    <button type="button" class="btn btn-light" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPCreate")">
+                        <i class="fa fa-plus"></i> Создать
+                    </button>
+                </li>
+
+                <li class="li-text-white">
+                    <button class="transparent-btn">
+                        <i class="fa fa-filter color-white"></i>
+                        <p class="color-white">Фильтры (0)</p>
+                    </button>
+                </li>
+
+
+                <li class="li-text-white">
+                    <button class="btn btn-light" type="button" id="SetToday">
+                        <i class="fa fa-calendar-day"></i>
+                        Сегодня
+                    </button>
+                </li>
+
+                <li class="li-text-white mr-0">
+                    От:
+                </li>
+                <li class="li-text-white ml-0">
+                    <div class="input-group date col-auto" id="datetimepickerFROM" data-target-input="nearest">
+                        <input type="text" class="form-control datetimepicker-input" data-target="#datetimepickerFROM" id="DTPFROM" style="width:150px;" />
+                        <div class="input-group-append" data-target="#datetimepickerFROM" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                        </div>
+                    </div>
+                </li>
+                <li class="li-text-white mr-0">
+                    До:
+                </li>
+                <li class="li-text-white ml-0">
+                    <div class="input-group date col-auto" id="datetimepickerTO" data-target-input="nearest">
+                        <input type="text" class="form-control datetimepicker-input" data-target="#datetimepickerTO" id="DTPTO" style="width:150px;" />
+                        <div class="input-group-append" data-target="#datetimepickerTO" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="li-text-white">
+                    <select asp-for="DepartmentId" class="form-control" required>
+                        <option value="NULL" selected>Выбрать значение</option>
+                        @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments())
+                        {
+                            <option value="@item.Id">@item.DisplayName</option>
+                        }
+                    </select>
+                </li>
+                <li class="li-text-white">
+                    <button class="btn btn-light" type="submit">
+                        <i class="fa fa-search"></i> Поиск
+                    </button>
+                </li>
+            </ul>
+        </form>
+    </div>
 
     @* strange stuff *@
     <div id="placeholder"></div>
@@ -42,23 +109,7 @@
     <div class="tab-content bg-light">
 
         <div id="first-tab" class="tab-pane active">
-            <div class="row-container-left bg-blue">
-                <ul class="ul-list-left-aligned">
-                    <li class="li-text-white">
-                        <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPCreate")">
-                            <i class="fa fa-plus color-white"></i>
-                            <p class="color-white">Создать</p>
-                        </button>
-                    </li>
 
-                    <li class="li-text-white">
-                        <button class="transparent-btn">
-                            <i class="fa fa-filter color-white"></i>
-                            <p class="color-white">Фильтры (0)</p>
-                        </button>
-                    </li>
-                </ul>
-            </div>
 
             <section>
                 <table class="table table-bordered table-hover">
@@ -109,7 +160,7 @@
                                     <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPEdit", new { id = item.Id })">
                                         <i class="fa fa-pen"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger ml-1" onclick="location.href='@Url.Action("ZRPDelete", "Home", new { id = item.Id });'">
+                                    <button type="button" class="btn btn-danger ml-1" onclick="location.href='@Url.Action("ZRPDelete", new { id = item.Id })'">
                                         <i class="fa fa-trash"></i>
                                     </button>
                                 </div>
@@ -122,23 +173,6 @@
 
         <div id="second-tab" class="tab-pane fade">
 
-            <div class="row-container-left bg-blue">
-                <ul class="ul-list-left-aligned">
-                    <li class="li-text-white">
-                        <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#addZpr" data-url="@Url.Action("CreateZpr")">
-                            <i class="fa fa-plus color-white"></i>
-                            <p class="color-white">Создать</p>
-                        </button>
-                    </li>
-
-                    <li class="li-text-white">
-                        <button class="transparent-btn">
-                            <i class="fa fa-filter color-white"></i>
-                            <p class="color-white">Фильтры (0)</p>
-                        </button>
-                    </li>
-                </ul>
-            </div>
 
             <section>
                 <table class="table table-bordered table-hover">
@@ -189,7 +223,7 @@
                                     <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPEdit", new { id = item.Id })">
                                         <i class="fa fa-pen"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger ml-1" data-url="@Url.Action("ZRPDelete", "Home", new { id = item.Id })">
+                                    <button type="button" class="btn btn-danger ml-1" onclick="location.href='@Url.Action("ZRPDelete", new { id = item.Id })'">
                                         <i class="fa fa-trash"></i>
                                     </button>
                                 </div>
@@ -203,23 +237,6 @@
 
         <div id="third-tab" class="tab-pane fade">
 
-            <div class="row-container-left bg-blue">
-                <ul class="ul-list-left-aligned">
-                    <li class="li-text-white">
-                        <button class="transparent-btn color-white">
-                            <i class="fa fa-plus"></i>
-                            <p>Создать</p>
-                        </button>
-                    </li>
-
-                    <li class="li-text-white">
-                        <button class="transparent-btn color-white">
-                            <i class="fa fa-filter"></i>
-                            <p>Фильтры (0)</p>
-                        </button>
-                    </li>
-                </ul>
-            </div>
 
             <section>
                 <table class="table table-bordered table-hover">
@@ -270,7 +287,7 @@
                                     <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPEdit", new { id = item.Id })">
                                         <i class="fa fa-pen"></i>
                                     </button>
-                                    <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("ZRPDelete", new { id = item.Id })">
+                                    <button type="button" class="btn btn-danger ml-1" onclick="location.href='@Url.Action("ZRPDelete", new { id = item.Id })'">
                                         <i class="fa fa-trash"></i>
                                     </button>
                                 </div>
@@ -282,6 +299,64 @@
         </div>
     </div>
 
+    <script type="text/javascript">
+        $(document).ready(function () {
+            InitializeDatePicker();
+            $.noConflict();
+            $('#SetToday').click('click', SetTodayForTDTs);
+        });
+        function InitializeDatePicker() {
+
+            @if (string.IsNullOrEmpty(Model.From))
+            {
+            <text>
+                var d = new Date(moment().subtract(2, 'days'));
+                var now = moment();
+            </text>
+            }
+            else
+            {
+                <text>
+                    var d = new Date(@Model.From);
+                    var now = moment(@Model.To);
+                </text>
+            }
+            $('#datetimepickerFROM').datetimepicker({
+                locale: 'ru',
+                icons: {
+                    time: "fa fa-clock",
+                    date: "fa fa-calendar-alt",
+                    up: "fa fa-arrow-up",
+                    down: "fa fa-arrow-down"
+                }
+                });
+            $("#datetimepickerFROM").on("change.datetimepicker", ({ date }) => { $('#From').val(date._d.getTime()); })
+            $('#datetimepickerFROM').datetimepicker('date', new Date(d.getFullYear(), d.getMonth(), d.getDate()));
+
+            $('#datetimepickerTO').datetimepicker({
+                locale: 'ru',
+                icons: {
+                    time: "fa fa-clock",
+                    date: "fa fa-calendar-alt",
+                    up: "fa fa-arrow-up",
+                    down: "fa fa-arrow-down"
+                }
+                });
+            $("#datetimepickerTO").on("change.datetimepicker", ({ date }) => { $('#To').val(date._d.getTime()); })
+            $('#datetimepickerTO').datetimepicker('date', now);
+            }
+        function SetTodayForTDTs() {
+            var d = new Date(moment().subtract(2, 'days'));
+            var now = moment();
+            $('#datetimepickerFROM').datetimepicker();
+            $('#datetimepickerTO').datetimepicker();
+            $('#datetimepickerFROM').datetimepicker('date', new Date(d.getFullYear(), d.getMonth(), d.getDate()));
+            $('#datetimepickerTO').datetimepicker('date', now);
+            document.cookie = "ZRPDateFrom=" + d.getTime() + "; max-age=300000";
+            document.cookie = "ZRPDateTo=" + now.getTime() + "; max-age=300000";
+            $.noConflict();
+        }
+    </script>
 </section>
 
 

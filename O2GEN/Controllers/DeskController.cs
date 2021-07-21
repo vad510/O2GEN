@@ -260,53 +260,52 @@ namespace O2GEN.Controllers
         public IActionResult Departments()
         {
             ViewBag.Departments = Helpers.DBHelper.GetDepartments(logger: _logger);
+            //ControlListModel model = new ControlListModel();
+            //model.ControlModels = new System.Collections.Generic.List<ControlModel>();
+            //for (var i = 0; i < 5; i++)
+            //{
+            //    var first = new ControlModel()
+            //    {
+            //        Name = "1 lvl"
+            //    };
 
-            ControlListModel model = new ControlListModel();
-            model.ControlModels = new System.Collections.Generic.List<ControlModel>();
-            for (var i = 0; i < 5; i++)
-            {
-                var first = new ControlModel()
-                {
-                    Name = "1 lvl"
-                };
+            //    first.Childs = new System.Collections.Generic.List<ControlModel>();
 
-                first.Childs = new System.Collections.Generic.List<ControlModel>();
+            //    model.ControlModels.Add(first);
 
-                model.ControlModels.Add(first);
+            //    for (var j = 0; j < 2; j++)
+            //    {
+            //        ControlModel second = new ControlModel()
+            //        {
+            //            Name = "2 lvl"
+            //        };
 
-                for (var j = 0; j < 2; j++)
-                {
-                    ControlModel second = new ControlModel()
-                    {
-                        Name = "2 lvl"
-                    };
+            //        second.Childs = new System.Collections.Generic.List<ControlModel>();
 
-                    second.Childs = new System.Collections.Generic.List<ControlModel>();
+            //        first.Childs.Add(second);
 
-                    first.Childs.Add(second);
+            //        for (var s = 0; s < 2; s++)
+            //        {
+            //            ControlModel third = new ControlModel()
+            //            {
+            //                Name = "3 lvl"
+            //            };
+            //            third.Childs = new List<ControlModel>();
 
-                    for (var s = 0; s < 2; s++)
-                    {
-                        ControlModel third = new ControlModel()
-                        {
-                            Name = "3 lvl"
-                        };
-                        third.Childs = new List<ControlModel>();
+            //            second.Childs.Add(third);
 
-                        second.Childs.Add(third);
-
-                        for (var o = 0; o < 2; o++)
-                        {
-                            ControlModel fourth = new ControlModel
-                            {
-                                Name = "4 lvl"
-                            };
-                            third.Childs.Add(fourth);
-                        }
-                    }
-                }
-            }
-            return View(model);
+            //            for (var o = 0; o < 2; o++)
+            //            {
+            //                ControlModel fourth = new ControlModel
+            //                {
+            //                    Name = "4 lvl"
+            //                };
+            //                third.Childs.Add(fourth);
+            //            }
+            //        }
+            //    }
+            //}
+            return View(/*model*/);
         }
 
         [HttpGet]

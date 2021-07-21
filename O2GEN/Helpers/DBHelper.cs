@@ -10,24 +10,27 @@ namespace O2GEN.Helpers
 {
     public static class DBHelper
     {
-        private static string DBConnection = $"Data Source={(Environment.UserName == "Michael" ? "DESKTOP-JFNR95O\\SQLEXPRESS" : "DESKTOP-A17N4G7\\SQLEXPRESS01")};Initial Catalog=UFMDBLUK;Integrated Security=SSPI;";
-        //private static string DBConnection = "Data Source=10.201.192.241;Initial Catalog=UFMDBLUK;User ID=sa;Password=Zz123456789;";
+        //private static string DBConnection = $"Data Source={(Environment.UserName == "Michael" ? "DESKTOP-JFNR95O\\SQLEXPRESS" : "DESKTOP-A17N4G7\\SQLEXPRESS01")};Initial Catalog=UFMDBLUK;Integrated Security=SSPI;";
+        private static string DBConnection = "Data Source=10.201.192.241;Initial Catalog=UFMDBLUK;User ID=sa;Password=Zz123456789;";
 
         private static string GetConnectionString()
         {
-            //if (Environment.UserName == "Е")
-            //    return string.Empty;
-
-            if (Environment.UserName == "Е")
-                return "Server=DESKTOP-IO142CD\\SQLEXPRESS;Initial Catalog=UFMDBLUK;Integrated Security=SSPI";
-
             return DBConnection;
+            switch (Environment.UserName)
+                {
+                    case "Michael":
+                        return "Server=DESKTOP-JFNR95O\\SQLEXPRESS;Initial Catalog=UFMDBLUK;Integrated Security=SSPI";
+                    case "Е":
+                        return "Server=DESKTOP-IO142CD\\SQLEXPRESS;Initial Catalog=UFMDBLUK;Integrated Security=SSPI";
+                    default:
+                        return "Server=DESKTOP-A17N4G7\\SQLEXPRESS01;Initial Catalog=UFMDBLUK;Integrated Security=SSPI";
+            }
         }
 
         #region Тексты запросов
 
         #region Обходы
-        private static string GetZRP(DateTime From, DateTime To, int status)
+        private static string GetZRP(DateTime From, DateTime To, int status, int? DeptId)
         {
             return "" +
                 $"declare @__start_2 datetime2(7)='{From.ToString("yyyy-MM-dd HH:mm:ss")}', @__finish_1 datetime2(7)='{To.ToString("yyyy-MM-dd HH:mm:ss")}'; " +
@@ -73,7 +76,7 @@ namespace O2GEN.Helpers
                 "   FROM[Resources] AS[e10] " +
                 "    WHERE([e10].[IsDeleted] <> 1) AND([e10].[TenantId] = CAST(1 AS bigint)) " +
                 ") AS[t10] ON[t9].[ResourceId] = [t10].[Id] " +
-                $"WHERE {(status > 0 ? $"[e].[SCStatusId] = {status} AND " : "")}  (([e].[IsDeleted] <> 1) AND([e].[TenantId] = CAST(1 AS bigint))) AND(([t7].[DepartmentId] IS NOT NULL AND[t7].[DepartmentId] IN(CAST(3 AS bigint))) AND(CASE " +
+                $"WHERE {(status > 0 ? $"[e].[SCStatusId] = {status} AND " : "")}  (([e].[IsDeleted] <> 1) AND([e].[TenantId] = CAST(1 AS bigint))) AND(([t7].[DepartmentId] IS NOT NULL {(DeptId!= null? $"AND[t7].[DepartmentId] = {DeptId}" : "")} ) AND(CASE " +
                 "WHEN EXISTS( " +
                 "   SELECT 1 " +
                 "   FROM[Assignments] AS[e9] " +
@@ -119,7 +122,7 @@ namespace O2GEN.Helpers
 
 
 
-            return "DECLARE @SRRev bigint, @SCRev bigint, @TRev bigint, @IDRev bigint, @IPRev bigint, @IPIRev bigint, @APVRev bigint; " +
+            return "DECLARE @SRRev bigint, @SCRev bigint, @TRev bigint, @IDRev bigint, @IPRev bigint, @IPIRev bigint, @APVRev bigint, @ARev bigint; " +
 
             "SET @SRRev = (isnull((SELECT max(revision) id FROM SchedulingRequirements), 0) + 1); " +
             "SET @SCRev = (isnull((SELECT max(revision) id FROM SchedulingContainers), 0) + 1); " +
@@ -128,6 +131,7 @@ namespace O2GEN.Helpers
             "SET @IPRev = (isnull((SELECT max(revision) id FROM InspectionProtocols), 0) + 1); " +
             "SET @IPIRev = (isnull((SELECT max(revision) id FROM InspectionProtocolItems), 0) + 1); " +
             "SET @APVRev = (isnull((SELECT max(revision) id FROM AssetParameterValues), 0) + 1); " +
+            "SET @ARev = (isnull((SELECT max(revision) id FROM Assignments), 0) + 1); " +
 
             "DECLARE @SRId TABLE(id bigint); " +
             "DECLARE @SCId TABLE(id bigint); " +
@@ -183,8 +187,8 @@ namespace O2GEN.Helpers
             $"(isnull((SELECT top 1 id FROM PPUsers  where name = { (string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
             "getdate(), " +
             $"'{Guid.NewGuid().ToString("D")}', " +
-            $"{ obj.SCStatusId}, " +
-            $"{ obj.SCTypeId}, " +
+            $"1, " +
+            $"{obj.SCTypeId}, " +
             "(SELECT TOP 1 id FROM @SRId), " +
             "1, " +
             $"'{ obj.StartTime.ToString("yyyy-MM-dd HH:mm:ss")}', " +
@@ -217,12 +221,38 @@ namespace O2GEN.Helpers
             "0, " +
             "0); " +
 
+            "INSERT INTO Assignments " +
+            "(IsDeleted, " +
+            "Revision, " +
+            "CreatedByUser, " +
+            "CreationTime, " +
+            "ObjectUID, " +
+            "SchedulingContainerId, " +
+            "TaskId, " +
+            "ResourceId, " +
+            "Start, " +
+            "Finish, " +
+            "TenantId) " +
+            "VALUES " +
+            "(0, " +
+            "@ARev, " +
+            $"(isnull((SELECT top 1 id FROM PPUsers  where name = { (string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
+            "getdate(), " +
+            $"'{Guid.NewGuid().ToString("D")}', " +
+            $"(SELECT TOP 1 id FROM @SCId), " +
+            $"(SELECT TOP 1 id FROM @TId), " +
+            $"{obj.ResourceId}, " +
+            $"'{ obj.StartTime.ToString("yyyy-MM-dd HH:mm:ss")}', " +
+            $"'{ obj.EndTime.ToString("yyyy-MM-dd HH:mm:ss")}', " +
+            "1); " +
+
             "INSERT INTO InspectionDocuments " +
             "(IsDeleted, " +
             "Revision, " +
             "CreatedByUser, " +
             "CreationTime, " +
             "CreationDateTime, " +
+            "InspectionDateTime, " +
             "ObjectUID, " +
             "Name, " +
             "DepartmentId, " +
@@ -234,17 +264,20 @@ namespace O2GEN.Helpers
             $"(isnull((SELECT top 1 id FROM PPUsers  where name = { (string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
             "getdate(), " +
             "getdate(), " +
+            "getdate(), " +
             $"'{Guid.NewGuid().ToString("D")}', " +
             $"N'{obj.RouteName}', " +
+            $"{obj.DepartmentID}, " +
             "(SELECT TOP 1 id FROM @TId)); " +
             $"UPDATE PPEntityCollections SET Revision = @SRRev WHERE ID = {(int)RevEntry.SchedulingRequirement}; " +
             $"UPDATE PPEntityCollections SET Revision = @SCRev WHERE ID = {(int)RevEntry.SchedulingContainer}; " +
             $"UPDATE PPEntityCollections SET Revision = @TRev WHERE ID = {(int)RevEntry.Task}; " +
-            $"UPDATE PPEntityCollections SET Revision = @IDRev WHERE ID = {(int)RevEntry.InspectionDocument}; ";
+            $"UPDATE PPEntityCollections SET Revision = @IDRev WHERE ID = {(int)RevEntry.InspectionDocument}; "+
+            $"UPDATE PPEntityCollections SET Revision = @ARev WHERE ID = {(int)RevEntry.Assignment}; ";
         }
         private static string UpdateZRP(ZRP obj, string UserName)
         {
-            return "DECLARE @SRRev bigint, @SCRev bigint, @TRev bigint, @IDRev bigint, @IPRev bigint, @IPIRev bigint, @APVRev bigint; " +
+            return "DECLARE @SRRev bigint, @SCRev bigint, @TRev bigint, @IDRev bigint, @IPRev bigint, @IPIRev bigint, @APVRev bigint, @ARev bigint; " +
 
             "SET @SRRev = (isnull((SELECT max(revision) id FROM SchedulingRequirements), 0) + 1); " +
             "SET @SCRev = (isnull((SELECT max(revision) id FROM SchedulingContainers), 0) + 1); " +
@@ -253,6 +286,7 @@ namespace O2GEN.Helpers
             "SET @IPRev = (isnull((SELECT max(revision) id FROM InspectionProtocols), 0) + 1); " +
             "SET @IPIRev = (isnull((SELECT max(revision) id FROM InspectionProtocolItems), 0) + 1); " +
             "SET @APVRev = (isnull((SELECT max(revision) id FROM AssetParameterValues), 0) + 1); " +
+            "SET @ARev = (isnull((SELECT max(revision) id FROM Assignments), 0) + 1); " +
 
             "UPDATE SchedulingRequirements SET " +
             $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"{(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}")}),-1)), " +
@@ -282,6 +316,15 @@ namespace O2GEN.Helpers
             $"SR_Duration = {obj.EndTime.Subtract(obj.StartTime).TotalMilliseconds} " +
             $"WHERE SchedulingContainerId = {obj.Id}; " +
 
+            "UPDATE Assignments SET " +
+            $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"{(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}")}),-1)), " +
+            "ModificationTime = getdate(), " +
+            "Revision = @ARev, " +
+            $"ResourceId = {obj.ResourceId}, " +
+            $"Start = '{ obj.StartTime.ToString("yyyy-MM-dd HH:mm:ss")}', " +
+            $"Finish = '{ obj.EndTime.ToString("yyyy-MM-dd HH:mm:ss")}', " +
+            $"WHERE SchedulingContainerId = {obj.Id}; " +
+
             "UPDATE InspectionDocuments SET " +
             $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"{(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}")}),-1)), " +
             "ModificationTime = getdate(), " +
@@ -294,13 +337,14 @@ namespace O2GEN.Helpers
             $"UPDATE PPEntityCollections SET Revision = @SRRev WHERE ID = {(int)RevEntry.SchedulingRequirement}; " +
             $"UPDATE PPEntityCollections SET Revision = @SCRev WHERE ID = {(int)RevEntry.SchedulingContainer}; " +
             $"UPDATE PPEntityCollections SET Revision = @TRev WHERE ID = {(int)RevEntry.Task}; " +
-            $"UPDATE PPEntityCollections SET Revision = @IDRev WHERE ID = {(int)RevEntry.InspectionDocument}; ";
+            $"UPDATE PPEntityCollections SET Revision = @IDRev WHERE ID = {(int)RevEntry.InspectionDocument}; "+
+            $"UPDATE PPEntityCollections SET Revision = @ARev WHERE ID = {(int)RevEntry.Assignment}; ";
         }
         private static string DeleteZRP(int ID, string UserName)
         {
 
 
-            return "DECLARE @SRRev bigint, @SCRev bigint, @TRev bigint, @IDRev bigint, @IPRev bigint, @IPIRev bigint, @APVRev bigint; " +
+            return "DECLARE @SRRev bigint, @SCRev bigint, @TRev bigint, @IDRev bigint, @IPRev bigint, @IPIRev bigint, @APVRev bigint, @ARev bigint; " +
 
             "SET @SRRev = (isnull((SELECT max(revision) id FROM SchedulingRequirements), 0) + 1); " +
             "SET @SCRev = (isnull((SELECT max(revision) id FROM SchedulingContainers), 0) + 1); " +
@@ -309,28 +353,40 @@ namespace O2GEN.Helpers
             "SET @IPRev = (isnull((SELECT max(revision) id FROM InspectionProtocols), 0) + 1); " +
             "SET @IPIRev = (isnull((SELECT max(revision) id FROM InspectionProtocolItems), 0) + 1); " +
             "SET @APVRev = (isnull((SELECT max(revision) id FROM AssetParameterValues), 0) + 1); " +
+            "SET @ARev = (isnull((SELECT max(revision) id FROM Assignments), 0) + 1); " +
 
             "UPDATE SchedulingRequirements SET " +
             $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"{(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}")}),-1)), " +
             "DeletionTime = getdate(), " +
+            "IsDeleted = 1," +
             "Revision = @SRRev " +
             $"WHERE ID in (SELECT RequirementId FROM SchedulingContainers WHERE ID = {ID}); " +
 
             "UPDATE SchedulingContainers SET " +
             $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"{(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}")}),-1)), " +
             "DeletionTime = getdate(), " +
+            "IsDeleted = 1," +
             "Revision = @SCRev " +
             $"WHERE ID = {ID}; " +
 
             "UPDATE Tasks SET " +
             $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"{(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}")}),-1)), " +
             "DeletionTime = getdate(), " +
+            "IsDeleted = 1," +
             "Revision = @TRev " +
+            $"WHERE SchedulingContainerId = {ID}; " +
+
+            "UPDATE Assignments SET " +
+            $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"{(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}")}),-1)), " +
+            "DeletionTime = getdate(), " +
+            "IsDeleted = 1," +
+            "Revision = @ARev " +
             $"WHERE SchedulingContainerId = {ID}; " +
 
             "UPDATE InspectionDocuments SET " +
             $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"{(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}")}),-1)), " +
             "DeletionTime = getdate(), " +
+            "IsDeleted = 1," +
             "Revision = @IDRev " +
             $"WHERE TaskId in (SELECT Id FROM Tasks WHERE SchedulingContainerId = {ID}); " +
 
@@ -338,7 +394,8 @@ namespace O2GEN.Helpers
             $"UPDATE PPEntityCollections SET Revision = @SRRev WHERE ID = {(int)RevEntry.SchedulingRequirement}; " +
             $"UPDATE PPEntityCollections SET Revision = @SCRev WHERE ID = {(int)RevEntry.SchedulingContainer}; " +
             $"UPDATE PPEntityCollections SET Revision = @TRev WHERE ID = {(int)RevEntry.Task}; " +
-            $"UPDATE PPEntityCollections SET Revision = @IDRev WHERE ID = {(int)RevEntry.InspectionDocument}; ";
+            $"UPDATE PPEntityCollections SET Revision = @IDRev WHERE ID = {(int)RevEntry.InspectionDocument}; "+
+            $"UPDATE PPEntityCollections SET Revision = @ARev WHERE ID = {(int)RevEntry.Assignment}; ";
         }
 
         private static string GetInspectionProtocols(int SchedContID)
@@ -1577,7 +1634,7 @@ namespace O2GEN.Helpers
 
         #region Процедуры получения данных
         #region ЗРП
-        public static List<ZRP> GetZRP(DateTime From, DateTime To, ILogger logger, int status = -1)
+        public static List<ZRP> GetZRP(DateTime From, DateTime To, ILogger logger, int status = -1, int? DeptId = null)
         {
             string con = GetConnectionString();
 
@@ -1594,7 +1651,7 @@ namespace O2GEN.Helpers
                 using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
-                    using (var command = new SqlCommand(GetZRP(From, To, status), connection))
+                    using (var command = new SqlCommand(GetZRP(From, To, status, DeptId), connection))
                     {
                         command.CommandType = CommandType.Text;
                         command.Parameters.Clear();
@@ -2099,13 +2156,13 @@ namespace O2GEN.Helpers
         /// </summary>
         /// <param name="logger"></param>
         /// <returns></returns>
-        public static List<AssetParameterSet> GetAssetParameterSets(ILogger logger)
+        public static List<AssetParameterSet> GetAssetParameterSets(ILogger logger=null)
         {
             string con = GetConnectionString();
 
             if (string.IsNullOrEmpty(con))
             {
-                logger.LogDebug("connection string is null or empty");
+                logger?.LogDebug("connection string is null or empty");
                 return null;
             }
 
@@ -2139,7 +2196,7 @@ namespace O2GEN.Helpers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+                logger?.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
             }
             return output;
         }

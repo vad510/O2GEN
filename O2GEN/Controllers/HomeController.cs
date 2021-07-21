@@ -30,12 +30,26 @@ namespace O2GEN.Controllers
         }
 
         #region Index
+        [HttpGet]
         public IActionResult Index()
         {
-            ViewBag.ZRPCreated = Helpers.DBHelper.GetZRP(new DateTime(2021,3,23).AddMinutes(-30), new DateTime(2021, 4, 1).AddMinutes(30), _logger, (int)Helpers.ZRPStatus.Created);
-            ViewBag.ZRPStarted = Helpers.DBHelper.GetZRP(new DateTime(2021,3,23).AddMinutes(-30), new DateTime(2021, 4, 1).AddMinutes(30), _logger, (int)Helpers.ZRPStatus.Started);
-            ViewBag.ZRPEnded = Helpers.DBHelper.GetZRP(new DateTime(2021,3,23).AddMinutes(-30), new DateTime(2021, 4, 1).AddMinutes(30), _logger, (int)Helpers.ZRPStatus.Ended);
-            return View();
+            DateTime From = DateTime.Now.Date.AddDays(-2);
+            DateTime To = DateTime.Now;
+
+            ViewBag.ZRPCreated = Helpers.DBHelper.GetZRP(From, To, _logger, (int)Helpers.ZRPStatus.Created);
+            ViewBag.ZRPStarted = Helpers.DBHelper.GetZRP(From, To, _logger, (int)Helpers.ZRPStatus.Started);
+            ViewBag.ZRPEnded = Helpers.DBHelper.GetZRP(From, To, _logger, (int)Helpers.ZRPStatus.Ended);
+            return View(new ZRPFilter());
+        }
+        [HttpPost]
+        public IActionResult Index(ZRPFilter Model)
+        {
+            DateTime From = new DateTime().AddTicks((long.Parse(Model.From)* 10000) + 621356148000000000);
+            DateTime To = new DateTime().AddTicks((long.Parse(Model.To) * 10000) + 621356148000000000);
+            ViewBag.ZRPCreated = Helpers.DBHelper.GetZRP(From, To, _logger, (int)Helpers.ZRPStatus.Created, Model.DepartmentId);
+            ViewBag.ZRPStarted = Helpers.DBHelper.GetZRP(From, To, _logger, (int)Helpers.ZRPStatus.Started, Model.DepartmentId);
+            ViewBag.ZRPEnded = Helpers.DBHelper.GetZRP(From, To, _logger, (int)Helpers.ZRPStatus.Ended, Model.DepartmentId);
+            return View(Model);
         }
         #endregion
 
@@ -67,7 +81,7 @@ namespace O2GEN.Controllers
         public IActionResult ZRPDelete(int Id)
         {
             Helpers.DBHelper.DeleteZRP(Id, User.Identity.Name, _logger);
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", "Home");
         }
 
         public IActionResult ControlValueReports()

@@ -175,29 +175,6 @@
                                 <i class="fa fa-redo color-white"></i>
                             </li>
 
-                            <li class="li-text-white">
-                                <p>
-                                    Сегодня
-                                </p>
-                            </li>
-
-                            <li class="li-text-white">
-                                <div class="input-group date col-auto" id="datetimepickerFROM" data-target-input="nearest">
-                                    <input type="text" class="form-control datetimepicker-input" data-target="#datetimepickerFROM" id="DTPFROM" style="width:150px;" />
-                                    <div class="input-group-append" data-target="#datetimepickerFROM" data-toggle="datetimepicker">
-                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="li-text-white">
-                                <div class="input-group date col-auto" id="datetimepickerTO" data-target-input="nearest">
-                                    <input type="text" class="form-control datetimepicker-input" data-target="#datetimepickerTO" id="DTPTO" style="width:150px;" />
-                                    <div class="input-group-append" data-target="#datetimepickerTO" data-toggle="datetimepicker">
-                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                                    </div>
-                                </div>
-                            </li>
-
                         </ul>
                     </div>
 
@@ -230,11 +207,12 @@
     <script type="text/javascript">
 
         function Initializer() {
-            InitializeDatePicker();
-            $.noConflict();
+            //InitializeDatePicker();
+            //$.noConflict();
             InitializeMenu();
         }
 
+        /*
         function InitializeDatePicker() {
             $('#datetimepickerFROM').datetimepicker({
                 defaultDate: moment().subtract(2, 'days'),
@@ -261,7 +239,7 @@
                 }
             });
             $('#datetimepickerTO').datetimepicker('maxDate', moment());
-        }
+        }*/
 
         function InitializeMenu() {
             $("#sidebar").mCustomScrollbar({
