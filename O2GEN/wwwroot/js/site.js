@@ -40,16 +40,89 @@ let placeholder = document.getElementById("placeholder");
 ﻿function prepareLists() {
      const treeViewitems = document.getElementsByClassName("caret");
 
-    for (var i = 0; i < treeViewitems.length; i++) {
+     for (var i = 0; i < treeViewitems.length; i++) {
+         /*if (!treeViewitems[i].querySelector('[data-level="0"]') )*/
+
+
         treeViewitems[i].addEventListener("click", function () {
-
             this.classList.toggle('caret-down');
+            let clickedTr = this.closest('tr');
 
-            var clickedTr = this.closest('tr');
+            // find all childs which lvl are greater by 1(one) for clicked row
+            let clickedAttribute = parseInt(clickedTr.dataset.level);
+            let childAttribute = parseInt(clickedTr.dataset.level) + 1;
 
-            while (clickedTr.nextElementSibling.matches('.nested')) {
+            console.log("clicked attribute: " + childAttribute);
+
+            while (clickedTr.nextElementSibling != null) {
                 clickedTr = clickedTr.nextElementSibling;
-                clickedTr.classList.toggle('active-table');
+
+                let thisTrLevel = parseInt(clickedTr.dataset.level);
+
+                console.log("clicked childAttribute: " + childAttribute + " Compare: " + thisTrLevel);
+                console.log("Next lvl: " + thisTrLevel);
+                console.log("Lvl of childs to show: " + childAttribute);
+                //console.log(parseInt(childAttribute) > parseInt(thisTrLevel));
+
+                if (childAttribute == thisTrLevel) {
+                    console.log("Toggled");
+
+                    // when hide nested elements
+                    if (clickedTr.classList.contains('active-table')) {
+                        clickedTr.classList.remove('active-table');
+                        clickedTr.querySelectorAll('.caret-down').forEach(x => x.classList.remove('caret-down'));
+
+                        let head = clickedTr;
+
+                        // for all next elements
+                        while (head.nextElementSibling != null) {
+                            head = head.nextElementSibling;
+
+                            console.log('\n');
+                            console.log('Loop for hide elements');
+
+                            let lvl = parseInt(head.dataset.level);
+                            console.log("Found lvl: " + lvl);
+                            console.log("Clicked element lvl: " + thisTrLevel);
+                            console.log("Clicked element lvl: " + clickedAttribute);
+
+                            if (lvl > clickedAttribute) {
+                                console.log("Found child");
+
+                                head.classList.remove('active-table');
+                                head.querySelectorAll('.caret-down').forEach(x => x.classList.remove('caret-down'));
+                            }
+                            else if (lvl == clickedAttribute)
+                                return;
+                            console.log('\n');
+
+                            //else
+                            //    break;
+                        }
+
+                        break;
+                    }
+                    else {
+                        clickedTr.classList.add('active-table');
+                    }
+                }
+                else {
+
+                    if (clickedAttribute == thisTrLevel) {
+                        console.log("Breaked cause clicked tr and next tr was same");
+                        break;
+                    }
+
+                    //console.log('\n');
+                    //console.log("Entered another lvl: " + thisTrLevel);
+
+                    //if (childAttribute > thisTrLevel) {
+                    //    console.log("clicked level greater");
+                    //    clickedTr.classList.remove('active-table');
+                    //    clickedTr.querySelectorAll('.caret-down').forEach(x => x.classList.remove('caret-down'));
+                    //}
+                    //console.log('\n');
+                }
             }
         });
     }
@@ -63,6 +136,7 @@ var ready = function (action) {
     console.log("ready created");
 };
 
+// find all buttons which expects to create modal
 ready(function () {
 
     const elems = document.querySelectorAll('[data-toggle="modal-toggler"]');
@@ -76,6 +150,7 @@ ready(function () {
     prepareLists();
 });
 
+// Attempts to create modal
 function btnClick() {
     if (document.readyState != "complete")
         return;
@@ -88,6 +163,7 @@ function btnClick() {
     getDataWithXmlHttpRequest(url, placeholder);
 };
 
+// xhr for modal data
 function getDataWithXmlHttpRequest(url, placeholder) {
     const xhr = new XMLHttpRequest();
     xhr.onloadstart = function (e) {
@@ -119,6 +195,7 @@ function ControlDetVis() {
     }
 }
 
+// create modal
 function tryCreateModal(placeholder, response) {
     placeholder.innerHTML = response;
     const div = placeholder.querySelector(".modal");
@@ -200,9 +277,11 @@ function tryCreateModal(placeholder, response) {
         xhr.open('post', url);
         xhr.send(dataToSend2);
     });
+
     ControlDetVis();
 }
 
+// validate modal before submit
 function TryValidate(response) {
 
     if (placeholder == null)
@@ -244,7 +323,7 @@ function TryValidate(response) {
     }
 }
 
-
+// remove modal from screen
 function tryRemoveModals() {
     const modals = document.getElementsByClassName('modal');
 

@@ -109,7 +109,7 @@
                                     <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPEdit", new { id = item.Id })">
                                         <i class="fa fa-pen"></i>
                                     </button>
-                                    <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("ZRPDelete", new { id = item.Id })">
+                                    <button type="button" class="btn btn-danger ml-1" onclick="location.href='@Url.Action("ZRPDelete", "Home", new { id = item.Id });'">
                                         <i class="fa fa-trash"></i>
                                     </button>
                                 </div>
@@ -189,7 +189,7 @@
                                     <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPEdit", new { id = item.Id })">
                                         <i class="fa fa-pen"></i>
                                     </button>
-                                    <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("ZRPDelete", new { id = item.Id })">
+                                    <button type="button" class="btn btn-danger ml-1" data-url="@Url.Action("ZRPDelete", "Home", new { id = item.Id })">
                                         <i class="fa fa-trash"></i>
                                     </button>
                                 </div>
