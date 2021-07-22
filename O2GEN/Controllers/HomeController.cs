@@ -30,6 +30,7 @@ namespace O2GEN.Controllers
         }
 
         #region Index
+        [Route("Home/Index")]
         [HttpGet]
         public IActionResult Index()
         {
@@ -41,6 +42,7 @@ namespace O2GEN.Controllers
             ViewBag.ZRPEnded = Helpers.DBHelper.GetZRP(From, To, _logger, (int)Helpers.ZRPStatus.Ended);
             return View(new ZRPFilter());
         }
+        [Route("Home/Index")]
         [HttpPost]
         public IActionResult Index(ZRPFilter Model)
         {

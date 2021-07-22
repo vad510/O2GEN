@@ -15,15 +15,16 @@ namespace O2GEN.Helpers
 
         private static string GetConnectionString()
         {
-            return DBConnection;
-            switch (Environment.UserName)
+            switch (Environment.UserName.ToLower())
                 {
-                    case "Michael":
+                    case "michael":
                         return "Server=DESKTOP-JFNR95O\\SQLEXPRESS;Initial Catalog=UFMDBLUK;Integrated Security=SSPI";
-                    case "Е":
+                    case "e":
                         return "Server=DESKTOP-IO142CD\\SQLEXPRESS;Initial Catalog=UFMDBLUK;Integrated Security=SSPI";
-                    default:
+                    case "ev510":
                         return "Server=DESKTOP-A17N4G7\\SQLEXPRESS01;Initial Catalog=UFMDBLUK;Integrated Security=SSPI";
+                    default:
+                        return DBConnection;
             }
         }
 
