@@ -300,6 +300,8 @@
     </div>
 
     <script type="text/javascript">
+
+
         $(document).ready(function () {
             InitializeDatePicker();
             //$.noConflict();
@@ -328,10 +330,11 @@
                     date: "fa fa-calendar-alt",
                     up: "fa fa-arrow-up",
                     down: "fa fa-arrow-down"
-                }
-                });
-            $("#datetimepickerFROM").on("change.datetimepicker", ({ date }) => { $('#From').val(date._d.getTime()); })
-            $('#datetimepickerFROM').datetimepicker('date', new Date(d.getFullYear(), d.getMonth(), d.getDate()));
+                },
+                date: new Date(d.getFullYear(), d.getMonth(), d.getDate())
+            });
+
+            $('#datetimepickerFROM').on("change.datetimepicker", ({ date }) => { $('#From').val(date._d.getTime()); })
 
             $('#datetimepickerTO').datetimepicker({
                 locale: 'ru',
@@ -342,19 +345,26 @@
                     down: "fa fa-arrow-down"
                 }
                 });
-            $("#datetimepickerTO").on("change.datetimepicker", ({ date }) => { $('#To').val(date._d.getTime()); })
+            $("#datetimepickerTO").on("change.datetimepicker", ({ date }) => { $('#To').val(date._d.getTime()); });
             $('#datetimepickerTO').datetimepicker('date', now);
-            }
+        }
+
         function SetTodayForTDTs() {
             var d = new Date(moment().subtract(2, 'days'));
-            var now = moment();
-            $('#datetimepickerFROM').datetimepicker();
-            $('#datetimepickerTO').datetimepicker();
-            $('#datetimepickerFROM').datetimepicker('date', new Date(d.getFullYear(), d.getMonth(), d.getDate()));
-            $('#datetimepickerTO').datetimepicker('date', now);
-            document.cookie = "ZRPDateFrom=" + d.getTime() + "; max-age=300000";
-            document.cookie = "ZRPDateTo=" + now.getTime() + "; max-age=300000";
-            $.noConflict();
+            var now = new Date(moment());
+
+            console.log(now);
+
+            $('#datetimepickerFROM').datetimepicker({ locale: 'ru', date: new Date(d.getFullYear(), d.getMonth(), d.getDate()) })
+            $('#datetimepickerTO').datetimepicker({ locale: 'ru', date: now });
+
+            //document.cookie = "ZRPDateFrom=" + d.getTime() + "; max-age=300000";
+            //document.cookie = "ZRPDateTo=" + now + "; max-age=300000";
+            //$.noConflict();
+        }
+
+        function dateFromChanged() {
+
         }
     </script>
 </section>
