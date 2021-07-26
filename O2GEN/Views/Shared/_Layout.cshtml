@@ -39,6 +39,11 @@
     <script src="~/js/bootstrap-table.min.js"></script>
     <script src="~/js/bootstrap-select.min.js"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment-with-locales.min.js"></script>
+    <script src="~/lib/bsttdtp/js/tempusdominus-bootstrap-4.js"></script>
+
+
+
     <style>
         .bootstrap-datetimepicker-widget.dropdown-menu {
             width: auto;
@@ -101,9 +106,9 @@
                             <a asp-controller="Employee" asp-action="Roles">Роли</a>
                         </li>
                         @*???
-                        <li>
-                            <a asp-controller="Employee" asp-action="Resources">Ресурсы</a>
-                        </li>*@
+                            <li>
+                                <a asp-controller="Employee" asp-action="Resources">Ресурсы</a>
+                            </li>*@
                         <li>
                             <a href="#">Рабочие календари</a>
                         </li>
@@ -138,8 +143,8 @@
                         </li>
                         @*Убрано до выяснения надобности*@
                         @*<li>
-                            <a asp-controller="Desk" asp-action="TOTypes">Типы ТО</a>
-                        </li>*@
+                                <a asp-controller="Desk" asp-action="TOTypes">Типы ТО</a>
+                            </li>*@
                     </ul>
                 </li>
 
@@ -261,47 +266,47 @@
 
         $(document).ready(Initializer);
 
-            //$(document).ready(function () {
-            //    $("#sidebar").mCustomScrollbar({
-            //        theme: "minimal"
-            //    });
+                //$(document).ready(function () {
+                //    $("#sidebar").mCustomScrollbar({
+                //        theme: "minimal"
+                //    });
 
-            //    $('#dismiss, .overlay').on('click', function () {
-            //        $('#sidebar').removeClass('active');
-            //        $('.overlay').removeClass('active');
-            //    });
+                //    $('#dismiss, .overlay').on('click', function () {
+                //        $('#sidebar').removeClass('active');
+                //        $('.overlay').removeClass('active');
+                //    });
 
-            //    $('#sidebarCollapse').on('click', function () {
-            //        $('#sidebar').addClass('active');
-            //        $('.overlay').addClass('active');
-            //        $('.collapse.in').toggleClass('in');
-            //        $('a[aria-expanded=true]').attr('aria-expanded', 'false');
-            //    });
-            //});
+                //    $('#sidebarCollapse').on('click', function () {
+                //        $('#sidebar').addClass('active');
+                //        $('.overlay').addClass('active');
+                //        $('.collapse.in').toggleClass('in');
+                //        $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+                //    });
+                //});
 
-            //$.noConflict();
-            //jQuery(document).ready(function ($) {
-            //    $('#datetimepicker2').datetimepicker({
-            //        defaultDate: moment().subtract(2, 'days'),
-            //        locale: 'ru',
-            //        icons: {
-            //            time: "fa fa-clock",
-            //            date: "fa fa-calendar-alt",
-            //            up: "fa fa-arrow-up",
-            //            down: "fa fa-arrow-down"
-            //        },
-            //        maxDate: moment()
-            //    });
-            //});
+                //$.noConflict();
+                //jQuery(document).ready(function ($) {
+                //    $('#datetimepicker2').datetimepicker({
+                //        defaultDate: moment().subtract(2, 'days'),
+                //        locale: 'ru',
+                //        icons: {
+                //            time: "fa fa-clock",
+                //            date: "fa fa-calendar-alt",
+                //            up: "fa fa-arrow-up",
+                //            down: "fa fa-arrow-down"
+                //        },
+                //        maxDate: moment()
+                //    });
+                //});
     </script>
-
 
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/lib/bsttdtp/js/jquery.min.js"></script>
     <script src="~/lib/bsttdtp/js/popper.min.js"></script>
     <script src="~/lib/bsttdtp/js/moment-with-locales.min.js"></script>
-    <script src="~/lib/bsttdtp/js/base.js"></script>
     <script src="~/lib/bsttdtp/js/tempusdominus-bootstrap-4.js"></script>
+    <script src="~/lib/bsttdtp/js/base.js"></script>
+
 
     @*<script src="~/js/vlvscript.js"></script>*@
 
