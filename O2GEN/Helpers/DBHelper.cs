@@ -323,7 +323,7 @@ namespace O2GEN.Helpers
             "Revision = @ARev, " +
             $"ResourceId = {obj.ResourceId}, " +
             $"Start = '{ obj.StartTime.ToString("yyyy-MM-dd HH:mm:ss")}', " +
-            $"Finish = '{ obj.EndTime.ToString("yyyy-MM-dd HH:mm:ss")}', " +
+            $"Finish = '{ obj.EndTime.ToString("yyyy-MM-dd HH:mm:ss")}' " +
             $"WHERE SchedulingContainerId = {obj.Id}; " +
 
             "UPDATE InspectionDocuments SET " +

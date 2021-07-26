@@ -1,6 +1,7 @@
 ﻿@model O2GEN.Models.ZRPFilter
-
-@* Home *@
+@{
+    ViewData["Title"] = "Главная";
+}
 
 <section class="component-section">
     @*<div class="row-container-left">
@@ -311,14 +312,14 @@
             {
             <text>
                 var d = new Date(moment().subtract(2, 'days'));
-                var now = moment();
+                var now = new Date(moment());
             </text>
             }
             else
             {
                 <text>
                     var d = new Date(@Model.From);
-                    var now = moment(@Model.To);
+                    var now = new Date(@Model.To);
                 </text>
             }
             $('#datetimepickerFROM').datetimepicker({
@@ -347,14 +348,9 @@
             }
         function SetTodayForTDTs() {
             var d = new Date(moment().subtract(2, 'days'));
-            var now = moment();
-            $('#datetimepickerFROM').datetimepicker();
-            $('#datetimepickerTO').datetimepicker();
+            var now = new Date(moment());
             $('#datetimepickerFROM').datetimepicker('date', new Date(d.getFullYear(), d.getMonth(), d.getDate()));
             $('#datetimepickerTO').datetimepicker('date', now);
-            document.cookie = "ZRPDateFrom=" + d.getTime() + "; max-age=300000";
-            document.cookie = "ZRPDateTo=" + now.getTime() + "; max-age=300000";
-            $.noConflict();
         }
     </script>
 </section>
