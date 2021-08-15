@@ -1,0 +1,87 @@
+﻿--Таблица типов параметров
+
+GO
+IF (NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'AssetParameterTypes'))
+BEGIN
+	--Вставляем таблицу
+	print('AssetParameterTypes ADDED');
+    CREATE TABLE AssetParameterTypes(
+	Id bigint IDENTITY(1,1) NOT NULL,
+	IsDeleted bit NOT NULL,
+	Revision bigint NOT NULL,
+	Name nvarchar(max) NULL,
+	ObjectUID uniqueidentifier NULL
+		CONSTRAINT [PK_AssetParameterType] PRIMARY KEY CLUSTERED 
+	([Id] ASC)
+	WITH 
+	(PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+	) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY];
+
+	--Добавялем данные в Коллекцию таблиц
+	INSERT INTO PPEntityCollections (IsDeleted, Name, DisplayName, Revision, SchemaRevision) 
+	VALUES 
+	(0, N'AssetParameterTypes', N'AssetParameterTypes', 2, 1);
+
+	--Добавляем данные
+	INSERT INTO AssetParameterTypes (IsDeleted, Revision, Name) 
+	VALUES 
+	(1, 1, N'Измеряемый (ручной с точкой)'), 
+	(0, 1, N'Визуальный'),
+	(0, 1, N'Числовой (ручной ввод)'), 
+	(0, 1, N'Виброручка вибрация'),
+	(0, 1, N'Виброручка температура');
+
+	
+END;
+GO
+
+--Добавляем столбик в контроли
+IF NOT EXISTS(SELECT 1 FROM sys.columns  
+WHERE Name = N'AssetParameterTypeId' 
+AND Object_ID = Object_ID(N'AssetParameters')) 
+BEGIN 
+	print('AssetParameters.AssetParameterTypeId ADDED');
+	ALTER TABLE AssetParameters ADD AssetParameterTypeId bigint NULL; 
+END;
+GO
+
+--Добавляем столбик в контроли внутри обходов
+IF NOT EXISTS(SELECT 1 FROM sys.columns  
+WHERE Name = N'AssetParameterTypeId' 
+AND Object_ID = Object_ID(N'AssetParameterValues')) 
+BEGIN 
+	print('AssetParameterValues.AssetParameterTypeId ADDED');
+	ALTER TABLE AssetParameterValues ADD AssetParameterTypeId bigint NULL; 
+END;
+GO
+
+--Добавляем технический столбик. Для облегчения  вставки данных.
+IF NOT EXISTS(SELECT 1 FROM sys.columns  
+WHERE Name = N'InspectionProtocolId' 
+AND Object_ID = Object_ID(N'AssetParameterValues')) 
+BEGIN 
+	print('AssetParameterValues.InspectionProtocolId ADDED');
+    ALTER TABLE AssetParameterValues ADD InspectionProtocolId bigint NULL; 
+END;
+GO
+
+--Обновляем данные.
+UPDATE AssetParameters 
+	SET AssetParameterTypeId = (
+	CASE
+	WHEN ValueType IN (N'TYPE_INT64_N', N'TYPE_DOUBLE_N') AND Name like N'%вибрац%' THEN 4 
+	WHEN ValueType IN (N'TYPE_INT64_N', N'TYPE_DOUBLE_N') AND Name like N'%темпер%' THEN 5
+	WHEN ValueType = N'TYPE_BOOLEAN_N' THEN 2 
+	WHEN ValueType = N'TYPE_INT64_N' THEN 3 
+	ELSE 3 END);
+--Обновляем данные.
+UPDATE APV 
+	SET APV.AssetParameterTypeId = (
+	CASE 
+	WHEN APV.ValueType IN (N'TYPE_INT64_N', N'TYPE_DOUBLE_N') AND AP.Name like N'%вибрац%' THEN 4 
+	WHEN APV.ValueType IN (N'TYPE_INT64_N', N'TYPE_DOUBLE_N') AND AP.Name like N'%темпер%' THEN 5
+	WHEN APV.ValueType = N'TYPE_BOOLEAN_N' THEN 2 
+	WHEN APV.ValueType = N'TYPE_INT64_N' THEN 3 
+	ELSE 3 END)
+	FROM AssetParameterValues APV
+	INNER JOIN AssetParameters AP ON AP.Id = APV.AssetParameterId;

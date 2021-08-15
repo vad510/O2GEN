@@ -26,6 +26,7 @@ namespace O2GEN.Models
         public int? AssetSortId { get; set; }
         [DisplayName("Подразделение")]
         public int? DepartmentId { get; set; }
+        public List<int> Parameters { get; set; } = new List<int>();
 
 
     }

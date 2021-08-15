@@ -1,38 +1,81 @@
-﻿@* NUMBER OF TECH POS REPORTS *@
-
-@model O2GEN.Models.HomeModels.ReportOnViewedTechPositionList
+﻿@model O2GEN.Models.AssetsReportFilter
 @{
     ViewData["Title"] = "Отчет о количестве тех. позиций";
 }
 <section class="component-section">
-    <div class="row-container bg-blue">
+    <div class="row-container-left bg-blue">
 
-        <div class="row-div-two">
-            <ul class="ul-list-left-aligned-colum">
-                <li>
-                    <p>
-                        Интервал 1:
-                    </p>
+        <form action="ReportsOnViewedTechPositions" method="post">
+            <input asp-for="From1" style="display:none" />
+            <input asp-for="To1" style="display:none" />
+            <input asp-for="From2" style="display:none" />
+            <input asp-for="To2" style="display:none" />
+            <ul class="ul-list-left-aligned">
+
+                <li class="li-text-white mr-1">
+                    Интервал 1
                 </li>
 
-                <li>
-                    <p>
-                        Интервал 2:
-                    </p>
+                <li class="li-text-white mr-0">
+                    От:
+                </li>
+                <li class="li-text-white ml-0">
+                    <div class="input-group date col-auto" id="datetimepickerFROM1" data-target-input="nearest">
+                        <input type="text" class="form-control datetimepicker-input" data-target="#datetimepickerFROM1" id="DTPFROM1" style="width:150px;" />
+                        <div class="input-group-append" data-target="#datetimepickerFROM1" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                        </div>
+                    </div>
+                </li>
+                <li class="li-text-white mr-0">
+                    До:
+                </li>
+                <li class="li-text-white ml-0">
+                    <div class="input-group date col-auto" id="datetimepickerTO1" data-target-input="nearest">
+                        <input type="text" class="form-control datetimepicker-input" data-target="#datetimepickerTO1" id="DTPTO1" style="width:150px;" />
+                        <div class="input-group-append" data-target="#datetimepickerTO1" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                        </div>
+                    </div>
                 </li>
             </ul>
-        </div>
+            <ul class="ul-list-left-aligned">
 
-        <div class="row-div-two">
-            <ul class="ul-list-right-aligned">
-                <li>
-                    <button class="transparent-btn">
-                        <p class="color-white">Сформировать</p>
+                <li class="li-text-white mr-1">
+                    Интервал 2
+                </li>
+
+                <li class="li-text-white mr-0">
+                    От:
+                </li>
+                <li class="li-text-white ml-0">
+                    <div class="input-group date col-auto" id="datetimepickerFROM2" data-target-input="nearest">
+                        <input type="text" class="form-control datetimepicker-input" data-target="#datetimepickerFROM2" id="DTPFROM2" style="width:150px;" />
+                        <div class="input-group-append" data-target="#datetimepickerFROM2" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                        </div>
+                    </div>
+                </li>
+                <li class="li-text-white mr-0">
+                    До:
+                </li>
+                <li class="li-text-white ml-0">
+                    <div class="input-group date col-auto" id="datetimepickerTO2" data-target-input="nearest">
+                        <input type="text" class="form-control datetimepicker-input" data-target="#datetimepickerTO2" id="DTPTO2" style="width:150px;" />
+                        <div class="input-group-append" data-target="#datetimepickerTO2" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            <ul class="ul-list-left-aligned">
+                <li class="li-text-white">
+                    <button class="btn btn-light" type="submit">
+                        <i class="fa fa-th-list"></i> Сформировать
                     </button>
                 </li>
             </ul>
-        </div>
-
+        </form>
     </div>
 
     <div class="margin-between-above">
@@ -41,60 +84,181 @@
                 <tr>
                     <th>
                         <p>
-                            Станция
+                            Название станции
                         </p>
                     </th>
 
                     <th>
                         <p>
-                            Интервал 1
+                            Первый интервал
                         </p>
                     </th>
 
                     <th>
                         <p>
-                            Интервал 2
+                            Второй интервал
                         </p>
                     </th>
 
                     <th>
                         <p>
-                            Изменения %
+                            Разница
                         </p>
                     </th>
                 </tr>
 
             </thead>
             <tbody>
-                @foreach (var item in Model.ReportOnViewedTechPositions)
+                @if (ViewBag.Data != null)
                 {
-                    <tr>
-                        <td>
-                            <p>
-                                @item.StationName
-                            </p>
-                        </td>
+                    @foreach (var row in ViewBag.Data.Rows)
+                    {
+                        <tr>
+                            <td>
+                                <p>
+                                    @row.DeptName
+                                </p>
+                            </td>
 
-                        <td>
-                            <p>
-                                @item.FirstInterval
-                            </p>
-                        </td>
+                            <td>
+                                <p>
+                                    @row.FirstCount
+                                </p>
+                            </td>
 
-                        <td>
-                            <p>
-                                @item.SecondInterval
-                            </p>
-                        </td>
+                            <td>
+                                <p>
+                                    @row.SecondCount
+                                </p>
+                            </td>
 
-                        <td>
-                            <p>
-                                @item.Changes
-                            </p>
-                        </td>
-                    </tr>
+                            <td>
+                                <p>
+                                    @row.Diff
+                                </p>
+                            </td>
+                        </tr>
+                    }
                 }
             </tbody>
         </table>
     </div>
+
+    <script type="text/javascript">
+
+        function GetAssetParameterSets(SelectedObj) {
+            if (SelectedObj != 'undefined') {
+                $.ajax({
+                    method: "GET",
+                    url: "GetAssetParameterSets",
+                    dataType: "json",
+                    data: {
+                        "ObjId": SelectedObj.value
+                    },
+                    success: function (data) {
+                        var s = '<option value="" selected disabled>Выбрать</option>';
+                        for (var i = 0; i < data.length; i++) {
+                            s += '<option value="' + data[i].id + '">' + data[i].displayName + '</option>';
+                        }
+                        $("#AssetParameterSetId").html(s);
+                    }
+                })
+            }
+        }
+
+        function GetAssets(SelectedObj) {
+            if (SelectedObj != 'undefined') {
+                $.ajax({
+                    method: "GET",
+                    url: "GetAssets",
+                    dataType: "json",
+                    data: {
+                        "ObjId": SelectedObj.value
+                    },
+                    success: function (data) {
+                        var s = '<option value="" selected disabled>Выбрать</option>';
+                        for (var i = 0; i < data.length; i++) {
+                            s += '<option value="' + data[i].id + '">' + data[i].displayName + '</option>';
+                        }
+                        $("#AssetId").html(s);
+                    }
+                })
+            }
+        }
+
+        $(document).ready(function () {
+            InitializeDatePicker();
+            //$.noConflict();
+            $('#SetToday').click('click', SetTodayForTDTs);
+        });
+        function InitializeDatePicker() {
+
+            @if (string.IsNullOrEmpty(Model.From1))
+            {
+            <text>
+                var d1 = new Date(moment().subtract(2, 'days'));
+                var now1 = new Date(moment());
+                var d2 = new Date(moment().subtract(2, 'days'));
+                var now2 = new Date(moment());
+            </text>
+            }
+            else
+            {
+                <text>
+                    var d1 = new Date(@Model.From1);
+                    var now1 = new Date(@Model.To1);
+                    var d2 = new Date(@Model.From2);
+                    var now2 = new Date(@Model.To2);
+                </text>
+            }
+            $('#datetimepickerFROM1').datetimepicker({
+                locale: 'ru',
+                icons: {
+                    time: "fa fa-clock",
+                    date: "fa fa-calendar-alt",
+                    up: "fa fa-arrow-up",
+                    down: "fa fa-arrow-down"
+                }
+            });
+            $('#datetimepickerFROM1').on("change.datetimepicker", ({ date }) => { $('#From1').val(date._d.getTime()); });
+            $('#datetimepickerFROM1').datetimepicker('date', new Date(d1.getFullYear(), d1.getMonth(), d1.getDate()));
+
+            $('#datetimepickerFROM2').datetimepicker({
+                locale: 'ru',
+                icons: {
+                    time: "fa fa-clock",
+                    date: "fa fa-calendar-alt",
+                    up: "fa fa-arrow-up",
+                    down: "fa fa-arrow-down"
+                }
+            });
+
+            $('#datetimepickerFROM2').on("change.datetimepicker", ({ date }) => { $('#From2').val(date._d.getTime()); });
+            $('#datetimepickerFROM2').datetimepicker('date', new Date(d2.getFullYear(), d2.getMonth(), d2.getDate()));
+
+            $('#datetimepickerTO1').datetimepicker({
+                locale: 'ru',
+                icons: {
+                    time: "fa fa-clock",
+                    date: "fa fa-calendar-alt",
+                    up: "fa fa-arrow-up",
+                    down: "fa fa-arrow-down"
+                }
+                });
+            $("#datetimepickerTO1").on("change.datetimepicker", ({ date }) => { $('#To1').val(date._d.getTime()); });
+            $('#datetimepickerTO1').datetimepicker('date', now1);
+
+            $('#datetimepickerTO2').datetimepicker({
+                locale: 'ru',
+                icons: {
+                    time: "fa fa-clock",
+                    date: "fa fa-calendar-alt",
+                    up: "fa fa-arrow-up",
+                    down: "fa fa-arrow-down"
+                }
+            });
+            $("#datetimepickerTO2").on("change.datetimepicker", ({ date }) => { $('#To2').val(date._d.getTime()); });
+            $('#datetimepickerTO2').datetimepicker('date', now2);
+        }
+    </script>
 </section>

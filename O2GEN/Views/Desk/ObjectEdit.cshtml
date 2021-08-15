@@ -16,61 +16,145 @@
             </div>
             <form action="ObjectUpdate" method="post">
                 <div class="modal-body">
-                    @Html.Hidden("Id", Model.Id)
-                    @Html.Hidden("ObjectUID", Model.ObjectUID)
-                    <div class="form-group">
-                        <div class="form-group">
-                            <label asp-for="AssetSortId"></label>
-                            <select asp-for="AssetSortId" class="form-control" required>
-                                <option value="NULL" selected disabled>Выбрать значение</option>
-                                @foreach (AssetSort item in O2GEN.Helpers.DBHelper.GetAssetSorts())
-                                {
-                                    <option value="@item.Id">@item.DisplayName</option>
+                    <ul class="nav nav-tabs top-margin">
+                        <li class="nav-item active">
+                            <a class="nav-link text-black-50 active" href="#obj-tab" data-toggle="tab">Объект</a>
+                        </li>
+                        <li class="nav-item controls-tab fadable">
+                            <a class="nav-link text-black-50" href="#control-tab" data-toggle="tab">Контроли</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content bg-light">
+                        <div id="obj-tab" class="tab-pane active">
+                            <div class="p-3 color-black">
+                                @{
+                                    var parameters = O2GEN.Helpers.DBHelper.GetControls();
                                 }
-                            </select>
+                                @Html.Hidden("Id", Model.Id)
+                                @Html.Hidden("ObjectUID", Model.ObjectUID)
+                                <div class="form-group">
+                                    <div class="form-group">
+                                        <label asp-for="AssetSortId"></label>
+                                        <select asp-for="AssetSortId" class="form-control" required onchange="AssetSortFade()">
+                                            <option value="NULL" selected disabled>Выбрать значение</option>
+                                            @foreach (AssetSort item in O2GEN.Helpers.DBHelper.GetAssetSorts())
+                                            {
+                                                <option value="@item.Id">@item.DisplayName</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="DepartmentId"></label>
+                                        <select asp-for="DepartmentId" class="form-control" required onchange="GetAssetsNodes(this)">
+                                            <option value="NULL" selected disabled>Выбрать значение</option>
+                                            @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments())
+                                            {
+                                                <option value="@item.Id">@item.DisplayName</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="DisplayName"></label>
+                                        <input asp-for="DisplayName" class="form-control" required />
+                                    </div>
+                                    <div class="form-group fadable">
+                                        <label asp-for="AssetClassId"></label>
+                                        <select asp-for="AssetClassId" class="form-control" required onchange="GetAssetClassParameters(this)">
+                                            @{
+                                                var classes = O2GEN.Helpers.DBHelper.GetAssetClasses();
+                                                @for (int i = 0; i < classes.Count; i++)
+                                                {
+                                                    if (i == 0)
+                                                    {
+                                                        <option value="@classes[i].Id" selected>@classes[i].DisplayName</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@classes[i].Id">@classes[i].DisplayName</option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="form-group fadable">
+                                        <label asp-for="ParentId"></label>
+                                        <select asp-for="ParentId" class="form-control">
+                                            @if (Model.ParentId == null && Model.DepartmentId == null)
+                                            {
+                                                <option value="null" selected disabled>Необходимо выбрать подразделение</option>
+                                            }
+                                            else
+                                            {
+                                                if (Model.ParentId == null)
+                                                {
+                                                    <option selected disabled>Выберите значение</option>
+                                                }
+                                                foreach (var item in O2GEN.Helpers.DBHelper.GetAssets(DeptID: Model.DepartmentId, NotesOnly: true))
+                                                {
+                                                    if (item.Id == Model.Id) continue;
+                                                    if (Model.ParentId == item.Id)
+                                                    {
+                                                        <option value="@item.Id" selected>@item.DisplayName</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@item.Id">@item.DisplayName</option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="Maximo"></label>
+                                        <input asp-for="Maximo" class="form-control" />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label asp-for="DepartmentId"></label>
-                            <select asp-for="DepartmentId" class="form-control" required>
-                                <option value="NULL" selected disabled>Выбрать значение</option>
-                                @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments())
+                        <div id="control-tab" class="tab-pane">
+                            <div id="Selected" style="visibility:collapse;">
+                                @for (int i = 0; i < Model.Parameters.Count; i++)
                                 {
-                                    <option value="@item.Id">@item.DisplayName</option>
+                                    <input id="Parameters[@i]" name="Parameters[@i]" type="hidden" value="@Model.Parameters[i]">
                                 }
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="DisplayName"></label>
-                            <input asp-for="DisplayName" class="form-control" required />
-                        </div>
-                        <div class="form-group">
-                            @{#warning Обязательный для узла }
-                            <label asp-for="AssetClassId"></label>
-                            <select asp-for="AssetClassId" class="form-control">
-                                <option value="NULL" disabled selected>Выбрать значение</option>
-                                @foreach (AssetClass item in O2GEN.Helpers.DBHelper.GetAssetClasses())
-                                {
-                                    <option value="@item.Id">@item.DisplayName</option>
-                                }
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="ParentId"></label>
-                            <select asp-for="ParentId" class="form-control">
-                                @{#warning Вставляем список параметров с типом Тех. позиция }
-                                @{#warning Обязательный для узла }
-                                <option value="NULL">??</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="Maximo"></label>
-                            <input asp-for="Maximo" class="form-control" />
+                            </div>
+                            <div class="form-row pt-3">
+                                <div class="form-group col-md-5">
+                                    <input class="form-control mb-1" id="myInput1" type="text" placeholder="Поиск">
+                                    <select multiple class="form-control" formtarget="_blank" id="SelectList1" style="height: 400px">
+                                        @foreach (var item in parameters)
+                                        {
+                                            if (!Model.Parameters.Contains(item.Id))
+                                            {
+                                                <option value="@item.Id">@item.DisplayName</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-2 text-center">
+                                    <button type="button" class="btn btn-light mb-1" id="right"><i class="fa fa-arrow-right"></i></button>
+                                    <br />
+                                    <button type="button" class="btn btn-light" id="left"><i class="fa fa-arrow-left"></i></button>
+                                </div>
+                                <div class="form-group col-md-5">
+                                    <input class="form-control mb-1" id="myInput2" type="text" placeholder="Поиск">
+                                    <select multiple class="form-control" formtarget="_blank" id="SelectList2" style="height:400px">
+                                        @foreach (var item in parameters)
+                                        {
+                                            if (Model.Parameters.Contains(item.Id))
+                                            {
+                                                <option value="@item.Id">@item.DisplayName</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
-                    <button type="submit" class="btn btn-primary" data-save="modal">Применить</button>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                        <button type="submit" class="btn btn-primary" data-save="modal">Применить</button>
+                    </div>
                 </div>
             </form>
         </div>

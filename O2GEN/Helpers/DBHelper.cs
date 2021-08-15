@@ -16,15 +16,15 @@ namespace O2GEN.Helpers
         private static string GetConnectionString()
         {
             switch (Environment.UserName.ToLower())
-                {
-                    case "michael":
-                        return "Server=DESKTOP-JFNR95O\\SQLEXPRESS;Initial Catalog=UFMDBLUK;Integrated Security=SSPI";
-                    case "е":
-                        return "Server=DESKTOP-IO142CD\\SQLEXPRESS;Initial Catalog=UFMDBLUK;Integrated Security=SSPI";
-                    case "ev510":
-                        return "Server=DESKTOP-A17N4G7\\SQLEXPRESS01;Initial Catalog=UFMDBLUK;Integrated Security=SSPI";
-                    default:
-                        return DBConnection;
+            {
+                case "michael":
+                    return "Server=DESKTOP-JFNR95O\\SQLEXPRESS;Initial Catalog=UFMDBLUK;Integrated Security=SSPI";
+                case "е":
+                    return "Server=DESKTOP-IO142CD\\SQLEXPRESS;Initial Catalog=UFMDBLUK;Integrated Security=SSPI";
+                case "ev510":
+                    return "Server=DESKTOP-A17N4G7\\SQLEXPRESS01;Initial Catalog=UFMDBLUK;Integrated Security=SSPI";
+                default:
+                    return DBConnection;
             }
         }
 
@@ -77,7 +77,7 @@ namespace O2GEN.Helpers
                 "   FROM[Resources] AS[e10] " +
                 "    WHERE([e10].[IsDeleted] <> 1) AND([e10].[TenantId] = CAST(1 AS bigint)) " +
                 ") AS[t10] ON[t9].[ResourceId] = [t10].[Id] " +
-                $"WHERE {(status > 0 ? $"[e].[SCStatusId] = {status} AND " : "")}  (([e].[IsDeleted] <> 1) AND([e].[TenantId] = CAST(1 AS bigint))) AND(([t7].[DepartmentId] IS NOT NULL {(DeptId!= null? $"AND[t7].[DepartmentId] = {DeptId}" : "")} ) AND(CASE " +
+                $"WHERE {(status > 0 ? $"[e].[SCStatusId] = {status} AND " : "")}  (([e].[IsDeleted] <> 1) AND([e].[TenantId] = CAST(1 AS bigint))) AND(([t7].[DepartmentId] IS NOT NULL {(DeptId != null ? $"AND[t7].[DepartmentId] = {DeptId}" : "")} ) AND(CASE " +
                 "WHEN EXISTS( " +
                 "   SELECT 1 " +
                 "   FROM[Assignments] AS[e9] " +
@@ -113,15 +113,13 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         private static string CreateZRP(ZRP obj, string UserName)
         {
-            //SchedulingRequirements
-            //Tasks
-            //  InspectionDocuments
-            //      InspectionProtocols
-            //          InspectionProtocolItems
-            //              AssetParameterValues
-            //  SchedulingContainers
-
-
+            //SchedulingRequirements                    +
+            //Tasks                                     +
+            //  InspectionDocuments                     +
+            //      InspectionProtocols                 +
+            //      AssetParameterValues                +
+            //          InspectionProtocolItems         
+            //  SchedulingContainers                    +
 
             return "DECLARE @SRRev bigint, @SCRev bigint, @TRev bigint, @IDRev bigint, @IPRev bigint, @IPIRev bigint, @APVRev bigint, @ARev bigint; " +
 
@@ -138,9 +136,9 @@ namespace O2GEN.Helpers
             "DECLARE @SCId TABLE(id bigint); " +
             "DECLARE @TId TABLE(id bigint); " +
             "DECLARE @IDId TABLE(id bigint); " +
-            "DECLARE @IPId TABLE(id bigint); " +
+            "DECLARE @IPIdAIdPair TABLE(id bigint, assetid bigint); " +
             "DECLARE @IPIId TABLE(id bigint); " +
-            "DECLARE @APVId TABLE(id bigint); " +
+            "DECLARE @APVId TABLE(id bigint, assetid bigint, assetparameterid bigint); " +
 
             "INSERT INTO SchedulingRequirements " +
             "(IsDeleted, " +
@@ -258,7 +256,7 @@ namespace O2GEN.Helpers
             "Name, " +
             "DepartmentId, " +
             "TaskId) " +
-            "OUTPUT inserted.Id into @TId " +
+            "OUTPUT inserted.Id into @IDId " +
             "VALUES " +
             "(0, " +
             "@IDRev, " +
@@ -270,11 +268,195 @@ namespace O2GEN.Helpers
             $"N'{obj.RouteName}', " +
             $"{obj.DepartmentID}, " +
             "(SELECT TOP 1 id FROM @TId)); " +
+
+
             $"UPDATE PPEntityCollections SET Revision = @SRRev WHERE ID = {(int)RevEntry.SchedulingRequirement}; " +
             $"UPDATE PPEntityCollections SET Revision = @SCRev WHERE ID = {(int)RevEntry.SchedulingContainer}; " +
             $"UPDATE PPEntityCollections SET Revision = @TRev WHERE ID = {(int)RevEntry.Task}; " +
-            $"UPDATE PPEntityCollections SET Revision = @IDRev WHERE ID = {(int)RevEntry.InspectionDocument}; "+
-            $"UPDATE PPEntityCollections SET Revision = @ARev WHERE ID = {(int)RevEntry.Assignment}; ";
+            $"UPDATE PPEntityCollections SET Revision = @IDRev WHERE ID = {(int)RevEntry.InspectionDocument}; " +
+            $"UPDATE PPEntityCollections SET Revision = @ARev WHERE ID = {(int)RevEntry.Assignment}; " +
+            $"SELECT (SELECT TOP 1 id FROM @SRId) AS SRID, (SELECT TOP 1 id FROM @TId) AS TID, (SELECT TOP 1 id FROM @IDId) AS IDocID, (SELECT TOP 1 id FROM @SCId) AS SCID;";
+        }
+        private static string CreateInspectionProtocols(ZRP obj, string UserName, long TaskId, long IDocId)
+        {
+
+            string InspectionProtocols = "DECLARE @IPRev bigint; " +
+                "SET @IPRev = (isnull((SELECT max(revision) id FROM InspectionProtocols), 0) + 1); " +
+
+                "DECLARE @IPIdAIdPair TABLE(id bigint, assetid bigint); " +
+
+                "INSERT INTO InspectionProtocols " +
+                "(IsDeleted, " +
+                "Revision, " +
+                "CreatedByUser, " +
+                "CreationTime, " +
+                "ObjectUID, " +
+                "Name, " +
+                "InspectionDocumentId, " +
+                "InspectionProtocolStatusId, " +
+                "DepartmentId, " +
+                "AssetId, " +
+                "TaskId, " +
+                "InspectionDateTime) " +
+                "OUTPUT inserted.Id, inserted.AssetId into @IPIdAIdPair " +
+                "VALUES ";
+            for (int i = 0; i < obj.NewTechPoz.Count; i++)
+            {
+                if (i > 0) InspectionProtocols += ",";
+                InspectionProtocols +=
+                    "(" +
+                    "0, " +
+                    "@IPRev, " +
+                    $"(isnull((SELECT top 1 id FROM PPUsers  where name = { (string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
+                    $"getdate(), " +
+                    $"'{Guid.NewGuid().ToString("D")}', " +
+                    $"N'{obj.NewTechPoz[i].DisplayName}', " +
+                    $"{IDocId}, " +
+                    $"NULL, " +
+                    $"{obj.DepartmentID}, " +
+                    $"{obj.NewTechPoz[i].Id}, " +
+                    $"{TaskId}, " +
+                    $"getdate())";
+            }
+            InspectionProtocols += $"; UPDATE PPEntityCollections SET Revision = @IPRev WHERE ID = {(int)RevEntry.InspectionProtocol}; " +
+                "SELECT id AS IPItemId, AssetId FROM @IPIdAIdPair;";
+            return InspectionProtocols;
+        }
+        private static string CreateAssetParameters(ZRP obj, string UserName, Dictionary<long, long> IPData)
+        {
+            string SQLReq = "";
+            for (int i = 0; i < obj.NewTechPoz.Count; i++)
+            {
+                for (int j = 0; j < obj.NewTechPoz[i].Childs.Count; j++)
+                {
+                    for (int k = 0; k < obj.NewTechPoz[i].Childs[j].Childs.Count; k++)
+                    {
+#warning Есть  вероятность краша на вставке 1000+ записей, переделать на insert select union select
+                        if (!string.IsNullOrEmpty(SQLReq))
+                        {
+                            SQLReq += ",";
+                        }
+                        SQLReq +=
+                            "(" +
+                            "0, " +
+                            "@APVRev, " +
+                            $"(isnull((SELECT top 1 id FROM PPUsers  where name = { (string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
+                            $"getdate(), " +
+                            $"'{Guid.NewGuid().ToString("D")}', " +
+                            $"{obj.NewTechPoz[i].Childs[j].Id}, " +
+                            $"{obj.NewTechPoz[i].Childs[j].Childs[k].Id}, " +
+                            $"N'{obj.NewTechPoz[i].DisplayName} {obj.NewTechPoz[i].Childs[j].DisplayName}', " +
+                            $"0, " +
+                            $"0, " +
+                            $"(SELECT TOP 1 ValueType FROM AssetParameters WHERE Id = {obj.NewTechPoz[i].Childs[j].Childs[k].Id}), " +
+                            $"0, " +
+                            $"getdate(), " +
+                            $"{IPData[obj.NewTechPoz[i].Id]})";
+                    }
+                }
+            }
+            SQLReq = "DECLARE @APVRev bigint; " +
+                "SET @APVRev = (isnull((SELECT max(revision) id FROM AssetParameterValues), 0) + 1); " +
+
+                "DECLARE @APVData TABLE(ID bigint, AssetId bigint, AssetParameterId bigint, IPId bigint); " +
+
+                "INSERT INTO AssetParameterValues " +
+                "(IsDeleted, " +
+                "Revision, " +
+                "CreatedByUser, " +
+                "CreationTime, " +
+                "ObjectUID, " +
+                "AssetId, " +
+                "AssetParameterId, " +
+                "Name, " +
+                "Level, " +
+                "Critical, " +
+                "ValueType, " +
+                "BoolValue, " +
+                "DateTime, " +
+                "InspectionProtocolId) " +
+
+                "OUTPUT inserted.Id, inserted.AssetId, inserted.AssetParameterId, inserted.InspectionProtocolId into @APVData " +
+                "VALUES " +
+                SQLReq +
+                $"; UPDATE PPEntityCollections SET Revision = @APVRev WHERE ID = {(int)RevEntry.AssetParameterValue}; " +
+                "SELECT ID, AssetId, AssetParameterId, IPId FROM @APVData;";
+            return SQLReq;
+        }
+        private static string CreateInspectionProtocolItems(ZRP obj, string UserName, Dictionary<long, long> IPData, List<AssetParametersRowData> APVData)
+        {
+            string SQLReq = "";
+            for (int i = 0; i < obj.NewTechPoz.Count; i++)
+            {
+                for (int j = 0; j < obj.NewTechPoz[i].Childs.Count; j++)
+                {
+                    for (int k = 0; k < obj.NewTechPoz[i].Childs[j].Childs.Count; k++)
+                    {
+#warning Есть  вероятность краша на вставке 1000+ записей, переделать на insert select union select
+                        if (!string.IsNullOrEmpty(SQLReq))
+                        {
+                            SQLReq += ",";
+                        }
+                        SQLReq +=
+                            "(" +
+                            "0, " +
+                            "@IPIRev, " +
+                            $"(isnull((SELECT top 1 id FROM PPUsers  where name = { (string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
+                            $"getdate(), " +
+                            $"'{Guid.NewGuid().ToString("D")}', " +
+                            $"N'{obj.NewTechPoz[i].DisplayName} {obj.NewTechPoz[i].Childs[j].DisplayName}', " +
+                            $"getdate(), " +
+                            $"{obj.NewTechPoz[i].Childs[j].Id}, " +
+                            $"{IPData[obj.NewTechPoz[i].Id]}, " +
+                            $"{APVData.Find(x => x.IPId == IPData[obj.NewTechPoz[i].Id] && x.AssetId == obj.NewTechPoz[i].Childs[j].Id && x.AssetParameterId == obj.NewTechPoz[i].Childs[j].Childs[k].Id).Id}, " +
+                            "0, " +
+                            "0, " +
+                            "0, " +
+                            "0, " +
+                            "0, " +
+                            "0, " +
+                            "0, " +
+                            "0, " +
+                            "0, " +
+                            "0, " +
+                            "0, " +
+                            "0, " +
+                            "0," +
+                            $"N'{obj.NewTechPoz[i].DisplayName}')";
+                    }
+                }
+            }
+            SQLReq = "DECLARE @IPIRev bigint; " +
+                "SET @IPIRev = (isnull((SELECT max(revision) id FROM InspectionProtocolItems), 0) + 1); " +
+
+                "INSERT INTO InspectionProtocolItems " +
+                "(IsDeleted, " +
+                "Revision, " +
+                "CreatedByUser, " +
+                "CreationTime, " +
+                "ObjectUID, " +
+                "Name, " +
+                "InspectionDateTime, " +
+                "AssetId, " +
+                "InspectionProtocolId, " +
+                "AssetParameterValueId, " +
+                "ValueLong1, " +
+                "ValueLong2, " +
+                "ValueLong3, " +
+                "ValueLong4, " +
+                "ValueLong5, " +
+                "ValueLong6, " +
+                "ValueDouble1, " +
+                "ValueDouble2, " +
+                "ValueDouble3, " +
+                "ValueDouble4, " +
+                "ValueDouble5, " +
+                "ValueDouble6, " +
+                "ValueBool3, " +
+                "GroupString) VALUES " +
+                SQLReq +
+                $"; UPDATE PPEntityCollections SET Revision = @IPIRev WHERE ID = {(int)RevEntry.InspectionProtocolItem}; ";
+            return SQLReq;
         }
         private static string UpdateZRP(ZRP obj, string UserName)
         {
@@ -338,8 +520,28 @@ namespace O2GEN.Helpers
             $"UPDATE PPEntityCollections SET Revision = @SRRev WHERE ID = {(int)RevEntry.SchedulingRequirement}; " +
             $"UPDATE PPEntityCollections SET Revision = @SCRev WHERE ID = {(int)RevEntry.SchedulingContainer}; " +
             $"UPDATE PPEntityCollections SET Revision = @TRev WHERE ID = {(int)RevEntry.Task}; " +
-            $"UPDATE PPEntityCollections SET Revision = @IDRev WHERE ID = {(int)RevEntry.InspectionDocument}; "+
+            $"UPDATE PPEntityCollections SET Revision = @IDRev WHERE ID = {(int)RevEntry.InspectionDocument}; " +
             $"UPDATE PPEntityCollections SET Revision = @ARev WHERE ID = {(int)RevEntry.Assignment}; ";
+        }
+        /// <summary>
+        /// Удаление деталей обхода. 
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string DeleteInspectionProtocol(int ID, string UserName)
+        {
+            return "DECLARE @IPRev bigint; " +
+                "set @IPRev = (isnull((SELECT max(revision) id FROM InspectionProtocols ),0)+1); " +
+
+                "UPDATE InspectionProtocols SET " +
+                $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
+                "DeletionTime = getdate(), " +
+                "Revision = @IPRev, " +
+                "IsDeleted = 1 " +
+                $"WHERE ID = {ID}; " +
+
+                $"UPDATE PPEntityCollections SET Revision = @IPRev WHERE ID = {(int)RevEntry.InspectionProtocol};";
         }
         private static string DeleteZRP(int ID, string UserName)
         {
@@ -395,7 +597,7 @@ namespace O2GEN.Helpers
             $"UPDATE PPEntityCollections SET Revision = @SRRev WHERE ID = {(int)RevEntry.SchedulingRequirement}; " +
             $"UPDATE PPEntityCollections SET Revision = @SCRev WHERE ID = {(int)RevEntry.SchedulingContainer}; " +
             $"UPDATE PPEntityCollections SET Revision = @TRev WHERE ID = {(int)RevEntry.Task}; " +
-            $"UPDATE PPEntityCollections SET Revision = @IDRev WHERE ID = {(int)RevEntry.InspectionDocument}; "+
+            $"UPDATE PPEntityCollections SET Revision = @IDRev WHERE ID = {(int)RevEntry.InspectionDocument}; " +
             $"UPDATE PPEntityCollections SET Revision = @ARev WHERE ID = {(int)RevEntry.Assignment}; ";
         }
 
@@ -409,13 +611,13 @@ namespace O2GEN.Helpers
             "inner join InspectionProtocols AS IPs on IPI.InspectionProtocolId = IPs.Id " +
             "inner join AssetParameterValues AS APV on IPI.AssetParameterValueId = APV.Id " +
             "inner join AssetParameters AS AP on AP.Id = APV.AssetParameterId " +
-            $"WHERE InspectionDocumentId in (select id from InspectionDocuments where TaskId in (select id from Tasks where SchedulingContainerId = {SchedContID})) AND IPI.IsDeleted <> 1 ";
+            $"WHERE InspectionDocumentId in (select id from InspectionDocuments where TaskId in (select id from Tasks where SchedulingContainerId = {SchedContID})) AND IPs.IsDeleted <> 1 ";
         }
         #endregion
 
         #region Статусы
         /// <summary>
-        /// Календари
+        /// Статусы
         /// </summary>
         /// <returns></returns>
         private static string SelectSCStatuses()
@@ -481,11 +683,12 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         private static string SelectControls(int ID = -1)
         {
-            return "SELECT Id, DisplayName, ObjectUID, ValueType, BottomValue1, TopValue1, BottomValue2, TopValue2, BottomValue3, TopValue3 " +
-                "FROM AssetParameters " +
-                "WHERE(IsDeleted <> 1) AND(TenantId = CAST(1 AS bigint)) " +
-                $"{(ID == -1 ? "" : "AND Id = " + ID)} " +
-                "ORDER BY Id desc";
+            return "SELECT AP.Id, AP.DisplayName, AP.ObjectUID, AP.BottomValue1, AP.TopValue1, AP.BottomValue2, AP.TopValue2, AP.BottomValue3, AP.TopValue3, APT.Id AS AssetParameterTypeId, APT.Name AS ValueTypeName " +
+                "FROM AssetParameters AS AP " +
+                "INNER JOIN AssetParameterTypes AS APT ON AP.AssetParameterTypeId = APT.Id " +
+                "WHERE(AP.IsDeleted <> 1) AND(AP.TenantId = CAST(1 AS bigint)) " +
+                $"{(ID == -1 ? "" : "AND AP.Id = " + ID)} " +
+                "ORDER BY AP.Id desc";
         }
         /// <summary>
         /// Вставка Контроля
@@ -521,14 +724,15 @@ namespace O2GEN.Helpers
                 "Level3, " +
                 "Critical3, " +
                 "Level4, " +
-                "Critical4) " +
+                "Critical4, " +
+                "AssetParameterTypeId) " +
 
                 $"VALUES " +
 
                 $"(N'{obj.ValueBottom1.Replace(',', '.')}', " +
                 $"N'{obj.ValueBottom2.Replace(',', '.')}', " +
                 $"N'{obj.ValueBottom3.Replace(',', '.')}', " +
-                $"(isnull((SELECT top 1 id FROM PPUsers  where name =  {(string.IsNullOrEmpty(UserName) ? "NULL" : $"{(string.IsNullOrEmpty(UserName)?"NULL":$"'{UserName}'")}")}),-1)) , " +
+                $"(isnull((SELECT top 1 id FROM PPUsers  where name =  {(string.IsNullOrEmpty(UserName) ? "NULL" : $"{(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}")}),-1)) , " +
                 $"getdate(), " +
                 $"N'{obj.DisplayName}', " +
                 $"N'{obj.ObjectUID.ToString("D")}', " +
@@ -542,7 +746,7 @@ namespace O2GEN.Helpers
                 $"{obj.ValueTop1.Replace(',', '.')}, " +
                 $"{obj.ValueTop2.Replace(',', '.')}, " +
                 $"{obj.ValueTop3.Replace(',', '.')}, " +
-                $"'{GetControlType((ControlType)obj.ValueType)}', " +
+                $"'{GetControlType(obj.AssetParameterTypeId)}', " +
                 $"0, " +
                 $"0, " +
                 $"0, " +
@@ -550,7 +754,8 @@ namespace O2GEN.Helpers
                 $"0, " +
                 $"0, " +
                 $"0, " +
-                $"0); " +
+                $"0," +
+                $"{obj.AssetParameterTypeId}); " +
                 $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = 5;";
         }
         private static string UpdateControl(Control obj, string UserName)
@@ -561,7 +766,7 @@ namespace O2GEN.Helpers
                 $"BottomValue1 = N'{obj.ValueBottom1.Replace(',', '.')}', " +
                 $"BottomValue2 = N'{obj.ValueBottom2.Replace(',', '.')}', " +
                 $"BottomValue3 = N'{obj.ValueBottom3.Replace(',', '.')}', " +
-                $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName)?"NULL":$"{(string.IsNullOrEmpty(UserName)?"NULL":$"'{UserName}'")}")}),-1)), " +
+                $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"{(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}")}),-1)), " +
                 "ModificationTime = getdate(), " +
                 $"DisplayName = N'{obj.DisplayName}', " +
                 $"Name = N'{obj.DisplayName}', " +
@@ -569,7 +774,8 @@ namespace O2GEN.Helpers
                 $"TopValue1 = {obj.ValueTop1.Replace(',', '.')}, " +
                 $"TopValue2 = {obj.ValueTop2.Replace(',', '.')}, " +
                 $"TopValue3 = {obj.ValueTop3.Replace(',', '.')}, " +
-                $"ValueType = '{GetControlType((ControlType)obj.ValueType)}' " +
+                $"ValueType = '{GetControlType(obj.AssetParameterTypeId)}', " +
+                $"AssetParameterTypeId = {obj.AssetParameterTypeId} " +
                 $"WHERE ID = {obj.Id}; " +
 
                 $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.AssetParameter};";
@@ -579,13 +785,24 @@ namespace O2GEN.Helpers
             return "DECLARE @revision bigint; " +
                 "set @revision = (isnull((SELECT max(revision) id FROM AssetParameters ),0)+1); " +
                 "UPDATE AssetParameters SET " +
-                $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName)?"NULL":$"'{UserName}'")}),-1)), " +
+                $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
                 "DeletionTime = getdate(), " +
                 "Revision = @revision, " +
                 "IsDeleted = 1 " +
                 $"WHERE ID = {ID}; " +
 
                 $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.AssetParameter}; ";
+        }
+
+        /// <summary>
+        /// Типы контролей
+        /// </summary>
+        /// <returns></returns>
+        private static string SelectAssetParameterTypes()
+        {
+            return $"SELECT Id, Name " +
+                $"FROM AssetParameterTypes " +
+                $"where IsDeleted <> 1; ";
         }
         #endregion
 
@@ -594,7 +811,7 @@ namespace O2GEN.Helpers
         /// Маршруты
         /// </summary>
         /// <returns></returns>
-        private static string SelectAssetParameterSets(int ID = -1)
+        private static string SelectAssetParameterSets(int ID = -1, int? DeptId = null)
         {
             return "SELECT e.Id, e.DisplayName, e.ObjectUID, t.id as DepartmentID, t.DisplayName as DepartmentName  " +
                 "FROM AssetParameterSets AS e " +
@@ -605,6 +822,16 @@ namespace O2GEN.Helpers
                 ") AS t ON e.DepartmentId = t.Id " +
                 "WHERE e.IsDeleted <> 1 " +
                 $"{(ID == -1 ? "" : "AND e.Id = " + ID)} " +
+                $"{(DeptId == null ? "" : $"AND e.DepartmentId = {DeptId} ")}" +
+                "ORDER BY e.DisplayName";
+        }
+        private static string SelectAssetParameterSetsByDepartment(int DeptId)
+        {
+            return "SELECT e.Id, e.DisplayName, e.ObjectUID, e.DepartmentId, t.DisplayName as DepartmentName  " +
+                "FROM AssetParameterSets AS e " +
+                "LEFT JOIN Departments t ON e.DepartmentId = t.Id AND (t.IsDeleted<> 1) AND(t.TenantId = CAST(1 AS bigint)) " +
+                "WHERE e.IsDeleted <> 1 " +
+                $"AND e.DepartmentId = {DeptId} " +
                 "ORDER BY e.DisplayName";
         }
 
@@ -618,6 +845,7 @@ namespace O2GEN.Helpers
         {
             return "DECLARE @revision bigint; " +
                 "set @revision = (isnull((SELECT max(revision) id FROM AssetParameterSets ),0)+1); " +
+                "DECLARE @InsertedId TABLE(id int); " +
                 "INSERT into AssetParameterSets " +
                 "(DisplayName, " +
                 "DepartmentId, " +
@@ -625,14 +853,16 @@ namespace O2GEN.Helpers
                 "CreatedByUser, " +
                 "CreationTime," +
                 "Revision)" +
+                "output inserted.Id into @InsertedId " +
                 "values " +
-                $"N'{obj.DisplayName}', " +
+                $"(N'{obj.DisplayName}', " +
                 $"{obj.DepartmentID}, " +
                 $"'{obj.ObjectUID.ToString("D")}', " +
-                $"(isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName)?"NULL":$"'{UserName}'")}),-1)), " +
+                $"(isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
                 "getdate(), " +
                 "Revision);" +
-                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.AssetParameterSet};";
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.AssetParameterSet};" +
+                $"SELECT TOP 1 id FROM @InsertedPId;";
         }
         /// <summary>
         /// Обновление маршрута
@@ -647,9 +877,9 @@ namespace O2GEN.Helpers
                 "UPDATE AssetParameterSets SET " +
                 $"DisplayName = N'{obj.DisplayName}', " +
                 $"DepartmentId = {obj.DepartmentID}, " +
-                $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName)?"NULL":$"'{UserName}'")}),-1)), " +
+                $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
                 "ModificationTime = getdate(), " +
-                "Revision = @revision, " +
+                "Revision = @revision " +
                 $"WHERE ID = {obj.Id}; " +
 
                 $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.AssetParameterSet};";
@@ -665,7 +895,7 @@ namespace O2GEN.Helpers
             return "DECLARE @revision bigint; " +
                 "set @revision = (isnull((SELECT max(revision) id FROM AssetParameterSets ),0)+1); " +
                 "UPDATE AssetParameterSets SET " +
-                $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName)?"NULL":$"'{UserName}'")}),-1)), " +
+                $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
                 "DeletionTime = getdate(), " +
                 "Revision = @revision, " +
                 "IsDeleted = 1 " +
@@ -673,8 +903,75 @@ namespace O2GEN.Helpers
 
                 $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.AssetParameterSet}; ";
         }
+        /// <summary>
+        /// Получаем детали маршрута
+        /// </summary>
+        /// <param name="ID">Маршрут</param>
+        /// <returns></returns>
+        private static string SelectAssetParameterSetDetails(int ID)
+        {
+            return "  SELECT APSR.AssetId, A.DisplayName AS AssetName, APSR.AssetComponentId, AC.DisplayName AS AssetComponentName, APSR.AssetParameterId, AP.DisplayName AS AssetParameterName " +
+                "FROM AssetParameterSetRecords APSR " +
+                "LEFT JOIN Assets A ON APSR.AssetId = A.Id " +
+                "LEFT JOIN Assets AC ON APSR.AssetComponentId = AC.Id " +
+                "LEFT JOIN AssetParameters AP ON APSR.AssetParameterId = AP.Id " +
+                $"WHERE APSR.AssetParameterSetId = {ID} " +
+                "AND APSR.IsDeleted <> 1; ";
+        }
+        private static string CreateAssetParameterSetDetails(long APSId, long AId, long ACId, long APId, string UserName)
+        {
 
-        #warning TODO AssetParameterSetRecords
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM AssetParameterSetRecords ),0)+1); " +
+                "DECLARE @InsertedId TABLE(id int); " +
+                "INSERT into AssetParameterSetRecords " +
+                "(IsDeleted, " +
+                "Revision, " +
+                "CreatedByUser, " +
+                "CreationTime," +
+                "ObjectUID," +
+                "AssetParameterSetId," +
+                "AssetId," +
+                "AssetComponentId," +
+                "AssetParameterId)" +
+                "values " +
+                $"(0, " +
+                $"@revision, " +
+                $"(isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
+                "getdate(), " +
+                $"'{Guid.NewGuid().ToString("D")}', " +
+                $"{APSId}, " +
+                $"{AId}, " +
+                $"{ACId}, " +
+                $"{APId});" +
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.AssetParameterSetRecord};";
+        }
+
+        /// <summary>
+        /// Удаление деталей маршрута
+        /// </summary>
+        /// <returns></returns>
+        private static string DeleteAssetParameterSetDetails(long ID, string UserName)
+        {
+            return "DECLARE @revision bigint; " +
+                "set @revision = (isnull((SELECT max(revision) id FROM AssetParameterSetRecords ),0)+1); " +
+                "UPDATE AssetParameterSetRecords SET " +
+                $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
+                "DeletionTime = getdate(), " +
+                "Revision = @revision, " +
+                "IsDeleted = 1 " +
+                $"WHERE ID = {ID}; " +
+
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.AssetParameterSetRecord}; ";
+        }
+        /// <summary>
+        /// Для обновления/удаления деталей маршрута.
+        /// </summary>
+        /// <returns></returns>
+        private static string GetAssetParameterSetRecords(long APSID)
+        {
+            return $"SELECT Id, AssetId, AssetComponentId, AssetParameterId FROM AssetParameterSetRecords where IsDeleted<>1 AND  AssetParameterSetId = {APSID}";
+        }
         #endregion
 
         #region Классы объектов
@@ -771,10 +1068,11 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         private static string SelectAssetClassParameters(int AssetClassId)
         {
-            return "SELECT Id, ObjectUID, AssetClassId, AssetParameterId " +
-                "FROM AssetClassParameter " +
-                "WHERE (IsDeleted <> 1) " +
-                $"AND AssetClassId = {AssetClassId}";
+            return "SELECT ACP.Id, ACP.ObjectUID, ACP.AssetClassId, ACP.AssetParameterId, AP.DisplayName as AssetParameterName " +
+                "FROM AssetClassParameter ACP " +
+                "INNER JOIN AssetParameters AP ON AP.id = ACP.AssetParameterId " +
+                "WHERE (ACP.IsDeleted <> 1) " +
+                $"AND ACP.AssetClassId = {AssetClassId}";
         }
         /// <summary>
         /// Создание класса объектов
@@ -956,7 +1254,7 @@ namespace O2GEN.Helpers
         /// Объекты
         /// </summary>
         /// <returns></returns>
-        private static string SelectAssets(int DeptID = -1)
+        private static string SelectAssets(int? DeptID = -1, bool NotesOnly = false)
         {
             return "SELECT e.Id, e.DisplayName, e.Description, e.ExternalId, e.ObjectUID, e.ParentId,  t1.DisplayName as StateName, t1.ObjectUID, AT.Id as TypeID, AT.DisplayName as TypeName, e.AssetTypeId " +
                 "FROM Assets AS e " +
@@ -967,7 +1265,8 @@ namespace O2GEN.Helpers
                 ") AS t1 ON e.AssetStateId = t1.Id " +
                 "LEFT JOIN AssetTypes AT on AT.Id = e.AssetTypeId " +
                 "WHERE ((e.IsDeleted <> 1) AND (e.TenantId = CAST(1 AS bigint))) " +
-                (DeptID != -1 ? "AND e.DepartmentId =  {DeptID}" : "") +
+                (DeptID != null && DeptID != -1 ? $"AND e.DepartmentId =  {DeptID} " : "") +
+                (NotesOnly ? $"AND e.AssetSortId = 1 " : "") +
                 "ORDER BY e.DisplayName";
         }
         private static string SelectAsset(int ID)
@@ -975,6 +1274,51 @@ namespace O2GEN.Helpers
             return "SELECT Id, DisplayName, ParentId, ObjectUID, DepartmentId, AssetSortId, AssetClassId, ExternalId " +
                 "FROM Assets " +
                 $"WHERE Id = {ID}";
+        }
+        private static string GetSimpleAsset(int ID)
+        {
+            return "SELECT p.id ParentId, p.DisplayName ParentName,  ch.Id ChildId, ch.DisplayName ChildName, prm.Id ParamId, prm.DisplayName ParamName " +
+                "FROM Assets p " +
+                "LEFT JOIN Assets ch on p.Id = ch.ParentId  AND ch.IsDeleted <> 1 " +
+                "LEFT JOIN AssetParameterPair pair on pair.AssetId = ch.Id AND pair.IsDeleted <> 1 " +
+                "LEFT JOIN AssetParameters prm on prm.Id = pair.AssetParameterId AND prm.IsDeleted <> 1 " +
+                $"WHERE p.Id = {ID} AND p.IsDeleted <> 1; ";
+        }
+        private static string SelectAssetParameterForAsset(int AssetID)
+        {
+            return "SELECT AssetParameterId as Id FROM AssetParameterPair where IsDeleted <> 1 AND AssetId = " + AssetID;
+        }
+        private static string CreateAssetParameterPair(long AssetId, long ParameterId)
+        {
+            return "DECLARE @Rev bigint; " +
+                "set @Rev = (isnull((SELECT max(revision) id FROM AssetParameterPair ),0)+1); " +
+
+                "INSERT into AssetParameterPair " +
+                "(ObjectUID, " +
+                "Revision," +
+                "AssetId," +
+                "AssetParameterId," +
+                "IsDeleted)" +
+                "values " +
+                $"('{Guid.NewGuid().ToString("D")}', " +
+                $"@Rev, " +
+                $"{AssetId}, " +
+                $"{ParameterId}," +
+                "0);" +
+
+                $"UPDATE PPEntityCollections SET Revision = @Rev WHERE ID = {(int)RevEntry.AssetParameterPair};";
+        }
+        private static string DeleteAssetParameterPair(long AssetId, long AssetParameterId)
+        {
+            return "DECLARE @Rev bigint; " +
+                "set @Rev = (isnull((SELECT max(revision) id FROM AssetParameterPair ),0)+1); " +
+
+                "UPDATE AssetParameterPair SET " +
+                "Revision = @Rev, " +
+                "IsDeleted = 1 " +
+                $"WHERE AssetId = {AssetId} AND AssetParameterId = {AssetParameterId}; " +
+
+                $"UPDATE PPEntityCollections SET Revision = @Rev WHERE ID = {(int)RevEntry.AssetParameterPair};";
         }
         /// <summary>
         /// Создание объекта
@@ -984,9 +1328,10 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         private static string CreateAsset(Asset obj, string UserName)
         {
-            #warning Разобраться с тем что такое AssetSubtype
             return "DECLARE @revision bigint; " +
                 "set @revision = (isnull((SELECT max(revision) id FROM Assets ),0)+1); " +
+                "DECLARE @AId TABLE(id bigint); " +
+
                 "INSERT into Assets " +
                 "(ParentId, " +
                 "DisplayName, " +
@@ -1005,6 +1350,7 @@ namespace O2GEN.Helpers
                 "OperationStart, " +
                 "MadeDate, " +
                 "AssetSubtype)" +
+                "OUTPUT inserted.Id into @AId " +
                 "values " +
                 $"({(obj.ParentId == null ? "NULL" : obj.ParentId)}, " +
                 $"N'{obj.DisplayName}', " +
@@ -1012,7 +1358,7 @@ namespace O2GEN.Helpers
                 $"{obj.DepartmentId}, " +
                 $"{obj.AssetSortId}, " +
                 $"{(obj.AssetClassId == null ? "NULL" : obj.AssetClassId)}, " +
-                $"N'{obj.Maximo}', " +
+                $"{(string.IsNullOrEmpty(obj.Maximo) ? "NULL" : $"'{obj.Maximo}'")}, " +
                 $"'{obj.ObjectUID.ToString("D")}', " +
                 $"(isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
                 "getdate(), " +
@@ -1023,7 +1369,8 @@ namespace O2GEN.Helpers
                 "getdate(), " +
                 "getdate(), " +
                 "-1);" +
-                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.Asset};";
+                $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.Asset};" +
+                $"SELECT id FROM @AId;";
         }
         /// <summary>
         /// Обновление объекта
@@ -1040,7 +1387,7 @@ namespace O2GEN.Helpers
                 $"DisplayName = N'{obj.DisplayName}', " +
                 $"Name = N'{obj.DisplayName}', " +
                 $"DepartmentId = {obj.DepartmentId}, " +
-                $"ExternalId = N'{obj.Maximo}', " +
+                $"ExternalId = {(string.IsNullOrEmpty(obj.Maximo) ? "NULL" : $"'{obj.Maximo}'")}, " +
                 $"AssetSortId = {obj.AssetSortId}, " +
                 $"AssetClassId = {(obj.AssetClassId == null ? "NULL" : obj.AssetClassId)}, " +
                 $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
@@ -1125,7 +1472,7 @@ namespace O2GEN.Helpers
                 "IsDeleted, " +
                 "TenantId)" +
                 "values " +
-                $"({(obj.ParentId == null ? "NULL" : obj.ParentId)}, "+
+                $"({(obj.ParentId == null ? "NULL" : obj.ParentId)}, " +
                 $"N'{obj.Name}', " +
                 $"N'{obj.DisplayName}', " +
                 $"{obj.Latitude}, " +
@@ -1150,7 +1497,7 @@ namespace O2GEN.Helpers
             return "DECLARE @revision bigint; " +
                 "set @revision = (isnull((SELECT max(revision) id FROM Departments ),0)+1); " +
                 "UPDATE Departments SET " +
-                $"ParentId = {(obj.ParentId == null? "NULL":obj.ParentId)}, " +
+                $"ParentId = {(obj.ParentId == null ? "NULL" : obj.ParentId)}, " +
                 $"Name = N'{obj.Name}', " +
                 $"DisplayName = N'{obj.DisplayName}', " +
                 $"Latitude = {obj.Latitude}, " +
@@ -1229,7 +1576,7 @@ namespace O2GEN.Helpers
                 "values " +
                 "(0," +
                 "@revision, " +
-                $"(isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName)?"NULL":$"'{UserName}'")}),-1)), " +
+                $"(isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
                 $"getdate(), " +
                 $"'{obj.ObjectUID.ToString("D")}', " +
                 $"{obj.EngineerID}, " +
@@ -1248,7 +1595,7 @@ namespace O2GEN.Helpers
                 "set @revision = (isnull((SELECT max(revision) id FROM ResourceAllocations ),0)+1); " +
                 "UPDATE ResourceAllocations SET " +
                 "IsDeleted = 1, " +
-                $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName)?"NULL":$"'{UserName}'")}),-1)), " +
+                $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
                 "DeletionTime = getdate(), " +
                 "ResourceId = NULL " +
                 $"WHERE ID = {ID}; " +
@@ -1258,11 +1605,19 @@ namespace O2GEN.Helpers
         /// Бригады
         /// </summary>
         /// <returns></returns>
-        private static string SelectResources(int ID = -1)
+        private static string SelectResources(long? ID = null, long? DepID = null)
         {
             return "SELECT Id, DisplayName, ObjectUID, ResourceTypeId, ResourceStateId, DepartmentId, Latitude, Longitude, Address " +
                 "FROM Resources WHERE " +
-                $"{(ID > 0 ? $"Id = {ID} AND" : "")} " +
+                $"{(ID != null ? $"Id = {ID} AND" : "")} " +
+                $"{(DepID != null ? $"DepartmentId = {DepID} AND" : "")} " +
+                "(IsDeleted <> 1) AND (TenantId = CAST(1 AS bigint)) order by DisplayName";
+        }
+        private static string SelectResourcesByDepartment(int DepartmentID = -1)
+        {
+            return "SELECT Id, DisplayName, ObjectUID, ResourceTypeId, ResourceStateId, DepartmentId, Latitude, Longitude, Address " +
+                "FROM Resources WHERE " +
+                $"DepartmentId = {DepartmentID} " +
                 "(IsDeleted <> 1) AND (TenantId = CAST(1 AS bigint)) order by DisplayName";
         }
         /// <summary>
@@ -1295,8 +1650,8 @@ namespace O2GEN.Helpers
                 $"{obj.Latitude}, " +
                 $"{obj.Longitude}, " +
                 $"N'{obj.Address}', " +
-                $"{(obj.ResourceStateId==null? "NULL": obj.ResourceStateId)}, " +
-                $"(isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName)?"NULL":$"'{UserName}'")}),-1)), " +
+                $"{(obj.ResourceStateId == null ? "NULL" : obj.ResourceStateId)}, " +
+                $"(isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
                 $"getdate(), " +
                 $"'{obj.ObjectUID.ToString("D")}', " +
                 $"@revision, " +
@@ -1325,7 +1680,7 @@ namespace O2GEN.Helpers
                 $"Longitude = {obj.Longitude}, " +
                 $"Address = N'{obj.Address}', " +
                 $"ResourceStateId = {(obj.ResourceStateId == null ? "NULL" : obj.ResourceStateId)}, " +
-                $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName)?"NULL":$"'{UserName}'")}),-1)), " +
+                $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
                 "ModificationTime = getdate() " +
                 $"WHERE ID = {obj.Id}; " +
 
@@ -1342,7 +1697,7 @@ namespace O2GEN.Helpers
             return "DECLARE @revision bigint; " +
                 "set @revision = (isnull((SELECT max(revision) id FROM Resources ),0)+1); " +
                 "UPDATE Resources SET " +
-                $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName)?"NULL":$"'{UserName}'")}),-1)), " +
+                $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
                 "DeletionTime = getdate(), " +
                 "Revision = @revision, " +
                 "IsDeleted = 1 " +
@@ -1371,7 +1726,7 @@ namespace O2GEN.Helpers
         /// Работники
         /// </summary>
         /// <returns></returns>
-        private static string SelectEngineers(int ID = -1)
+        private static string SelectEngineers(long? ID = null, long? DeptId = null)
         {
             return "SELECT e.Id, t1.PersonName, e.ObjectUID, e.PersonId, t0.DisplayName as DepartmentName, isnull(t2.IsUser,0) as IsUser , e.DepartmentId, e.PersonId, t1.Surname, t1.GivenName, t1.MiddleName, e.CalendarId, t1.PersonPositionId " +
                 "FROM Engineers AS e " +
@@ -1392,7 +1747,8 @@ namespace O2GEN.Helpers
                 "    GROUP BY Id " +
                 ") AS t2 ON t1.UserId = t2.Id " +
                 "WHERE ((e.IsDeleted <> 1) " +
-                $"{(ID == -1 ? "" : "AND e.Id = " + ID)} " +
+                $"{(ID == null ? "" : "AND e.Id = " + ID)} " +
+                $"{(DeptId == null ? "" : "AND e.DepartmentId = " + DeptId)} " +
                 "AND(e.TenantId = CAST(1 AS bigint))) " +
                 "AND(e.PersonId IS NOT NULL ) ORDER BY PersonName";
         }
@@ -1424,15 +1780,15 @@ namespace O2GEN.Helpers
                 "values" +
                 "(0, " +
                 "@PRevision, " +
-                $"(isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName)?"NULL":$"'{UserName}'")}),-1)), " +
+                $"(isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
                 $"getdate(), " +
                 $"'{obj.ObjectUID.ToString("D")}', " +
-                $"N'{obj.Surname} {obj.GivenName.Substring(0, 1) + "."} {(!string.IsNullOrEmpty(obj.MiddleName)? obj.MiddleName.Substring(0,1)+".":"" )}', " +
+                $"N'{obj.Surname} {obj.GivenName.Substring(0, 1) + "."} {(!string.IsNullOrEmpty(obj.MiddleName) ? obj.MiddleName.Substring(0, 1) + "." : "")}', " +
                 $"N'{obj.Surname}', " +
                 $"N'{obj.GivenName}', " +
-                $"{(!string.IsNullOrEmpty(obj.MiddleName) ? "N'"+obj.MiddleName+"'": "NULL")}, " +
+                $"{(!string.IsNullOrEmpty(obj.MiddleName) ? "N'" + obj.MiddleName + "'" : "NULL")}, " +
                 $"1, " +
-                $"{(obj.PersonPositionId == null? "NULL": obj.PersonPositionId)}); " +
+                $"{(obj.PersonPositionId == null ? "NULL" : obj.PersonPositionId)}); " +
 
                 "INSERT INTO Engineers " +
                 $"(DisplayName, " +
@@ -1451,7 +1807,7 @@ namespace O2GEN.Helpers
                 $"(select top 1 id from @InsertedPId), " +
                 $"{(obj.CalendarId == null ? "NULL" : obj.CalendarId)}, " +
                 $"{(obj.DepartmentId == null ? "NULL" : obj.DepartmentId)}, " +
-                $"(isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName)?"NULL":$"'{UserName}'")}),-1)), " +
+                $"(isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
                 $"getdate(), " +
                 $"'{obj.ObjectUID.ToString("D")}', " +
                 $"@ERevision, " +
@@ -1489,7 +1845,7 @@ namespace O2GEN.Helpers
                 $"DisplayName = N'{obj.Surname} {obj.GivenName.Substring(0, 1) + "."} {(!string.IsNullOrEmpty(obj.MiddleName) ? obj.MiddleName.Substring(0, 1) + "." : "")}', " +
                 $"CalendarId = {(obj.CalendarId == null ? "NULL" : obj.CalendarId)}, " +
                 $"DepartmentId = {(obj.DepartmentId == null ? "NULL" : obj.DepartmentId)}, " +
-                $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName)?"NULL":$"'{UserName}'")}),-1)), " +
+                $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
                 "ModificationTime = getdate(), " +
                 "Revision = @ERevision " +
                 $"WHERE ID = {obj.Id}; " +
@@ -1577,7 +1933,7 @@ namespace O2GEN.Helpers
                 $"N'{obj.MiddleName}', " +
                 $"{obj.UserId}, " +
                 $"N'{obj.PersonPositionId}', " +
-                $"(isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName)?"NULL":$"'{UserName}'")}),-1)), " +
+                $"(isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
                 $"getdate(), " +
                 $"'{obj.ObjectUID.ToString("D")}', " +
                 $"@revision); " +
@@ -1601,7 +1957,7 @@ namespace O2GEN.Helpers
                 $"GivenName = N'{obj.GivenName}', " +
                 $"MiddleName = N'{obj.MiddleName}', " +
                 $"PersonPositionId = {obj.PersonPositionId}, " +
-                $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName)?"NULL":$"'{UserName}'")}),-1)), " +
+                $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
                 "ModificationTime = getdate(), " +
                 $"WHERE ID = {obj.Id}; " +
 
@@ -1618,7 +1974,7 @@ namespace O2GEN.Helpers
             return "DECLARE @revision bigint; " +
                 "set @revision = (isnull((SELECT max(revision) id FROM Persons ),0)+1); " +
                 "UPDATE Persons SET " +
-                $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName)?"NULL":$"'{UserName}'")}),-1)), " +
+                $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
                 "DeletionTime = getdate(), " +
                 "Revision = @revision, " +
                 "IsDeleted = 1 " +
@@ -1629,6 +1985,66 @@ namespace O2GEN.Helpers
 
 
 
+        #endregion
+
+        #region  Отчеты
+        /// <summary>
+        /// Отчёт по значениям контролей
+        /// </summary>
+        /// <returns></returns>
+        private static string SelectCVR(DateTime From, DateTime To, long DepartmentId, long AssetId)
+        {
+            return "SELECT A.Id AS AId, A.DisplayName AS AName, AC.Id AS ACId, AC.DisplayName AS ACName, AP.Id AS APId, AP.DisplayName AS APName, SC.Id AS SCId, SC.StartTime, APV.Value " +
+                "FROM SchedulingContainers AS SC " +
+                "INNER JOIN Departments AS D ON SC.DepartmentId = D.Id " +
+                "INNER JOIN Tasks AS T ON T.SchedulingContainerId = SC.Id " +
+                "INNER JOIN InspectionProtocols AS IProt ON IProt.TaskId = T.Id AND IProt.IsDeleted <> 1 " +
+                "INNER JOIN InspectionProtocolItems AS IProtItems ON IProtItems.InspectionProtocolId = IProt.Id " +
+                "INNER JOIN AssetParameterValues AS APV ON APV.Id = IProtItems.AssetParameterValueId " +
+                "INNER JOIN Assets AS A ON A.Id = IProt.AssetId " +
+                "INNER JOIN Assets AS AC ON AC.Id = APV.AssetId " +
+                "INNER JOIN AssetParameters AS AP ON AP.Id = APV.AssetParameterId " +
+                $"WHERE SC.StartTime <= '{To.ToString("yyyy-MM-dd HH:mm:ss")}' AND SC.CloseTime >= '{From.ToString("yyyy-MM-dd HH:mm:ss")}' AND D.Id = {DepartmentId} AND A.Id = {AssetId} AND SC.IsDeleted <> 1 " +
+                "ORDER BY SC.StartTime";
+        }
+        private static string SelectAssetsFromAPS(long APSId)
+        {
+            return "SELECT DISTINCT A.Id, A.DisplayName " +
+                "FROM AssetParameterSetRecords AS APSR " +
+                "INNER JOIN Assets AS A ON A.Id = APSR.AssetId AND A.IsDeleted <> 1 " +
+                "WHERE APSR.IsDeleted <> 1 " +
+                $"AND APSR.AssetParameterSetId = {APSId}";
+        }
+        /// <summary>
+        /// Отчет по осмотренным Тех. позициям
+        /// </summary>
+        /// <returns></returns>
+        private static string SelectVA(DateTime From, DateTime To)
+        {
+            return "SELECT D.Id, D.DisplayName, count(*) AS Rows " +
+                "FROM Departments AS D " +
+                "LEFT JOIN SchedulingContainers AS SC ON D.Id = SC.DepartmentId AND SC.IsDeleted <> 1 " +
+                "LEFT JOIN Tasks AS T ON T.SchedulingContainerId = SC.Id " +
+                "LEFT JOIN InspectionProtocols AS IProt ON IProt.TaskId = T.Id AND IProt.IsDeleted <> 1 " +
+                "WHERE IProt.ModificationTime IS NOT NULL AND IProt.InspectionProtocolStatusId IS NOT NULL " +
+                $"AND SC.StartTime <= '{To.ToString("yyyy-MM-dd HH:mm:ss")}' AND SC.CloseTime >= '{From.ToString("yyyy-MM-dd HH:mm:ss")}' AND D.IsDeleted <> 1 " +
+                "group by D.Id, D.DisplayName ";
+        }
+
+        /// <summary>
+        /// Отчет по всем Тех. позициям
+        /// </summary>
+        /// <returns></returns>
+        private static string SelectNA(DateTime From, DateTime To)
+        {
+            return "SELECT D.Id, D.DisplayName, count(*) AS Rows " +
+                "FROM Departments AS D " +
+                "LEFT JOIN SchedulingContainers AS SC ON D.Id = SC.DepartmentId AND SC.IsDeleted <> 1 " +
+                "LEFT JOIN Tasks AS T ON T.SchedulingContainerId = SC.Id " +
+                "LEFT JOIN InspectionProtocols AS IProt ON IProt.TaskId = T.Id AND IProt.IsDeleted <> 1 " +
+                $"WHERE SC.StartTime <= '{To.ToString("yyyy-MM-dd HH:mm:ss")}' AND SC.CloseTime >= '{From.ToString("yyyy-MM-dd HH:mm:ss")}' AND D.IsDeleted <> 1 " +
+                "group by D.Id, D.DisplayName ";
+        }
         #endregion
 
         #endregion
@@ -1686,7 +2102,7 @@ namespace O2GEN.Helpers
             return output;
         }
 
-        public static ZRP GetZRP(int ID, ILogger logger)
+        public static ZRP GetZRP(int ID, string UserName, ILogger logger)
         {
             string con = GetConnectionString();
 
@@ -1721,14 +2137,14 @@ namespace O2GEN.Helpers
                                     RouteName = row["Name"].ToString(),
                                     DepartmentID = int.Parse(row["DepartmentId"].ToString()),
                                     ResourceId = int.Parse(row["RequirementResourceId"].ToString()),
-                                    ObjectUID = string.IsNullOrEmpty(row["ObjectUID"].ToString())?null:new Guid(row["ObjectUID"].ToString())
+                                    ObjectUID = string.IsNullOrEmpty(row["ObjectUID"].ToString()) ? null : new Guid(row["ObjectUID"].ToString())
 
                                 };
                             }
                         }
                     }
                 }
-                output.InsProt = GetInspectionProtocols(output.Id, logger);
+                output.InsProt = GetInspectionProtocols(output.Id, UserName, logger);
             }
             catch (Exception ex)
             {
@@ -1739,17 +2155,163 @@ namespace O2GEN.Helpers
 
         public static void CreateZRP(ZRP obj, string UserName, ILogger logger)
         {
-            ExecuteNonQuery(CreateZRP(obj, UserName), logger);
+            long SRID = 0, TID = 0, IDocID = 0, SCID = 0;
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return;
+            }
+            try
+            {
+                using (var connection = new SqlConnection(con))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(CreateZRP(obj, UserName), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                SRID = long.Parse(row["SRID"].ToString());
+                                TID = long.Parse(row["TID"].ToString());
+                                IDocID = long.Parse(row["IDocID"].ToString());
+                                SCID = long.Parse(row["SCID"].ToString());
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Ошибка на запросе данных БР");
+            }
+
+            if (obj.NewTechPoz.Count > 0)
+            {
+                //AssetId IPItemId
+                Dictionary<long, long> IPData = CreateInspectionProtocols(obj, UserName, logger, TID, IDocID);
+                List<AssetParametersRowData> APVData = CreateAssetParameters(obj, UserName, logger, IPData);
+                CreateInspectionProtocolItems(obj, UserName, logger, IPData, APVData);
+            }
         }
+        #region Вставка деталей
+        private struct AssetParametersRowData
+        {
+            public long Id;
+            public long AssetId;
+            public long AssetParameterId;
+            public long IPId;
+        }
+        private static Dictionary<long, long> CreateInspectionProtocols(ZRP obj, string UserName, ILogger logger, long TID, long IDocID)
+        {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
+            Dictionary<long, long> output = new Dictionary<long, long>();
+
+            try
+            {
+                using (var connection = new SqlConnection(con))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(CreateInspectionProtocols(obj, UserName, TID, IDocID), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output.Add(long.Parse(row["AssetId"].ToString()), long.Parse(row["IPItemId"].ToString()));
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Ошибка на создании деталей протокола {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
+        private static List<AssetParametersRowData> CreateAssetParameters(ZRP obj, string UserName, ILogger logger, Dictionary<long, long> IPData)
+        {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
+            List<AssetParametersRowData> output = new List<AssetParametersRowData>();
+
+            try
+            {
+                using (var connection = new SqlConnection(con))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(CreateAssetParameters(obj, UserName, IPData), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output.Add(new AssetParametersRowData()
+                                {
+                                    Id = long.Parse(row["ID"].ToString()),
+                                    AssetId = long.Parse(row["AssetId"].ToString()),
+                                    AssetParameterId = long.Parse(row["AssetParameterId"].ToString()),
+                                    IPId = long.Parse(row["IPId"].ToString()),
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Ошибка на создании деталей протокола {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
+        private static void CreateInspectionProtocolItems(ZRP obj, string UserName, ILogger logger, Dictionary<long, long> IPData, List<AssetParametersRowData> APData)
+        {
+            ExecuteNonQuery(CreateInspectionProtocolItems(obj, UserName, IPData, APData), logger);
+        }
+        #endregion
+
         public static void UpdateZRP(ZRP obj, string UserName, ILogger logger)
         {
             ExecuteNonQuery(UpdateZRP(obj, UserName), logger);
+
+            var Details = GetInspectionProtocols(obj.Id, UserName, logger);
+
+            for (int i = 0; i < Details.Count; i++)
+            {
+                if (obj.InsProt.Find(x => x.Id == Details[i].Id) == null)
+                {
+                    DeleteInspectionProtocol(Details[i].Id, UserName, logger);
+                }
+            }
+
         }
         public static void DeleteZRP(int ID, string UserName, ILogger logger)
         {
             ExecuteNonQuery(DeleteZRP(ID, UserName), logger);
         }
-        public static List<InspectionProtocol> GetInspectionProtocols(int ShedContID, ILogger logger)
+        public static List<InspectionProtocol> GetInspectionProtocols(int ShedContID, string UserName, ILogger logger)
         {
             string con = GetConnectionString();
 
@@ -1796,9 +2358,13 @@ namespace O2GEN.Helpers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Ошибка на запросе данных БР");
+                logger.LogError(ex, $"Ошибка на запросе данных БР {new StackTrace().GetFrame(1).GetMethod().Name}");
             }
             return output;
+        }
+        public static void DeleteInspectionProtocol(int InspectionProtocolID, string UserName, ILogger logger)
+        {
+            ExecuteNonQuery(DeleteInspectionProtocol(InspectionProtocolID, UserName), logger);
         }
         #endregion
 
@@ -2073,8 +2639,8 @@ namespace O2GEN.Helpers
                                     Id = int.Parse(row["Id"].ToString()),
                                     DisplayName = row["DisplayName"].ToString(),
                                     ObjectUID = new Guid(row["ObjectUID"].ToString()),
-                                    ValueType = GetControlTypeIndex(row["ValueType"].ToString()),
-                                    DisplayValueType = GetControlTypeDisplay(row["ValueType"].ToString())
+                                    DisplayValueType = row["ValueTypeName"].ToString(),
+                                    AssetParameterTypeId = long.Parse(row["AssetParameterTypeId"].ToString())
                                 });
                             }
                         }
@@ -2117,14 +2683,14 @@ namespace O2GEN.Helpers
                                     Id = int.Parse(row["Id"].ToString()),
                                     DisplayName = row["DisplayName"].ToString(),
                                     ObjectUID = new Guid(row["ObjectUID"].ToString()),
-                                    ValueType = GetControlTypeIndex(row["ValueType"].ToString()),
-                                    DisplayValueType = GetControlTypeDisplay(row["ValueType"].ToString()),
+                                    DisplayValueType = row["ValueTypeName"].ToString(),
                                     ValueBottom1 = row["BottomValue1"].ToString(),
                                     ValueTop1 = row["TopValue1"].ToString(),
                                     ValueBottom2 = row["BottomValue2"].ToString(),
                                     ValueTop2 = row["TopValue2"].ToString(),
                                     ValueBottom3 = row["BottomValue3"].ToString(),
                                     ValueTop3 = row["TopValue3"].ToString(),
+                                    AssetParameterTypeId = long.Parse(row["AssetParameterTypeId"].ToString())
                                 };
                             }
                         }
@@ -2134,6 +2700,53 @@ namespace O2GEN.Helpers
             catch (Exception ex)
             {
                 logger.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
+
+        /// <summary>
+        /// Типы контролей
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <returns></returns>
+        public static List<AssetParameterType> GetAssetParameterTypes(ILogger logger = null)
+        {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger?.LogDebug("connection string is null or empty");
+                return null;
+            }
+
+            List<AssetParameterType> output = new List<AssetParameterType>();
+
+            try
+            {
+                using (var connection = new SqlConnection(con))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectAssetParameterTypes(), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output.Add(new AssetParameterType()
+                                {
+                                    Id = long.Parse(row["Id"].ToString()),
+                                    Name = row["Name"].ToString()
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
             }
             return output;
         }
@@ -2157,7 +2770,7 @@ namespace O2GEN.Helpers
         /// </summary>
         /// <param name="logger"></param>
         /// <returns></returns>
-        public static List<AssetParameterSet> GetAssetParameterSets(ILogger logger=null)
+        public static List<AssetParameterSet> GetAssetParameterSets(ILogger logger = null, int? DeptID = -1)
         {
             string con = GetConnectionString();
 
@@ -2174,7 +2787,7 @@ namespace O2GEN.Helpers
                 using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
-                    using (var command = new SqlCommand(SelectAssetParameterSets(), connection))
+                    using (var command = new SqlCommand(SelectAssetParameterSets(DeptId: DeptID), connection))
                     {
                         command.CommandType = CommandType.Text;
                         command.Parameters.Clear();
@@ -2217,7 +2830,7 @@ namespace O2GEN.Helpers
                 using (var connection = new SqlConnection(GetConnectionString()))
                 {
                     connection.Open();
-                    using (var command = new SqlCommand(SelectAssetParameterSets(ID), connection))
+                    using (var command = new SqlCommand(SelectAssetParameterSets(ID: ID), connection))
                     {
                         command.CommandType = CommandType.Text;
                         command.Parameters.Clear();
@@ -2237,6 +2850,7 @@ namespace O2GEN.Helpers
                         }
                     }
                 }
+                output.Childs = GetAssetParameterSetDetails(output.Id, logger);
             }
             catch (Exception ex)
             {
@@ -2246,15 +2860,209 @@ namespace O2GEN.Helpers
         }
         public static void CreateAssetParameterSet(AssetParameterSet obj, string UserName, ILogger logger)
         {
-            ExecuteScalar(CreateAssetParameterSet(obj, UserName), logger);
+            string APID = ExecuteScalar(CreateAssetParameterSet(obj, UserName), logger);
+            for (int i = 0; i < obj.Childs.Count; i++)
+            {
+                for (int j = 0; j < obj.Childs[i].Childs.Count; j++)
+                {
+                    for (int k = 0; k < obj.Childs[i].Childs[j].Childs.Count; k++)
+                    {
+                        CreateAssetParameterSetRecord(long.Parse(APID), obj.Childs[i].Id, obj.Childs[i].Childs[j].Id, obj.Childs[i].Childs[j].Childs[k].Id, UserName, logger);
+                    }
+                }
+            }
         }
         public static void UpdateAssetParameterSet(AssetParameterSet obj, string UserName, ILogger logger)
         {
-            ExecuteScalar(UpdateAssetParameterSet(obj, UserName), logger);
+            ExecuteNonQuery(UpdateAssetParameterSet(obj, UserName), logger);
+            var currentData = GetAssetParameterSetRecords(obj.Id, logger);
+
+            //Добавляем  новые
+            for (int i = 0; i < obj.Childs.Count; i++)
+            {
+                for (int j = 0; j < obj.Childs[i].Childs.Count; j++)
+                {
+                    for (int k = 0; k < obj.Childs[i].Childs[j].Childs.Count; k++)
+                    {
+                        if (currentData.Find(x => x.AParentId == obj.Childs[i].Id && x.AChildId == obj.Childs[i].Childs[j].Id && x.ParamId == obj.Childs[i].Childs[j].Childs[k].Id) == null)
+                        {
+                            CreateAssetParameterSetRecord(obj.Id, obj.Childs[i].Id, obj.Childs[i].Childs[j].Id, obj.Childs[i].Childs[j].Childs[k].Id, UserName, logger);
+                        }
+                    }
+                }
+            }
+            //Удаляем убранные пользователем.
+            for (int i = 0; i < currentData.Count; i++)
+            {
+                Hierarchy AP = null;
+                Hierarchy AC = null;
+                Hierarchy P = null;
+                AP = obj.Childs.Find(x => x.Id == currentData[i].AParentId);
+                if (AP == null)
+                {
+                    DeleteAssetParameterSetRecord(currentData[i].APSRId, UserName, logger);
+                    continue;
+                }
+                AC = AP.Childs.Find(x => x.Id == currentData[i].AChildId);
+                if (AC == null)
+                {
+                    DeleteAssetParameterSetRecord(currentData[i].APSRId, UserName, logger);
+                    continue;
+                }
+                P = AC.Childs.Find(x => x.Id == currentData[i].ParamId);
+                if (P == null)
+                {
+                    DeleteAssetParameterSetRecord(currentData[i].APSRId, UserName, logger);
+                    continue;
+                }
+
+            }
         }
         public static void DeleteAssetParameterSet(int ID, string UserName, ILogger logger)
         {
-            ExecuteScalar(DeleteAssetParameterSet(ID, UserName), logger);
+            ExecuteNonQuery(DeleteAssetParameterSet(ID, UserName), logger);
+        }
+
+        /// <summary>
+        /// Создание деталей маршрута
+        /// </summary>
+        /// <param name="APSId"></param>
+        /// <param name="AParId"></param>
+        /// <param name="AChildId"></param>
+        /// <param name="ParId"></param>
+        /// <param name="UserName"></param>
+        /// <param name="logger"></param>
+        public static void CreateAssetParameterSetRecord(long APSId, long AParId, long AChildId, long ParId, string UserName, ILogger logger)
+        {
+            ExecuteNonQuery(CreateAssetParameterSetDetails(APSId, AParId, AChildId, ParId, UserName), logger);
+        }
+        /// <summary>
+        /// Удаление деталей маршрута.
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="UserName"></param>
+        /// <param name="logger"></param>
+        public static void DeleteAssetParameterSetRecord(long ID, string UserName, ILogger logger)
+        {
+            ExecuteNonQuery(DeleteAssetParameterSetDetails(ID, UserName), logger);
+        }
+
+        /// <summary>
+        /// Данные по техпозициям для нового обхода
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="logger"></param>
+        /// <returns></returns>
+        public static List<Hierarchy> GetAssetParameterSetDetails(int ID, ILogger logger)
+        {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
+            List<Hierarchy> output = new List<Hierarchy>();
+            try
+            {
+                using (var connection = new SqlConnection(GetConnectionString()))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectAssetParameterSetDetails(ID), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            Hierarchy A = null;
+                            Hierarchy AC = null;
+                            Hierarchy AP = null;
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                A = output.Find(x => x.Id == int.Parse(row["AssetId"].ToString()));
+                                if (A == null)
+                                {
+                                    A = new Hierarchy() { Id = int.Parse(row["AssetId"].ToString()), DisplayName = row["AssetName"].ToString() };
+                                    output.Add(A);
+                                }
+                                AC = A.Childs.Find(x => x.Id == int.Parse(row["AssetComponentId"].ToString()));
+                                if (AC == null)
+                                {
+                                    AC = new Hierarchy() { Id = int.Parse(row["AssetComponentId"].ToString()), DisplayName = row["AssetComponentName"].ToString() };
+                                    A.Childs.Add(AC);
+                                }
+                                AP = AC.Childs.Find(x => x.Id == int.Parse(row["AssetParameterId"].ToString()));
+                                if (AP == null)
+                                {
+                                    AP = new Hierarchy() { Id = int.Parse(row["AssetParameterId"].ToString()), DisplayName = row["AssetParameterName"].ToString() };
+                                    AC.Childs.Add(AP);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
+        /// <summary>
+        /// Данные по техпозициям проверки
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="logger"></param>
+        /// <returns></returns>
+        private static List<AssetParameterSetDataSet> GetAssetParameterSetRecords(long APSId, ILogger logger)
+        {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
+            List<AssetParameterSetDataSet> output = new List<AssetParameterSetDataSet>();
+            try
+            {
+                using (var connection = new SqlConnection(GetConnectionString()))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(GetAssetParameterSetRecords(APSId), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output.Add(new AssetParameterSetDataSet()
+                                {
+                                    APSRId = long.Parse(row["Id"].ToString()),
+                                    AParentId = long.Parse(row["AssetId"].ToString()),
+                                    AChildId = long.Parse(row["AssetComponentId"].ToString()),
+                                    ParamId = long.Parse(row["AssetParameterId"].ToString())
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
+        private class AssetParameterSetDataSet
+        {
+            public long APSRId;
+            public long AParentId;
+            public long AChildId;
+            public long ParamId;
         }
         #endregion
 
@@ -2346,7 +3154,7 @@ namespace O2GEN.Helpers
 
         public static void CreateAssetClass(AssetClass obj, string UserName, ILogger logger)
         {
-            var idnew= ExecuteScalar(CreateAssetClass(obj, UserName), logger);
+            var idnew = ExecuteScalar(CreateAssetClass(obj, UserName), logger);
 
             foreach (var item in obj.Parameters)
             {
@@ -2360,7 +3168,7 @@ namespace O2GEN.Helpers
             foreach (var item in obj.Parameters)
             {
                 if (currPar.Find(x => x.AssetParameterId == item) == null)
-                    CreateAssetClassParameter(new AssetClassParameter() { AssetClassId = obj.Id, AssetParameterId = item },UserName, logger);
+                    CreateAssetClassParameter(new AssetClassParameter() { AssetClassId = obj.Id, AssetParameterId = item }, UserName, logger);
             }
             foreach (var item in currPar)
             {
@@ -2407,7 +3215,8 @@ namespace O2GEN.Helpers
                                     Id = int.Parse(row["Id"].ToString()),
                                     AssetClassId = int.Parse(row["AssetClassId"].ToString()),
                                     AssetParameterId = int.Parse(row["AssetParameterId"].ToString()),
-                                    ObjectUID= new Guid(row["ObjectUID"].ToString())
+                                    AssetParameterName = row["AssetParameterName"].ToString(),
+                                    ObjectUID = new Guid(row["ObjectUID"].ToString())
                                 });
                             }
                         }
@@ -2633,13 +3442,13 @@ namespace O2GEN.Helpers
         /// </summary>
         /// <param name="logger"></param>
         /// <returns></returns>
-        public static List<Asset> GetAssets(ILogger logger, int DeptID = -1)
+        public static List<Asset> GetAssets(ILogger logger = null, int? DeptID = -1, bool NotesOnly = false)
         {
             string con = GetConnectionString();
 
             if (string.IsNullOrEmpty(con))
             {
-                logger.LogDebug("connection string is null or empty");
+                logger?.LogDebug("connection string is null or empty");
                 return null;
             }
 
@@ -2651,7 +3460,7 @@ namespace O2GEN.Helpers
                 using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
-                    using (var command = new SqlCommand(SelectAssets(DeptID), connection))
+                    using (var command = new SqlCommand(SelectAssets(DeptID, NotesOnly), connection))
                     {
                         command.CommandType = CommandType.Text;
                         command.Parameters.Clear();
@@ -2676,29 +3485,25 @@ namespace O2GEN.Helpers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+                logger?.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
             }
-            while (all.Count > 0)
+
+            Asset temp = null;
+            for (int i = 0; i < all.Count; i++)
             {
-                if (all[0].ParentId == (int?)null)
+                if (all[i].ParentId != null)
                 {
-                    output.Add(all[0]);
-                }
-                else
-                {
-                    Asset parrent = output.Find(x => x.Id == all[0].ParentId);
-                    if (parrent == null)
+                    temp = all.Find(x => x.Id == all[i].ParentId);
+                    if (temp != null)
                     {
-                        parrent = all.Find(x => x.Id == all[0].ParentId);
-                    }
-                    if (parrent != null)
-                    {
-                        if (parrent.Childs == null)
-                            parrent.Childs = new List<Asset>();
-                        parrent.Childs.Add(all[0]);
+                        if (temp.Childs is null) temp.Childs = new List<Asset>();
+                        temp.Childs.Add(all[i]);
                     }
                 }
-                all.RemoveAt(0);
+            }
+            foreach (var item in all.FindAll(x => x.ParentId == null))
+            {
+                output.Add(item);
             }
             return output;
         }
@@ -2727,14 +3532,6 @@ namespace O2GEN.Helpers
                         {
                             foreach (var row in dataReader.Select(row => row))
                             {
-                                Debug.WriteLine(row["Id"].ToString());
-                                Debug.WriteLine(row["DisplayName"].ToString());
-                                Debug.WriteLine(row["ObjectUID"].ToString());
-                                Debug.WriteLine(row["ExternalId"].ToString());
-                                Debug.WriteLine(row["ParentId"].ToString());
-                                Debug.WriteLine(row["DepartmentId"].ToString());
-                                Debug.WriteLine(row["AssetClassId"].ToString());
-                                Debug.WriteLine(row["AssetSortId"].ToString());
                                 output = new Asset()
                                 {
                                     Id = int.Parse(row["Id"].ToString()),
@@ -2750,6 +3547,63 @@ namespace O2GEN.Helpers
                         }
                     }
                 }
+                foreach (var item in GetAssetParameterForAsset(output.Id, logger))
+                {
+                    output.Parameters.Add(item);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
+        public static Hierarchy GetSimpleAsset(int ID, ILogger logger)
+        {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
+            Hierarchy output = null;
+            try
+            {
+                using (var connection = new SqlConnection(con))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(GetSimpleAsset(ID), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            Hierarchy AC = null;
+                            Hierarchy AP = null;
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                if (output == null)
+                                {
+                                    output = new Hierarchy() { Id = int.Parse(row["ParentId"].ToString()), DisplayName = row["ParentName"].ToString() };
+                                }
+                                AC = output.Childs.Find(x => x.Id == int.Parse(row["ChildId"].ToString()));
+                                if (AC == null)
+                                {
+                                    AC = new Hierarchy() { Id = int.Parse(row["ChildId"].ToString()), DisplayName = row["ChildName"].ToString() };
+                                    output.Childs.Add(AC);
+                                }
+                                AP = AC.Childs.Find(x => x.Id == int.Parse(row["ParamId"].ToString()));
+                                if (AP == null)
+                                {
+                                    AP = new Hierarchy() { Id = int.Parse(row["ParamId"].ToString()), DisplayName = row["ParamName"].ToString() };
+                                    AC.Childs.Add(AP);
+                                }
+                            }
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -2759,15 +3613,81 @@ namespace O2GEN.Helpers
         }
         public static void CreateAsset(Asset obj, string UserName, ILogger logger)
         {
-            ExecuteNonQuery(CreateAsset(obj, UserName), logger);
+            //Родитель и класс объектов только у узлов.
+            if (obj.AssetSortId == 1) { obj.ParentId = null; obj.AssetClassId = null; obj.Parameters = null; }
+            long id = long.Parse(ExecuteScalar(CreateAsset(obj, UserName), logger));
+            if (obj.Parameters != null)
+            {
+                foreach (var item in obj.Parameters)
+                {
+                    CreateAssetParameterPair(id, item, logger);
+                }
+            }
         }
         public static void UpdateAsset(Asset obj, string UserName, ILogger logger)
         {
             ExecuteNonQuery(UpdateAsset(obj, UserName), logger);
+
+            var pairs = GetAssetParameterForAsset(obj.Id, logger);
+            foreach (var item in pairs)
+            {
+                if (!obj.Parameters.Contains(item))
+                    DeleteAssetParameterPair(obj.Id, item, logger);
+            }
+            foreach (var item in obj.Parameters)
+            {
+                if (!pairs.Contains(item))
+                    CreateAssetParameterPair(obj.Id, item, logger);
+            }
         }
         public static void DeleteAsset(int ID, string UserName, ILogger logger)
         {
             ExecuteNonQuery(DeleteAsset(ID, UserName), logger);
+        }
+
+        public static List<int> GetAssetParameterForAsset(int AssetId, ILogger logger = null)
+        {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger?.LogDebug("connection string is null or empty");
+                return null;
+            }
+            List<int> output = new List<int>();
+            try
+            {
+                using (var connection = new SqlConnection(con))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectAssetParameterForAsset(AssetId), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output.Add(int.Parse(row["Id"].ToString()));
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
+
+        public static void CreateAssetParameterPair(long AssetId, long AssetParameterId, ILogger logger)
+        {
+            ExecuteNonQuery(CreateAssetParameterPair(AssetId, AssetParameterId), logger);
+        }
+        public static void DeleteAssetParameterPair(long AssetId, long AssetParameterId, ILogger logger)
+        {
+            ExecuteNonQuery(DeleteAssetParameterPair(AssetId, AssetParameterId), logger);
         }
         public static List<AssetType> GetAssetTypes(ILogger logger = null)
         {
@@ -2859,7 +3779,7 @@ namespace O2GEN.Helpers
         /// </summary>
         /// <param name="logger"></param>
         /// <returns></returns>
-        public static List<Department> GetDepartments(bool ClearList = false, ILogger logger = null)
+        public static List<Department> GetDepartments(bool ClearList = false, int ForDept = -1, ILogger logger = null)
         {
             string con = GetConnectionString();
 
@@ -2901,30 +3821,40 @@ namespace O2GEN.Helpers
             {
                 logger?.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
             }
-            while (all.Count > 0)
+            if (ClearList)
             {
-                #warning Не работает дальше второго слоя
-                if (all[0].ParentId == (int?)null)
-                {
-                    output.Add(all[0]);
-                }
+                if (ForDept > -1)
+                    return removeChilds(all, ForDept);
                 else
+                    return all;
+            }
+            else
+            {
+                Department temp = null;
+                for (int i = 0; i < all.Count; i++)
                 {
-                    Department parrent = output.Find(x => x.Id == all[0].ParentId);
-                    if (parrent == null)
+                    if (all[i].ParentId != null)
                     {
-                        parrent = all.Find(x => x.Id == all[0].ParentId);
-                    }
-                    if (parrent != null)
-                    {
-                        if (parrent.Childs == null)
-                            parrent.Childs = new List<Department>();
-                        parrent.Childs.Add(all[0]);
+                        temp = all.Find(x => x.Id == all[i].ParentId);
+                        if (temp.Childs is null) temp.Childs = new List<Department>();
+                        temp.Childs.Add(all[i]);
                     }
                 }
-                all.RemoveAt(0);
+                foreach (var item in all.FindAll(x => x.ParentId == null))
+                {
+                    output.Add(item);
+                }
             }
             return output;
+        }
+        private static List<Department> removeChilds(List<Department> list, int id)
+        {
+            foreach (var item in list.FindAll(x => x.ParentId == id).ToArray())
+            {
+                removeChilds(list, item.Id);
+                list.Remove(item);
+            }
+            return list;
         }
 
         public static List<Department> GetChildDepartments(ILogger logger = null)
@@ -3040,7 +3970,7 @@ namespace O2GEN.Helpers
         /// </summary>
         /// <param name="logger"></param>
         /// <returns></returns>
-        public static List<Resource> GetResources(ILogger logger = null)
+        public static List<Resource> GetResources(long? Id = null, long? DeptId = null, ILogger logger = null)
         {
             string con = GetConnectionString();
 
@@ -3056,7 +3986,7 @@ namespace O2GEN.Helpers
                 using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
-                    using (var command = new SqlCommand(SelectResources(), connection))
+                    using (var command = new SqlCommand(SelectResources(Id, DeptId), connection))
                     {
                         command.CommandType = CommandType.Text;
                         command.Parameters.Clear();
@@ -3097,7 +4027,7 @@ namespace O2GEN.Helpers
                 using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
-                    using (var command = new SqlCommand(SelectResources(ID), connection))
+                    using (var command = new SqlCommand(SelectResources(ID: ID), connection))
                     {
                         command.CommandType = CommandType.Text;
                         command.Parameters.Clear();
@@ -3350,13 +4280,13 @@ namespace O2GEN.Helpers
         /// </summary>
         /// <param name="logger"></param>
         /// <returns></returns>
-        public static List<Engineer> GetEngineers(ILogger logger)
+        public static List<Engineer> GetEngineers(long? DeptId = null, ILogger logger = null)
         {
             string con = GetConnectionString();
 
             if (string.IsNullOrEmpty(con))
             {
-                logger.LogDebug("connection string is null or empty");
+                logger?.LogDebug("connection string is null or empty");
                 return null;
             }
 
@@ -3366,7 +4296,7 @@ namespace O2GEN.Helpers
                 using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
-                    using (var command = new SqlCommand(SelectEngineers(), connection))
+                    using (var command = new SqlCommand(SelectEngineers(DeptId: DeptId), connection))
                     {
                         command.CommandType = CommandType.Text;
                         command.Parameters.Clear();
@@ -3389,7 +4319,7 @@ namespace O2GEN.Helpers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+                logger?.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
             }
             return output;
         }
@@ -3398,7 +4328,7 @@ namespace O2GEN.Helpers
         /// </summary>
         /// <param name="logger"></param>
         /// <returns></returns>
-        public static List<Engineer> GetEngineersList(ILogger logger=null)
+        public static List<Engineer> GetEngineersList(ILogger logger = null)
         {
             string con = GetConnectionString();
 
@@ -3459,7 +4389,7 @@ namespace O2GEN.Helpers
                 using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
-                    using (var command = new SqlCommand(SelectEngineers(ID), connection))
+                    using (var command = new SqlCommand(SelectEngineers(ID: ID), connection))
                     {
                         command.CommandType = CommandType.Text;
                         command.Parameters.Clear();
@@ -3566,6 +4496,192 @@ namespace O2GEN.Helpers
 
         #endregion
 
+        #region Отчеты
+        
+        public static List<Asset> GetAssetsFromAPS(long APSId, ILogger logger = null)
+        {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger?.LogDebug("connection string is null or empty");
+                return null;
+            }
+
+            List<Asset> output = new List<Asset>();
+            try
+            {
+                using (var connection = new SqlConnection(con))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectAssetsFromAPS(APSId), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output.Add( new Asset()
+                                {
+                                    Id = int.Parse(row["Id"].ToString()),
+                                    DisplayName = row["DisplayName"].ToString()
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
+        public static ControlValueReportData GetCVR(DateTime From, DateTime To, long DepartmentId, long AssetId, ILogger logger)
+        {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
+            ControlValueReportData output = new ControlValueReportData();
+            try
+            {
+                using (var connection = new SqlConnection(con))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectCVR(From, To, DepartmentId,AssetId), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                if(!output.SCs.ContainsKey(long.Parse(row["SCId"].ToString())))
+                                {
+                                    output.SCs.Add(long.Parse(row["SCId"].ToString()), Convert.ToDateTime(row["StartTime"]));
+                                }
+                                ControlValueReportRow RowData = output.Rows.Find(x => x.AId == long.Parse(row["AId"].ToString()) && x.ACId == long.Parse(row["ACId"].ToString()) && x.APId == long.Parse(row["APId"].ToString()));
+                                if(RowData == null)
+                                {
+                                    RowData = new ControlValueReportRow()
+                                    {
+                                        AId = long.Parse(row["AId"].ToString()),
+                                        AName = row["AName"].ToString(),
+                                        ACId = long.Parse(row["ACId"].ToString()),
+                                        ACName = row["ACName"].ToString(),
+                                        APId = long.Parse(row["APId"].ToString()),
+                                        APName = row["APName"].ToString()
+                                    };
+                                    output.Rows.Add(RowData);
+                                }
+                                RowData.Data.Add(long.Parse(row["SCId"].ToString()), row["Value"].ToString());
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
+        /// <summary>
+        /// Отчет по осмотренным Тех. позициям
+        /// </summary>
+        public static List<AssetsReportData> GetVA(DateTime From, DateTime To, ILogger logger)
+        {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
+            List<AssetsReportData> output = new List<AssetsReportData>();
+            try
+            {
+                using (var connection = new SqlConnection(con))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectVA(From, To), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output.Add(new AssetsReportData()
+                                {
+                                    Id = long.Parse(row["Id"].ToString()),
+                                    DisplayName = row["DisplayName"].ToString(),
+                                    Rows = long.Parse(row["Rows"].ToString())
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
+        /// <summary>
+        /// Отчет по осмотренным Тех. позициям
+        /// </summary>
+        public static List<AssetsReportData> GetNA(DateTime From, DateTime To, ILogger logger)
+        {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
+            List<AssetsReportData> output = new List<AssetsReportData>();
+            try
+            {
+                using (var connection = new SqlConnection(con))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectNA(From, To), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output.Add(new AssetsReportData()
+                                {
+                                    Id = long.Parse(row["Id"].ToString()),
+                                    DisplayName = row["DisplayName"].ToString(),
+                                    Rows = long.Parse(row["Rows"].ToString())
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
+        #endregion
+
         #endregion
 
         #region Служебные
@@ -3638,6 +4754,7 @@ namespace O2GEN.Helpers
             }
         }
 
+        [Obsolete]
         private static string GetControlType(ControlType type)
         {
             switch (type)
@@ -3652,7 +4769,23 @@ namespace O2GEN.Helpers
                     return "";
             }
         }
+        private static string GetControlType(long type)
+        {
+            switch (type)
+            {
+                case 4:
+                case 5:
+                    return "TYPE_DOUBLE_N";
+                case 2:
+                    return "TYPE_BOOLEAN_N";
+                case 3:
+                    return "TYPE_INT64_N";
+                default:
+                    return "";
+            }
+        }
 
+        [Obsolete]
         private static int GetControlTypeIndex(string type)
         {
             switch (type)
@@ -3667,6 +4800,7 @@ namespace O2GEN.Helpers
             }
         }
 
+        [Obsolete]
         private static string GetControlTypeDisplay(string type)
         {
             switch (type.Trim())
@@ -3681,6 +4815,7 @@ namespace O2GEN.Helpers
             }
         }
 
+        [Obsolete]
         public static string GetControlTypeDisplay(int type)
         {
             switch (type)
@@ -3698,6 +4833,7 @@ namespace O2GEN.Helpers
     }
 
 
+    [Obsolete]
     public enum ControlType
     {
         /// <summary>
@@ -3721,7 +4857,7 @@ namespace O2GEN.Helpers
         Stoped = 4
     }
     /// <summary>
-    /// ID в сводной таблице для фиксирования обновлений.
+    /// ID в сводной таблице для фиксирования обновлений PPEntityCollections
     /// </summary>
     public enum RevEntry
     {
@@ -3942,6 +5078,7 @@ namespace O2GEN.Helpers
         PersonPositionPersonPositionSNB = 215,
         PersonPositionSNB = 216,
         WorkPermitChangeLog = 217,
-        WorkPermitChangeLogEngineer = 218
+        WorkPermitChangeLogEngineer = 218,
+        AssetParameterTypes = 219 
     }
 }

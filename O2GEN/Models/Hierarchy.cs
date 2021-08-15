@@ -5,18 +5,12 @@ using System.ComponentModel;
 namespace O2GEN.Models
 {
     /// <summary>
-    /// Маршрут
+    /// Объект иерархии
     /// </summary>
-    public class AssetParameterSet
+    public class Hierarchy
     {
         public int Id { get; set; } = -1;
-
-        [DisplayName("Название")]
         public string DisplayName { get; set; }
-        [DisplayName("Подразделение")]
-        public int? DepartmentID { get; set; }
-        public string DepartmentName { get; set; }
-        public Guid ObjectUID { get; set; } = Guid.NewGuid();
         public List<Hierarchy> Childs { get; set; } = new List<Hierarchy>();
     }
 }

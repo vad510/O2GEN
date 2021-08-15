@@ -186,12 +186,21 @@ function sortHidden() {
     }
 }
 function ControlDetVis() {
-    var value = $('#ValueType').val();
-    if (value == '2' || value == '0') {
-        $('#ContolDetails').fadeIn();
+    var value = $('#AssetParameterTypeId').val();
+    if (value == '2' || value === null) {
+        $('#ContolDetails').fadeOut();
     }
     else {
-        $('#ContolDetails').fadeOut();
+        $('#ContolDetails').fadeIn();
+    }
+}
+function AssetSortFade() {
+    var value = $('#AssetSortId').val();
+    if (value == '2') {
+        $('.fadable').fadeIn();
+    }
+    else {
+        $('.fadable').fadeOut();
     }
 }
 
@@ -279,6 +288,7 @@ function tryCreateModal(placeholder, response) {
     });
 
     ControlDetVis();
+    AssetSortFade();
 }
 
 // validate modal before submit

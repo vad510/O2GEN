@@ -27,14 +27,14 @@ namespace O2GEN.Models
         public string ObjName { get; set; }
 
         [DisplayName("Тип обхода")]
-        public int SCTypeId { get; set; }
+        public int? SCTypeId { get; set; }
         /// <summary>
         /// Тип Обхода
         /// </summary>
         [DisplayName("Тип обхода")]
         public string SCTypeName { get; set; }
         [DisplayName("Статус обхода")]
-        public int SCStatusId { get; set; }
+        public int? SCStatusId { get; set; }
         [DisplayName("Статус обхода")]
         public string SCStatusName { get; set; }
         /// <summary>
@@ -55,14 +55,24 @@ namespace O2GEN.Models
 
         [DisplayName("Подразделение")]
         public int? DepartmentID { get; set; }
-
-        [DisplayName("Переодичность обхода")]
-        public string Period { get; set; }
+        [DisplayName("Дни:")]
+        public int PeriodDays { get; set; }
+        [DisplayName("Часы:")]
+        public int PeriodHours { get; set; }
+        [DisplayName("Минуты:")]
+        public int PeriodMinutes { get; set; }
         /// <summary>
         /// Не думаю что имеет смысл в передаче, у нас будет список AssetParameter
         /// </summary>
         [DisplayName("Маршрут")]
         public int? AssetParameterSetId { get; set; }
+        /// <summary>
+        /// Инфа по техпозициям уже существующего обхода.
+        /// </summary>
         public List<InspectionProtocol> InsProt { get; set; } = new List<InspectionProtocol>();
+        /// <summary>
+        /// Инфа по техпозициям для создаваемой пачки обходов.
+        /// </summary>
+        public List<Hierarchy> NewTechPoz { get; set; } = new List<Hierarchy>();
     }
 }

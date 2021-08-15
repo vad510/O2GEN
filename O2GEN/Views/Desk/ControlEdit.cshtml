@@ -25,11 +25,12 @@
                             <span asp-validation-for="DisplayName" class="text-danger"></span>
                         </div>
                         <div class="form-group col-md-6">
-                            <select asp-for="ValueType" class="form-control" required onchange="ControlDetVis()">
-                                <option value="" selected disabled>Тип контроля</option>
-                                <option value="0">@O2GEN.Helpers.DBHelper.GetControlTypeDisplay(0)</option>
-                                <option value="1">@O2GEN.Helpers.DBHelper.GetControlTypeDisplay(1)</option>
-                                <option value="2">@O2GEN.Helpers.DBHelper.GetControlTypeDisplay(2)</option>
+                            <select asp-for="AssetParameterTypeId" class="form-control" required onchange="ControlDetVis()">
+                                <option value="null" selected disabled>Тип контроля</option>
+                                @foreach (var item in O2GEN.Helpers.DBHelper.GetAssetParameterTypes())
+                                {
+                                    <option value="@item.Id">@item.Name</option>
+                                }
                             </select>
                             <span asp-validation-for="DisplayName" class="text-danger"></span>
                         </div>

@@ -1,7 +1,5 @@
-﻿@model O2GEN.Models.ZRPFilter
-@{
-    ViewData["Title"] = "Главная";
-}
+﻿@model O2GEN.Models.Filter
+@{ ViewData["Title"] = "Главная"; }
 
 <section class="component-section">
     @*<div class="row-container-left">
@@ -76,11 +74,9 @@
 
                 <li class="li-text-white">
                     <select asp-for="DepartmentId" class="form-control" required>
-                        <option value="NULL" selected>Выбрать значение</option>
+                        <option value="NULL" selected>Выбрать подразделение</option>
                         @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments())
-                        {
-                            <option value="@item.Id">@item.DisplayName</option>
-                        }
+                        {<option value="@item.Id">@item.DisplayName</option>}
                     </select>
                 </li>
                 <li class="li-text-white">
@@ -145,29 +141,31 @@
                             </th>
                         </tr>
                     </thead>
-                    @foreach (var item in ViewBag.ZRPCreated)
-                    {
-                        <tr>
-                            <td><p>@item.ObjName</p></td>
-                            <td><p>@item.SCStatusName</p></td>
-                            <td><p>@item.SCTypeName</p></td>
-                            <td><p>@item.RouteName</p></td>
-                            <td><p>@item.ResName</p></td>
-                            <td><p>@item.StartTime.ToString()</p></td>
-                            <td><p>@item.EndTime.ToString()</p></td>
-                            <td><p> </p></td>
-                            <td>
-                                <div class="d-flex justify-content-center">
-                                    <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPEdit", new { id = item.Id })">
-                                        <i class="fa fa-pen"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-danger ml-1" onclick="location.href='@Url.Action("ZRPDelete", new { id = item.Id })'">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    }
+                    <tbody>
+                        @foreach (var item in ViewBag.ZRPCreated)
+                        {
+            <tr>
+                <td><p>@item.ObjName</p></td>
+                <td><p>@item.SCStatusName</p></td>
+                <td><p>@item.SCTypeName</p></td>
+                <td><p>@item.RouteName</p></td>
+                <td><p>@item.ResName</p></td>
+                <td><p>@item.StartTime.ToString()</p></td>
+                <td><p>@item.EndTime.ToString()</p></td>
+                <td><p> </p></td>
+                <td>
+                    <div class="d-flex justify-content-center">
+                        <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPEdit", new { id = item.Id })">
+                            <i class="fa fa-pen"></i>
+                        </button>
+                        <button type="button" class="btn btn-danger ml-1" onclick="location.href='@Url.Action("ZRPDelete", new { id = item.Id })'">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+}
+                    </tbody>
                 </table>
             </section>
         </div>
@@ -208,37 +206,36 @@
                             </th>
                         </tr>
                     </thead>
-                    @foreach (var item in ViewBag.ZRPStarted)
-                    {
-                        <tr>
-                            <td><p>@item.ObjName</p></td>
-                            <td><p>@item.SCStatusName</p></td>
-                            <td><p>@item.SCTypeName</p></td>
-                            <td><p>@item.RouteName</p></td>
-                            <td><p>@item.ResName</p></td>
-                            <td><p>@item.StartTime.ToString()</p></td>
-                            <td><p>@item.EndTime.ToString()</p></td>
-                            <td><p> </p></td>
-                            <td>
-                                <div class="d-flex justify-content-center">
-                                    <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPEdit", new { id = item.Id })">
-                                        <i class="fa fa-pen"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-danger ml-1" onclick="location.href='@Url.Action("ZRPDelete", new { id = item.Id })'">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    }
+                    <tbody>
+                        @foreach (var item in ViewBag.ZRPStarted)
+                        {
+            <tr>
+                <td><p>@item.ObjName</p></td>
+                <td><p>@item.SCStatusName</p></td>
+                <td><p>@item.SCTypeName</p></td>
+                <td><p>@item.RouteName</p></td>
+                <td><p>@item.ResName</p></td>
+                <td><p>@item.StartTime.ToString()</p></td>
+                <td><p>@item.EndTime.ToString()</p></td>
+                <td><p> </p></td>
+                <td>
+                    <div class="d-flex justify-content-center">
+                        <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPEdit", new { id = item.Id })">
+                            <i class="fa fa-pen"></i>
+                        </button>
+                        <button type="button" class="btn btn-danger ml-1" onclick="location.href='@Url.Action("ZRPDelete", new { id = item.Id })'">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+}
+                    </tbody>
                 </table>
             </section>
-
         </div>
 
         <div id="third-tab" class="tab-pane fade">
-
-
             <section>
                 <table class="table table-bordered table-hover">
                     <thead class="color-black">
@@ -272,29 +269,31 @@
                             </th>
                         </tr>
                     </thead>
-                    @foreach (var item in ViewBag.ZRPEnded)
-                    {
-                        <tr>
-                            <td><p>@item.ObjName</p></td>
-                            <td><p>@item.SCStatusName</p></td>
-                            <td><p>@item.SCTypeName</p></td>
-                            <td><p>@item.RouteName</p></td>
-                            <td><p>@item.ResName</p></td>
-                            <td><p>@item.StartTime.ToString()</p></td>
-                            <td><p>@item.EndTime.ToString()</p></td>
-                            <td><p> </p></td>
-                            <td>
-                                <div class="d-flex justify-content-center">
-                                    <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPEdit", new { id = item.Id })">
-                                        <i class="fa fa-pen"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-danger ml-1" onclick="location.href='@Url.Action("ZRPDelete", new { id = item.Id })'">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    }
+                    <tbody>
+                        @foreach (var item in ViewBag.ZRPEnded)
+                        {
+            <tr>
+                <td><p>@item.ObjName</p></td>
+                <td><p>@item.SCStatusName</p></td>
+                <td><p>@item.SCTypeName</p></td>
+                <td><p>@item.RouteName</p></td>
+                <td><p>@item.ResName</p></td>
+                <td><p>@item.StartTime.ToString()</p></td>
+                <td><p>@item.EndTime.ToString()</p></td>
+                <td><p> </p></td>
+                <td>
+                    <div class="d-flex justify-content-center">
+                        <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPEdit", new { id = item.Id })">
+                            <i class="fa fa-pen"></i>
+                        </button>
+                        <button type="button" class="btn btn-danger ml-1" onclick="location.href='@Url.Action("ZRPDelete", new { id = item.Id })'">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+}
+                    </tbody>
                 </table>
             </section>
         </div>
@@ -331,11 +330,11 @@
                     date: "fa fa-calendar-alt",
                     up: "fa fa-arrow-up",
                     down: "fa fa-arrow-down"
-                },
-                date: new Date(d.getFullYear(), d.getMonth(), d.getDate())
+                }
             });
 
-            $('#datetimepickerFROM').on("change.datetimepicker", dateFromChanged)
+            $('#datetimepickerFROM').on("change.datetimepicker", ({ date }) => { $('#From').val(date._d.getTime()); });
+            $('#datetimepickerFROM').datetimepicker('date', new Date(d.getFullYear(), d.getMonth(), d.getDate()));
 
             $('#datetimepickerTO').datetimepicker({
                 locale: 'ru',
@@ -351,25 +350,18 @@
         }
 
         function SetTodayForTDTs() {
-            //var d = new Date(moment().subtract(2, 'days'));
-            //var now = new Date(moment());
-            //var d = new Date();
-            //console.log(now);
-            //$('#datetimepickerFROM').datetimepicker({ locale: 'ru', date: new Date(d.getFullYear(), d.getMonth(), d.getDate()) })
-            //$('#datetimepickerTO').datetimepicker({ locale: 'ru', date: now });
-
-            //document.cookie = "ZRPDateFrom=" + d.getTime() + "; max-age=300000";
-            //document.cookie = "ZRPDateTo=" + now + "; max-age=300000";
-            //$.noConflict();
 
             var from = document.getElementById('DTPFROM');
-            var date = new Date();
+            var date = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
             date.setDate(date.getDate() - 2);
             from.value = formatDate(date);
 
             var to = document.getElementById('DTPTO');
             var toDate = new Date();
             to.value = formatDate(toDate);
+
+            $('#From').val(date.getTime());
+            $('#To').val(toDate.getTime());
         }
 
         function dateFromChanged({ date }) {
@@ -377,123 +369,255 @@
         }
 
         function formatDate(date) {
-            var month = date.getMonth();
+            var month = date.getMonth()+1;
             var day = date.getDate();
             var year = date.getFullYear();
             var hours = date.getHours();
             var minutes = date.getMinutes();
 
-            return (day + '.' + month + '.' + year + ' ' + hours + ':' + minutes);
+            return ((day > 9 ? '' : '0') + day + '.' + (month > 9 ? '' : '0') + month + '.' + year + ' ' + hours + ':' + (minutes > 9 ? '' : '0') + minutes);
+        }
+
+        function GetResources(SelectedObj) {
+            if (SelectedObj != 'undefined') {
+                $.ajax({
+                    method: "GET",
+                    url: "GetResourcesByDepartmentJson",
+                    dataType: "json",
+                    data: {
+                        "ObjId": SelectedObj.value
+                    },
+                    success: function (data) {
+                        var s = '<option value="" selected disabled>Выбрать</option>';
+                        for (var i = 0; i < data.length; i++) {
+                            s += '<option value="' + data[i].id + '">' + data[i].displayName + '</option>';
+                        }
+                        $("#ResourceId").html(s);
+                    }
+                })
+            }
+        }
+        function GetRoutes(SelectedObj) {
+            if (SelectedObj != 'undefined') {
+                $.ajax({
+                    method: "GET",
+                    url: "GetAssetParameterSetByDepartmentJson",
+                    dataType: "json",
+                    data: {
+                        "ObjId": SelectedObj.value
+                    },
+                    success: function (data) {
+                        var s = '<option value="" selected disabled>Выбрать</option>';
+                        for (var i = 0; i < data.length; i++) {
+                            s += '<option value="' + data[i].id + '">' + data[i].displayName + '</option>';
+                        }
+                        $("#AssetParameterSetId").html(s);
+                    }
+                })
+            }
+        }
+        function RemoveNode(node) {
+            var current = $(node).parents('tr');
+            var level = $(node).parents('tr').attr('data-level')-0;
+            while (true) {
+                if ($(current).next().length == 0) break;
+                var next = $(current).next();
+                if (($(next).attr('data-level')-0) <= level) {
+                    break;
+                }
+                else {
+                    $(next).remove();
+                }
+            }
+            $(current).remove();
+        }
+
+        function sortInputsForCreate() {
+            var list = $('#tp_table_cont').children();
+            var l0c = -1;
+            var l1c = -1;
+            var l2c = -1;
+            for (var i = 0; i < list.length; i++) {
+                var currDLvl = $(list[i]).attr('data-level');
+                var inpElem = $($('#tp_table_cont').children()[i]).find('input');
+                if (currDLvl == '0') {
+                    l0c = l0c + 1;
+                    l1c = -1;
+                    l2c = -1;
+                    for (var z = 0; z < inpElem.length; z++) {
+                        if ($(inpElem[z]).attr('name').endsWith('.Id')) {
+                            $(inpElem[z]).attr('name', 'NewTechPoz[' + l0c + '].Id');
+                        }
+                        else {
+                            $(inpElem[z]).attr('name', 'NewTechPoz[' + l0c + '].Name');
+                        }
+                    }
+                }
+                else if (currDLvl == '1') {
+                    l1c = l1c + 1;
+                    l2c = -1;
+                    for (var z = 0; z < inpElem.length; z++) {
+                        if ($(inpElem[z]).attr('name').endsWith('.Id')) {
+                            $(inpElem[z]).attr('name', 'NewTechPoz[' + l0c + '].Childs[' + l1c + '].Id');
+                        }
+                        else {
+                            $(inpElem[z]).attr('name', 'NewTechPoz[' + l0c + '].Childs[' + l1c + '].Name');
+                        }
+                    }
+                }
+                else if (currDLvl == '2') {
+                    l2c = l2c + 1;
+                    for (var z = 0; z < inpElem.length; z++) {
+                        if ($(inpElem[z]).attr('name').endsWith('.Id')) {
+                            $(inpElem[z]).attr('name', 'NewTechPoz[' + l0c + '].Childs[' + l1c + '].Childs[' + l2c + '].Id');
+                        }
+                        else {
+                            $(inpElem[z]).attr('name', 'NewTechPoz[' + l0c + '].Childs[' + l1c + '].Childs[' + l2c + '].Name');
+                        }
+                    }
+                }
+            }
+        }
+
+        function sortInputsForUpdate() {
+            var list = $('#tp_table_cont').children();
+            var l0c = -1;
+            for (var i = 0; i < list.length; i++) {
+                var currDLvl = $(list[i]).attr('data-level');
+                var inpElem = $($('#tp_table_cont').children()[i]).find('input');
+                if (currDLvl == '0') {
+                    l0c = l0c + 1;
+                    for (var z = 0; z < inpElem.length; z++) {
+                        if ($(inpElem[z]).attr('name').endsWith('.Id')) {
+                            $(inpElem[z]).attr('name', 'InsProt[' + l0c + '].Id');
+                        }
+                        else {
+                            $(inpElem[z]).attr('name', 'InsProt[' + l0c + '].Name');
+                        }
+                    }
+                }
+            }
+        }
+
+        function GetRouteDetails(SelectedObj) {
+            if (SelectedObj != 'undefined') {
+                $.ajax({
+                    method: "GET",
+                    url: "GetRouteDetailsJson",
+                    dataType: "json",
+                    data: {
+                        "ObjId": SelectedObj.value
+                    },
+                    success: function (data) {
+                        var s = '';
+                        @*НЕТ ДАННЫХ*@
+                        if (data.length == 0) {
+                            s += '<tr><td colspan="2"> Нет данных.</td></tr>';
+                        }
+                        else {
+                            for (var a = 0; a < data.length; a++) {
+                                if (data[a].childs.length == 0) {
+                                    @* НЕТ ДОЧЕРНИХ *@
+                                    s +=
+                                        '<tr class="parent" data-level="0">' +
+                                            '<td>' +
+                                                '<span>'+data[a].displayName+'</span>' +
+                                                '<input type="text" style="display: none;" name="NewTechPoz['+a+'].Id" value="'+data[a].id+'" />' +
+                                                '<input type="text" style="display: none;" name="NewTechPoz['+a+'].DisplayName" value="'+data[a].displayName+'" />' +
+                                            '</td>' +
+                                            '<td>' +
+                                                '<div class="d-flex justify-content-center">' +
+                                                    '<button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this); sortInputsForCreate();">' +
+                                                        '<i class="fa fa-trash"></i>' +
+                                                    '</button>' +
+                                                '</div>' +
+                                            '</td>' +
+                                        '</tr>';
+
+                                }
+                                else {
+                                    @* ЕСТЬ ДОЧЕРНИЕ *@
+                                    s +=
+                                        '<tr class="parent" data-level="0">' +
+                                            '<td>' +
+                                                '<span class="caret"><span class="badge badge-info mr-1">'+data[a].childs.length+'</span>'+data[a].displayName+'</span>' +
+                                                '<input type="text" style="display: none;" name="NewTechPoz['+a+'].Id" value="'+data[a].id+'" />' +
+                                                '<input type="text" style="display: none;" name="NewTechPoz['+a+'].DisplayName" value="'+data[a].displayName+'" />' +
+                                            '</td>' +
+                                            '<td>' +
+                                                '<div class="d-flex justify-content-center">' +
+                                                    '<button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this); sortInputsForCreate();">' +
+                                                        '<i class="fa fa-trash"></i>' +
+                                                    '</button>' +
+                                                '</div>' +
+                                            '</td>' +
+                                        '</tr>';
+
+                                    for (var ac = 0; ac < data[a].childs.length; ac++) {
+                                        if (data[a].childs.length == 0) {
+
+                                            @* НЕТ ДОЧЕРНИХ *@
+                                            s +=
+                                                '<tr class="nested" data-level="1">' +
+                                                    '<td>' +
+                                                        '<span class="ml-3">'+data[a].childs[ac].displayName+'</span>' +
+                                                        '<input type="text" style="display: none;" name="NewTechPoz['+a+'].Childs['+ac+'].Id" value="'+data[a].childs[ac].id+'" />' +
+                                                        '<input type="text" style="display: none;" name="NewTechPoz['+a+'].Childs['+ac+'].DisplayName" value="'+data[a].childs[ac].displayName+'" />' +
+                                                    '</td>' +
+                                                    '<td>' +
+                                                        '<div class="d-flex justify-content-center">' +
+                                                            '<button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this); sortInputsForCreate();">' +
+                                                                '<i class="fa fa-trash"></i>' +
+                                                            '</button>' +
+                                                        '</div>' +
+                                                    '</td>' +
+                                                '</tr>';
+                                        }
+                                        else {
+                                            @* ЕСТЬ ДОЧЕРНИЕ *@
+                                            s +=
+                                                '<tr class="parent nested" data-level="1">' +
+                                                    '<td>' +
+                                                        '<span class="caret ml-3"><span class="badge badge-info mr-1">'+data[a].childs.length+'</span>'+data[a].childs[ac].displayName+'</span>' +
+                                                        '<input type="text" style="display: none;" name="NewTechPoz['+a+'].Childs['+ac+'].Id" value="'+data[a].childs[ac].id+'" />' +
+                                                        '<input type="text" style="display: none;" name="NewTechPoz['+a+'].Childs['+ac+'].DisplayName" value="'+data[a].childs[ac].displayName+'" />' +
+                                                    '</td>' +
+                                                    '<td>' +
+                                                        '<div class="d-flex justify-content-center">' +
+                                                            '<button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this); sortInputsForCreate();">' +
+                                                                '<i class="fa fa-trash"></i>' +
+                                                            '</button>' +
+                                                        '</div>' +
+                                                    '</td>' +
+                                                '</tr>';
+                                            @* САМЫЙ НИЗШИЙ СЛОЙ,ДОЧЕРНИХ БЫТЬ НЕ МОЖЕТ *@
+                                            for (var ap = 0; ap < data[a].childs[ac].childs.length; ap++) {
+                                                s +=
+                                                    '<tr class="nested" data-level="2">' +
+                                                        '<td>' +
+                                                            '<span class="ml-5">'+data[a].childs[ac].childs[ap].displayName+'</span>' +
+                                                            '<input type="text" style="display: none;" name="NewTechPoz['+a+'].Childs['+ac+'].Childs['+ap+'].Id" value="'+data[a].childs[ac].childs[ap].id+'" />' +
+                                                            '<input type="text" style="display: none;" name="NewTechPoz['+a+'].Childs['+ac+'].Childs['+ap+'].DisplayName" value="'+data[a].childs[ac].childs[ap].displayName+'" />' +
+                                                        '</td>' +
+                                                        '<td>' +
+                                                            '<div class="d-flex justify-content-center">' +
+                                                                '<button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this); sortInputsForCreate();">' +
+                                                                    '<i class="fa fa-trash"></i>' +
+                                                                '</button>' +
+                                                            '</div>' +
+                                                        '</td>' +
+                                                    '</tr>';
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        $("#tp_table_cont").html(s);
+                        prepareLists();
+                    }
+                })
+            }
         }
     </script>
 </section>
-
-
-@*<style>
-
-    </style>
-
-    <nav class="navbar">
-
-        <div class="container-fluid">
-            <div class="row">
-
-                <div class="form-inline">
-                    <button type="button" id="earth" class="btn btn-info" style="background-color: steelblue">
-                        <i class="fas fa-globe-americas"></i>
-                    </button>
-                    <div class="d-inline">&nbsp;</div>
-                    <button type="button" id="reload" class="btn btn-info" style="background-color: steelblue">
-                        <i class="fas fa-redo-alt"></i>
-                    </button>
-                    <label for="datetimepicker2">СЕГОДНЯ</label>
-                    <div class="input-group date col-auto" id="datetimepicker2" data-target-input="nearest">
-                        <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker2" id="itdtp2" style="width:150px;" />
-                        <div class="input-group-append" data-target="#datetimepicker2" data-toggle="datetimepicker">
-                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                        </div>
-                    </div>
-                    <div>
-                        <a asp-action="Test" asp-controller="Test">Test page</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-
-    </nav>
-
-    <nav class="navbar">
-
-        <div class="container-fluid">
-            <div class="row">
-
-                <div class="d-flex justify-content-start">
-                    <button type="button" class="btn btn-secondary">ЗПР в работе</button>
-                    <div class="d-inline">&nbsp;</div>
-                    <button type="button" class="btn btn-secondary">ЗПР выданные</button>
-                    <div class="d-inline">&nbsp;</div>
-                    <button type="button" class="btn btn-secondary">ЗПР закрытые</button>
-                </div>
-            </div>
-        </div>
-
-
-
-    </nav>
-    <nav class="navbar">
-
-        <div class="container-fluid">
-            <div class="row">
-
-                <div class="d-flex justify-content-start">
-                    <button type="button" class="btn btn-secondary"><i class="fas fa-plus"></i>Создать</button>
-
-                    <div class="d-inline">&nbsp;</div>
-                    <button type="button" class="btn btn-secondary"><i class="fas fa-filter"></i>Фильтры</button>
-                </div>
-            </div>
-        </div>
-    </nav>
-    <nav class="navbar">*@
-@*<div class="container-fluid" style="max-width: 1500px; background-color: whitesmoke">
-        <div class="row" style="max-width:1500px">
-
-            <div class="col-sm">
-                <table class="table table-bordered table-sm table-striped" style="background-color: whitesmoke">
-                    <thead>
-                        <tr>
-                            <th scope="col">Тип оборудования</th>
-                            <th scope="col">Статус обхода</th>
-                            <th scope="col">Тип обхода</th>
-                            <th scope="col">Обход</th>
-                            <th scope="col">Обходчик</th>
-                            <th scope="col">Дата начала(план)</th>
-                            <th scope="col">Дата окончания(план)</th>
-                            <th scope="col">Дефект</th>
-                            <th scope="col">Редактирование</th>
-                        </tr>
-                    </thead>
-                </table>
-            </div>
-        </div>
-    </div>*@
-@*</nav>*@
-
-
-
-@*@if (User.Identity.IsAuthenticated)
-    {
-        <p>@User.Identity.Name</p>
-
-        <form method="post" asp-controller="Account" asp-action="Logout">
-            <input type="submit" value="Выход" />
-        </form>
-    }
-    else
-    {
-
-        <a asp-controller="Account" asp-action="Login">Вход</a>
-        <a asp-controller="Account" asp-action="Register">Регистрация</a>
-    }*@

@@ -13,7 +13,7 @@
         {
             <tr class="parent nested" data-level="@depth">
                 <td>
-                    <span class="caret">@child.DisplayName</span>
+                    <span class="caret ml-@(depth*3>5?5:depth*3)"><span class="badge badge-info mr-1">@child.Childs?.Count</span>@child.DisplayName</span>
                 </td>
 
                 <td>
@@ -38,7 +38,7 @@
                 {
                     <tr class="nested" data-level="@(depth + 1)">
                         <td>
-                            <span>@item.DisplayName</span>
+                            <span class="ml-@((depth+1)*3>5?5:(depth+1)*3)">@item.DisplayName</span>
                         </td>
 
                         <td>
@@ -59,7 +59,7 @@
         {
             <tr class="nested" data-level="@(depth)">
                 <td>
-                    <span>@child.DisplayName</span>
+                    <span class="ml-@(depth*3>5?5:depth*3)">@child.DisplayName</span>
                 </td>
 
                 <td>
@@ -190,11 +190,14 @@
 @* MOCK *@
 <section class="component-section">
     <div id="placeholder"></div>
-    <div class="row-container-left bg-blue with-padding">
-        <button type="button" class="transparent-btn" data-toggle="modal-toggler" data-target="#DepartmentEdit" data-url="@Url.Action("DepartmentCreate")">
-            <i class="fa fa-plus color-white"></i>
-            <p class="color-white">Создать</p>
-        </button>
+    <div class="row-container-left bg-blue">
+        <ul class="ul-list-left-aligned">
+            <li class="li-text-white">
+                <button type="button" class="btn btn-light" data-toggle="modal-toggler" data-target="#ObjectEdit" data-url="@Url.Action("DepartmentCreate")">
+                    <i class="fa fa-plus"></i> Создать
+                </button>
+            </li>
+        </ul>
     </div>
 
     <div class="margin-between-above">
@@ -207,15 +210,9 @@
                         </p>
                     </th>
 
-                    <th>
-                        <p>
-                            Тип
-                        </p>
-                    </th>
-
-                    <th>
-                        <p>
-
+                    <th width="300">
+                        <p class="text-center">
+                            Изменить/Удалить
                         </p>
                     </th>
                 </tr>
@@ -250,8 +247,7 @@
                     {
                         <tr class="parent" data-level="@depth">
                             <td>
-                                <span class="caret">@item.DisplayName</span>
-
+                                <span class="caret"><span class="badge badge-info mr-1">@item.Childs?.Count</span>@item.DisplayName</span>
                             </td>
 
                             <td>

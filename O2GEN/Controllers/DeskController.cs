@@ -10,16 +10,34 @@ namespace O2GEN.Controllers
     public class DeskController : Controller
     {
         private readonly ILogger<DeskController> _logger;
-        ObjectListModel obj = new();
         public DeskController(ILogger<DeskController> logger)
         {
             _logger = logger;
         }
 
+        [Route("Desk/Objects")]
+        [HttpGet]
         public IActionResult Objects()
         {
-            ViewBag.Objects = Helpers.DBHelper.GetAssets(_logger);
-            return View(obj);
+            string DepartmentIdData = Request.Cookies["odid"];
+            int Dept = 0;
+            int.TryParse(DepartmentIdData, out Dept);
+            if (Dept == 0)
+            {
+                var d = Helpers.DBHelper.GetChildDepartments();
+                if (d.Count > 0) Dept = d[0].Id;
+            }
+            ViewBag.Objects = Helpers.DBHelper.GetAssets(_logger, Dept);
+            Response.Cookies.Append("odid", Dept.ToString());
+            return View(new Filter() { DepartmentId = Dept });
+        }
+        [Route("Desk/Objects")]
+        [HttpPost]
+        public IActionResult Objects(Filter Model)
+        {
+            ViewBag.Objects = Helpers.DBHelper.GetAssets(_logger, Model.DepartmentId);
+            Response.Cookies.Append("odid", (Model.DepartmentId == null ? "" : Model.DepartmentId.ToString()));
+            return View(Model);
         }
 
 
@@ -164,10 +182,30 @@ namespace O2GEN.Controllers
             return RedirectToAction("ObjectClass");
         }
 
+
+        [Route("Desk/Route")]
+        [HttpGet]
         public IActionResult Route()
         {
-            ViewBag.Routes = Helpers.DBHelper.GetAssetParameterSets(_logger);
-            return View();
+            string DepartmentIdData = Request.Cookies["rdid"];
+            int Dept = 0;
+            int.TryParse(DepartmentIdData, out Dept);
+            if (Dept == 0)
+            {
+                var d = Helpers.DBHelper.GetChildDepartments();
+                if (d.Count > 0) Dept = d[0].Id;
+            }
+            ViewBag.Routes = Helpers.DBHelper.GetAssetParameterSets(_logger,Dept);
+            Response.Cookies.Append("rdid", Dept.ToString());
+            return View(new Filter() { DepartmentId = Dept });
+        }
+        [Route("Desk/Route")]
+        [HttpPost]
+        public IActionResult Route(Filter Model)
+        {
+            ViewBag.Routes = Helpers.DBHelper.GetAssetParameterSets(_logger, Model.DepartmentId);
+            Response.Cookies.Append("rdid", (Model.DepartmentId == null ? "" : Model.DepartmentId.ToString()));
+            return View(Model);
         }
         [HttpGet]
         public IActionResult RouteCreate()
@@ -181,6 +219,23 @@ namespace O2GEN.Controllers
             var res = Helpers.DBHelper.GetAssetParameterSet(id, _logger);
             if (res != null) return PartialView("RouteEdit", res);
             return View();
+        }
+
+        [HttpPost]
+        public IActionResult RouteUpdate(AssetParameterSet Model)
+        {
+            if (Model.Id == -1)
+                Helpers.DBHelper.CreateAssetParameterSet(Model, User.Identity.Name, _logger);
+            else
+                Helpers.DBHelper.UpdateAssetParameterSet(Model, User.Identity.Name, _logger);
+            return RedirectToAction("Route");
+        }
+
+        [HttpGet]
+        public IActionResult RouteDelete(int Id)
+        {
+            Helpers.DBHelper.DeleteAssetParameterSet(Id, User.Identity.Name, _logger);
+            return RedirectToAction("Route");
         }
 
         public IActionResult Controls()
@@ -209,11 +264,10 @@ namespace O2GEN.Controllers
         {
             if (!ModelState.IsValid)
             {
-                Debug.Write("Model state not valid");
-                //
+                //Debug.Write("Model state not valid");
                 return PartialView("ControlEdit", Model);
             }
-            Debug.Write("Model state is valid");
+            //Debug.Write("Model state is valid");
             //return RedirectToAction("Controls", "Desk");
 
             if (Model.Id == -1)
@@ -260,52 +314,7 @@ namespace O2GEN.Controllers
         public IActionResult Departments()
         {
             ViewBag.Departments = Helpers.DBHelper.GetDepartments(logger: _logger);
-            //ControlListModel model = new ControlListModel();
-            //model.ControlModels = new System.Collections.Generic.List<ControlModel>();
-            //for (var i = 0; i < 5; i++)
-            //{
-            //    var first = new ControlModel()
-            //    {
-            //        Name = "1 lvl"
-            //    };
-
-            //    first.Childs = new System.Collections.Generic.List<ControlModel>();
-
-            //    model.ControlModels.Add(first);
-
-            //    for (var j = 0; j < 2; j++)
-            //    {
-            //        ControlModel second = new ControlModel()
-            //        {
-            //            Name = "2 lvl"
-            //        };
-
-            //        second.Childs = new System.Collections.Generic.List<ControlModel>();
-
-            //        first.Childs.Add(second);
-
-            //        for (var s = 0; s < 2; s++)
-            //        {
-            //            ControlModel third = new ControlModel()
-            //            {
-            //                Name = "3 lvl"
-            //            };
-            //            third.Childs = new List<ControlModel>();
-
-            //            second.Childs.Add(third);
-
-            //            for (var o = 0; o < 2; o++)
-            //            {
-            //                ControlModel fourth = new ControlModel
-            //                {
-            //                    Name = "4 lvl"
-            //                };
-            //                third.Childs.Add(fourth);
-            //            }
-            //        }
-            //    }
-            //}
-            return View(/*model*/);
+            return View();
         }
 
         [HttpGet]
@@ -341,5 +350,40 @@ namespace O2GEN.Controllers
             Helpers.DBHelper.DeleteDepartment(Id, User.Identity.Name, _logger);
             return RedirectToAction("Departments");
         }
+
+        #region AJAX!
+        [HttpGet]
+        public JsonResult GetAssetsNodesJson(string ObjId)
+        {
+            int id = 0;
+            if (int.TryParse(ObjId, out id))
+                return new JsonResult(Helpers.DBHelper.GetAssets(logger: _logger, DeptID: id, NotesOnly: true));
+            else
+                return new JsonResult(new List<Resource>());
+        }
+        [HttpGet]
+        public JsonResult GetAssetClassParametersJson(string ObjId)
+        {
+            int id = 0;
+            if (int.TryParse(ObjId, out id))
+                return new JsonResult(Helpers.DBHelper.GetAssetClassParameters(id, logger: _logger));
+            else
+                return new JsonResult(new List<AssetClassParameter>());
+        }
+        [HttpGet]
+        public JsonResult GetControlsJson()
+        {
+            return new JsonResult(Helpers.DBHelper.GetControls(logger: _logger));
+        }
+        [HttpGet]
+        public JsonResult GetAssetDetails(string ObjId)
+        {
+            int id = 0;
+            if (int.TryParse(ObjId, out id))
+                return new JsonResult(Helpers.DBHelper.GetSimpleAsset(id,_logger));
+            else
+                return new JsonResult(new List<Resource>());
+        }
+        #endregion
     }
 }

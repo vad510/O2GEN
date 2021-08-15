@@ -49,11 +49,32 @@ namespace O2GEN.Controllers
             }
         }
 
+
+        [Route("Employee/Engineers")]
+        [HttpGet]
         public IActionResult Engineers()
         {
-            ViewBag.Engineers = Helpers.DBHelper.GetEngineers(_logger);
-            return View(_employeeListModels);
+            string DepartmentIdData = Request.Cookies["engdid"];
+            int Dept = 0;
+            int.TryParse(DepartmentIdData, out Dept);
+            if (Dept == 0)
+            {
+                var d = Helpers.DBHelper.GetChildDepartments();
+                if (d.Count > 0) Dept = d[0].Id;
+            }
+            ViewBag.Engineers = Helpers.DBHelper.GetEngineers(DeptId: Dept, logger: _logger);
+            Response.Cookies.Append("engdid", Dept.ToString());
+            return View(new Filter() { DepartmentId = Dept });
         }
+        [Route("Employee/Engineers")]
+        [HttpPost]
+        public IActionResult Engineers(Filter Model)
+        {
+            ViewBag.Engineers = Helpers.DBHelper.GetEngineers(DeptId: Model.DepartmentId, logger: _logger);
+            Response.Cookies.Append("engdid", (Model.DepartmentId == null ? "" : Model.DepartmentId.ToString()));
+            return View(Model);
+        }
+
         [HttpGet]
         public IActionResult EngineerCreate()
         {
@@ -93,11 +114,29 @@ namespace O2GEN.Controllers
         {
             return View();
         }
-
+        [Route("Employee/Resources")]
+        [HttpGet]
         public IActionResult Resources()
         {
-            ViewBag.Resources = Helpers.DBHelper.GetResources(_logger);
-            return View();
+            string DepartmentIdData = Request.Cookies["resdid"];
+            int Dept = 0;
+            int.TryParse(DepartmentIdData, out Dept);
+            if (Dept == 0)
+            {
+                var d = Helpers.DBHelper.GetChildDepartments();
+                if (d.Count > 0) Dept = d[0].Id;
+            }
+            ViewBag.Resources = Helpers.DBHelper.GetResources(DeptId: Dept, logger: _logger);
+            Response.Cookies.Append("resdid", Dept.ToString());
+            return View(new Filter() { DepartmentId = Dept });
+        }
+        [Route("Employee/Resources")]
+        [HttpPost]
+        public IActionResult Resources(Filter Model)
+        {
+            ViewBag.Resources = Helpers.DBHelper.GetResources(DeptId: Model.DepartmentId, logger: _logger);
+            Response.Cookies.Append("resdid", (Model.DepartmentId == null ? "" : Model.DepartmentId.ToString()));
+            return View(Model);
         }
 
         [HttpGet]

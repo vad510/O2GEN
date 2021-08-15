@@ -31,12 +31,11 @@
                     <div class="form-group">
                         <label asp-for="ParentId"></label>
                         <select asp-for="ParentId" class="form-control">
-                            <option value="null" selected disabled>Тип контроля</option>
-                            @foreach (var item in O2GEN.Helpers.DBHelper.GetDepartments(true))
+                            <option value="null" selected disabled>Выбрать</option>
+                            @foreach (var item in O2GEN.Helpers.DBHelper.GetDepartments(true,Model.Id))
                             {
                                 if(item.Id!=Model.Id)
                                 {
-                                    #warning НУЖНО ИСКЛЮЧИТЬ ДОЧЕРНИЕ ЭЛЕМЕНТЫ
                                     <option value="@item.Id">@item.DisplayName</option>
                                 }
                             }
