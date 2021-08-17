@@ -351,7 +351,8 @@ namespace O2GEN.Helpers
                             $"(SELECT TOP 1 ValueType FROM AssetParameters WHERE Id = {obj.NewTechPoz[i].Childs[j].Childs[k].Id}), " +
                             $"0, " +
                             $"getdate(), " +
-                            $"{IPData[obj.NewTechPoz[i].Id]})";
+                            $"{IPData[obj.NewTechPoz[i].Id]}, " +
+                            $"(SELECT TOP 1 AssetParameterTypeId FROM AssetParameters WHERE Id = {obj.NewTechPoz[i].Childs[j].Childs[k].Id}))";
                     }
                 }
             }
@@ -374,7 +375,8 @@ namespace O2GEN.Helpers
                 "ValueType, " +
                 "BoolValue, " +
                 "DateTime, " +
-                "InspectionProtocolId) " +
+                "InspectionProtocolId, " +
+                "AssetParameterTypeId) " +
 
                 "OUTPUT inserted.Id, inserted.AssetId, inserted.AssetParameterId, inserted.InspectionProtocolId into @APVData " +
                 "VALUES " +
