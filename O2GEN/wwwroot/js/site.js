@@ -197,10 +197,12 @@ function ControlDetVis() {
 function AssetSortFade() {
     var value = $('#AssetSortId').val();
     if (value == '2') {
-        $('.fadable').fadeIn();
+        $('.chld-fadable').fadeIn();
+        $('.par-fadable').fadeOut();
     }
     else {
-        $('.fadable').fadeOut();
+        $('.chld-fadable').fadeOut();
+        $('.par-fadable').fadeIn();
     }
 }
 

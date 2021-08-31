@@ -164,7 +164,7 @@
                             s += '<option value="' + data[i].id + '">' + data[i].displayName + '</option>';
                         }
                         $("#Assets").html(s);
-                        $("#SelectedAssets").html('<tr><td colspan="2">Нет данных.</td></tr>')
+                        $("#SelectedAssets").html('<tr class="nodata"><td colspan="2">Нет данных.</td></tr>')
                     }
                 })
             }
@@ -177,18 +177,92 @@
                     url: "GetAssetDetails",
                     dataType: "json",
                     data: {
-                        "ObjId": SelectedObj.value
+                        "ObjId": SelectedObj.value,
+                        "DeptId": "",
                     },
                     success: function (data) {
                         var s = $("#SelectedAssets").html();
-                        if (data.childs.length == 0) {
+                        s += GetAssetHtml(data);
+                        $("#SelectedAssets").html(s);
+                        $("#SelectedAssets").find(".nodata").remove();
+                        prepareLists();
+                        var objDiv = document.getElementById("tableContainer");
+                        objDiv.scrollTop = objDiv.scrollHeight;
+                        sortInputs();
+                    }
+                })
+            }
+        }
+        function AddAssetByDept(SelectedObj) {
+            if (SelectedObj != 'undefined') {
+                $.ajax({
+                    method: "GET",
+                    url: "GetAssetDetails",
+                    dataType: "json",
+                    data: {
+                        "ObjId": "",
+                        "DeptId": SelectedObj.value
+                    },
+                    success: function (data) {
+                        $("#SelectedAssets").html(GetAssetHtml(data));
+                        $("#SelectedAssets").find(".nodata").remove();
+                        prepareLists();
+                        sortInputs();
+                    }
+                })
+            }
+        }
+        function GetAssetHtml(data) {
+            var s = '';
+            for (var a = 0; a < data.length; a++) {
+
+                if (data[a].childs.length == 0) {
+                    @* НЕТ ДОЧЕРНИХ *@
+                    s +=
+                    '<tr class="parent" data-level="0">' +
+                        '<td>' +
+                        '<span>' + data[a].displayName + '</span>' +
+                        '<input type="text" style="display: none;" name="Childs[' + data[a].id + '].Id" value="' + data[a].id + '" />' +
+                        /*'<input type="text" style="display: none;" name="Childs[' + data.id + '].DisplayName" value="' + data.displayName + '" />' +*/
+                        '</td>' +
+                        '<td>' +
+                        '<div class="d-flex justify-content-center">' +
+                        '<button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this)">' +
+                        '<i class="fa fa-trash"></i>' +
+                        '</button>' +
+                        '</div>' +
+                        '</td>' +
+                        '</tr>';
+
+                }
+                else {
+                    @* ЕСТЬ ДОЧЕРНИЕ *@
+                    s +=
+                    '<tr class="parent" data-level="0">' +
+                        '<td>' +
+                        '<span class="caret"><span class="badge badge-info mr-1">' + data[a].childs.length + '</span>' + data[a].displayName + '</span>' +
+                        '<input type="text" style="display: none;" name="Childs[' + data[a].id + '].Id" value="' + data[a].id + '" />' +
+                        /*'<input type="text" style="display: none;" name="Childs[' + data.id + '].DisplayName" value="' + data.displayName + '" />' +*/
+                        '</td>' +
+                        '<td>' +
+                        '<div class="d-flex justify-content-center">' +
+                        '<button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this)">' +
+                        '<i class="fa fa-trash"></i>' +
+                        '</button>' +
+                        '</div>' +
+                        '</td>' +
+                        '</tr>';
+
+                    for (var ac = 0; ac < data[a].childs.length; ac++) {
+                        if (data[a].childs.length == 0) {
+
                             @* НЕТ ДОЧЕРНИХ *@
                             s +=
-                            '<tr class="parent" data-level="0">' +
+                            '<tr class="nested" data-level="1">' +
                                 '<td>' +
-                                '<span>' + data.displayName + '</span>' +
-                                '<input type="text" style="display: none;" name="Childs[' + data.id + '].Id" value="' + data.id + '" />' +
-                                /*'<input type="text" style="display: none;" name="Childs[' + data.id + '].DisplayName" value="' + data.displayName + '" />' +*/
+                                '<span class="ml-3">' + data[a].childs[ac].displayName + '</span>' +
+                                '<input type="text" style="display: none;" name="Childs[' + data[a].id + '].Childs[' + ac + '].Id" value="' + data[a].childs[ac].id + '" />' +
+                                /*'<input type="text" style="display: none;" name="Childs[' + data.id + '].Childs[' + ac + '].DisplayName" value="' + data.childs[ac].displayName + '" />' +*/
                                 '</td>' +
                                 '<td>' +
                                 '<div class="d-flex justify-content-center">' +
@@ -198,16 +272,15 @@
                                 '</div>' +
                                 '</td>' +
                                 '</tr>';
-
                         }
                         else {
                             @* ЕСТЬ ДОЧЕРНИЕ *@
                             s +=
-                            '<tr class="parent" data-level="0">' +
+                            '<tr class="parent nested" data-level="1">' +
                                 '<td>' +
-                                '<span class="caret"><span class="badge badge-info mr-1">' + data.childs.length + '</span>' + data.displayName + '</span>' +
-                                '<input type="text" style="display: none;" name="Childs[' + data.id + '].Id" value="' + data.id + '" />' +
-                                /*'<input type="text" style="display: none;" name="Childs[' + data.id + '].DisplayName" value="' + data.displayName + '" />' +*/
+                                '<span class="caret ml-3"><span class="badge badge-info mr-1">' + data[a].childs[ac].childs.length + '</span>' + data[a].childs[ac].displayName + '</span>' +
+                                '<input type="text" style="display: none;" name="Childs[' + data[a].id + '].Childs[' + ac + '].Id" value="' + data[a].childs[ac].id + '" />' +
+                                /*'<input type="text" style="display: none;" name="Childs[' + data.id + '].Childs[' + ac + '].DisplayName" value="' + data.childs[ac].displayName + '" />' +*/
                                 '</td>' +
                                 '<td>' +
                                 '<div class="d-flex justify-content-center">' +
@@ -217,72 +290,29 @@
                                 '</div>' +
                                 '</td>' +
                                 '</tr>';
-
-                            for (var ac = 0; ac < data.childs.length; ac++) {
-                                if (data.childs.length == 0) {
-
-                                    @* НЕТ ДОЧЕРНИХ *@
-                                    s +=
-                                    '<tr class="nested" data-level="1">' +
-                                        '<td>' +
-                                        '<span class="ml-3">' + data.childs[ac].displayName + '</span>' +
-                                        '<input type="text" style="display: none;" name="Childs[' + data.id + '].Childs[' + ac + '].Id" value="' + data.childs[ac].id + '" />' +
-                                        /*'<input type="text" style="display: none;" name="Childs[' + data.id + '].Childs[' + ac + '].DisplayName" value="' + data.childs[ac].displayName + '" />' +*/
-                                        '</td>' +
-                                        '<td>' +
-                                        '<div class="d-flex justify-content-center">' +
-                                        '<button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this)">' +
-                                        '<i class="fa fa-trash"></i>' +
-                                        '</button>' +
-                                        '</div>' +
-                                        '</td>' +
-                                        '</tr>';
-                                }
-                                else {
-                                    @* ЕСТЬ ДОЧЕРНИЕ *@
-                                    s +=
-                                    '<tr class="parent nested" data-level="1">' +
-                                        '<td>' +
-                                        '<span class="caret ml-3"><span class="badge badge-info mr-1">' + data.childs.length + '</span>' + data.childs[ac].displayName + '</span>' +
-                                        '<input type="text" style="display: none;" name="Childs[' + data.id + '].Childs[' + ac + '].Id" value="' + data.childs[ac].id + '" />' +
-                                        /*'<input type="text" style="display: none;" name="Childs[' + data.id + '].Childs[' + ac + '].DisplayName" value="' + data.childs[ac].displayName + '" />' +*/
-                                        '</td>' +
-                                        '<td>' +
-                                        '<div class="d-flex justify-content-center">' +
-                                        '<button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this)">' +
-                                        '<i class="fa fa-trash"></i>' +
-                                        '</button>' +
-                                        '</div>' +
-                                        '</td>' +
-                                        '</tr>';
-                                    @* САМЫЙ НИЗШИЙ СЛОЙ, ДОЧЕРНИХ БЫТЬ НЕ МОЖЕТ *@
-                                        for (var ap = 0; ap < data.childs[ac].childs.length; ap++) {
-                                        s +=
-                                            '<tr class="nested" data-level="2">' +
-                                            '<td>' +
-                                            '<span class="ml-5">' + data.childs[ac].childs[ap].displayName + '</span>' +
-                                            '<input type="text" style="display: none;" name="Childs[' + data.id + '].Childs[' + ac + '].Childs[' + ap + '].Id" value="' + data.childs[ac].childs[ap].id + '" />' +
-                                            /*'<input type="text" style="display: none;" name="Childs[' + data.id + '].Childs[' + ac + '].Childs[' + ap + '].DisplayName" value="' + data.childs[ac].childs[ap].displayName + '" />' +*/
-                                            '</td>' +
-                                            '<td>' +
-                                            '<div class="d-flex justify-content-center">' +
-                                            '<button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this)">' +
-                                            '<i class="fa fa-trash"></i>' +
-                                            '</button>' +
-                                            '</div>' +
-                                            '</td>' +
-                                            '</tr>';
-                                    }
-                                }
+                            @* САМЫЙ НИЗШИЙ СЛОЙ, ДОЧЕРНИХ БЫТЬ НЕ МОЖЕТ *@
+                            for (var ap = 0; ap < data[a].childs[ac].childs.length; ap++) {
+                                s +=
+                                    '<tr class="nested" data-level="2">' +
+                                    '<td>' +
+                                    '<span class="ml-5">' + data[a].childs[ac].childs[ap].displayName + '</span>' +
+                                    '<input type="text" style="display: none;" name="Childs[' + data[a].id + '].Childs[' + ac + '].Childs[' + ap + '].Id" value="' + data[a].childs[ac].childs[ap].id + '" />' +
+                                    /*'<input type="text" style="display: none;" name="Childs[' + data.id + '].Childs[' + ac + '].Childs[' + ap + '].DisplayName" value="' + data.childs[ac].childs[ap].displayName + '" />' +*/
+                                    '</td>' +
+                                    '<td>' +
+                                    '<div class="d-flex justify-content-center">' +
+                                    '<button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this)">' +
+                                    '<i class="fa fa-trash"></i>' +
+                                    '</button>' +
+                                    '</div>' +
+                                    '</td>' +
+                                    '</tr>';
                             }
                         }
-                        $("#SelectedAssets").html(s);
-                        prepareLists();
-                        var objDiv = document.getElementById("tableContainer");
-                        objDiv.scrollTop = objDiv.scrollHeight;
                     }
-                })
+                }
             }
+            return s;
         }
     </script>
 </section>

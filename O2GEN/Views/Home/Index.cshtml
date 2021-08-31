@@ -1,4 +1,4 @@
-﻿@model O2GEN.Models.Filter
+﻿@model O2GEN.Models.ZRPFilter
 @{ ViewData["Title"] = "Главная"; }
 
 <section class="component-section">
@@ -35,14 +35,6 @@
                 </li>
 
                 <li class="li-text-white">
-                    <button class="transparent-btn">
-                        <i class="fa fa-filter color-white"></i>
-                        <p class="color-white">Фильтры (0)</p>
-                    </button>
-                </li>
-
-
-                <li class="li-text-white">
                     <button class="btn btn-light" type="button" id="SetToday">
                         <i class="fa fa-calendar-day"></i>
                         Сегодня
@@ -76,8 +68,11 @@
                     <select asp-for="DepartmentId" class="form-control" required>
                         <option value="NULL" selected>Выбрать подразделение</option>
                         @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments())
-                        {<option value="@item.Id">@item.DisplayName</option>}
+                        { <option value="@item.Id">@item.DisplayName</option> }
                     </select>
+                </li>
+                <li>
+                    <input asp-for="DisplayName" class="form-control" placeholder="Название" />
                 </li>
                 <li class="li-text-white">
                     <button class="btn btn-light" type="submit">
@@ -92,14 +87,14 @@
     <div id="placeholder"></div>
 
     <ul class="nav nav-tabs top-margin">
-        <li class="nav-item active">
+        @*<li class="nav-item active">
             <a class="nav-link text-black-50 active" href="#first-tab" data-toggle="tab">ЗПР выданные</a>
+        </li>*@
+        <li class="nav-item active">
+            <a class="nav-link text-black-50 active" href="#first-tab" data-toggle="tab">Обходы в работе</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link text-black-50" href="#second-tab" data-toggle="tab">ЗПР в работе</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-black-50" href="#third-tab" data-toggle="tab">ЗПР закрытые</a>
+            <a class="nav-link text-black-50" href="#second-tab" data-toggle="tab">Обходы закрытые</a>
         </li>
     </ul>
 
@@ -142,7 +137,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var item in ViewBag.ZRPCreated)
+                        @foreach (var item in ViewBag.ZRPInWork)
                         {
             <tr>
                 <td><p>@item.ObjName</p></td>
@@ -207,7 +202,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var item in ViewBag.ZRPStarted)
+                        @foreach (var item in ViewBag.ZRPDone)
                         {
             <tr>
                 <td><p>@item.ObjName</p></td>
@@ -235,7 +230,7 @@
             </section>
         </div>
 
-        <div id="third-tab" class="tab-pane fade">
+        @*<div id="third-tab" class="tab-pane fade">
             <section>
                 <table class="table table-bordered table-hover">
                     <thead class="color-black">
@@ -296,7 +291,7 @@
                     </tbody>
                 </table>
             </section>
-        </div>
+        </div>*@
     </div>
 
     <script type="text/javascript">

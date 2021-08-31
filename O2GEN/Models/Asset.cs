@@ -12,7 +12,7 @@ namespace O2GEN.Models
         public int Id { get; set; } = -1;
         [DisplayName("Наименование")]
         public string DisplayName { get; set; }
-        [DisplayName("Индекс Максимо")]
+        [DisplayName("Тех. позиция")]
         public string Maximo { get; set; }
         public string Status { get; set; }
         public string Description { get; set; }
@@ -26,6 +26,8 @@ namespace O2GEN.Models
         public int? AssetSortId { get; set; }
         [DisplayName("Подразделение")]
         public int? DepartmentId { get; set; }
+        [DisplayName("Статус оборудования")]
+        public long? AssetStateId { get; set; }
         public List<int> Parameters { get; set; } = new List<int>();
 
 

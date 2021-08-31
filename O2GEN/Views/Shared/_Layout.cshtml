@@ -114,7 +114,7 @@
                             <a href="#">Рабочие календари</a>
                         </li>*@
                         <li>
-                            <a asp-controller="Employee" asp-action="Resources">Бригады</a>
+                            <a asp-controller="Employee" asp-action="Resources">Должности</a>
                         </li>
                     </ul>
                 </li>
@@ -130,9 +130,9 @@
                         <li>
                             <a asp-controller="Desk" asp-action="EmployeeCategory">Категории персонала</a>
                         </li>
-                        <li>
+                        @*<li>
                             <a asp-controller="Desk" asp-action="EmployeePosition">Должность</a>
-                        </li>
+                        </li>*@
                         <li>
                             <a asp-controller="Desk" asp-action="ObjectClass">Классы объектов</a>
                         </li>
@@ -173,14 +173,6 @@
                             <li>
                                 @Html.DynamicNavigationLink("link")
                             </li>
-
-                            <li>
-                                <i class="fa fa-globe color-white"></i>
-                            </li>
-                            <li>
-                                <i class="fa fa-redo color-white"></i>
-                            </li>
-
                         </ul>
                     </div>
 

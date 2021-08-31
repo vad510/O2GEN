@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using O2GEN.Models;
 using O2GEN.Models.EmployeeModels;
 using O2GEN.Models.HomeModels;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace O2GEN.Controllers
@@ -168,5 +169,18 @@ namespace O2GEN.Controllers
             Helpers.DBHelper.DeleteResource(id, User.Identity.Name, _logger);
             return RedirectToAction("Resources");
         }
+
+        #region AJAX!
+
+        [HttpGet]
+        public JsonResult GetEngineersByDept(string DeptId)
+        {
+            int id = 0;
+            if (int.TryParse(DeptId, out id))
+                return new JsonResult(Helpers.DBHelper.GetEngineersList(id, _logger));
+            else
+                return new JsonResult(new List<Engineer>());
+        }
+        #endregion
     }
 }

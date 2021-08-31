@@ -31,18 +31,18 @@ namespace O2GEN.Helpers.ValidationAttributes
             }
 
             var toValidateWith = (string)property.GetValue(validationContext.ObjectInstance);
-            var optionValue = (int?)optionProperty.GetValue(validationContext.ObjectInstance);
+            var optionValue = (long?)optionProperty.GetValue(validationContext.ObjectInstance);
 
             switch (optionValue)
             {
-                case 0:
-                    case 2:
+                case 2:
+                    { }
+                    break;
+                    default:
                     {
                         if (double.Parse(currentValue.Replace(",", ".")) <= double.Parse(toValidateWith.Replace(",", ".")))
                             return new ValidationResult(ErrorMessage);
                     }
-                    break;
-                default:
                     break;
             }
 

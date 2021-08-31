@@ -37,7 +37,7 @@
                             </div>
                             <div class="form-group">
                                 <label asp-for="DepartmentID"></label>
-                                <select asp-for="DepartmentID" class="form-control" onchange="GetAssets(this)">
+                                <select asp-for="DepartmentID" class="form-control" onchange="GetAssets(this); AddAssetByDept(this);">
                                     <option selected disabled>Выбрать</option>
                                     @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments())
                                     {
@@ -57,7 +57,7 @@
                                         else
                                         {
                                             <option value="null" selected disabled>Выбрать добавляемый объект</option>
-                                            foreach (var item in O2GEN.Helpers.DBHelper.GetAssets(DeptID: Model.DepartmentID, NotesOnly: true))
+                                            foreach (var item in O2GEN.Helpers.DBHelper.GetSimpleAssets(null, Model.DepartmentID))
                                             {
                                                 <option value="@item.Id" >@item.DisplayName</option>
                                             }
@@ -84,7 +84,7 @@
                                     <tbody id="SelectedAssets">
                                         @if (Model.Childs.Count == 0)
                                         {
-                                            <tr><td colspan="2">Нет данных.</td></tr>
+                                            <tr class="nodata"><td colspan="2">Нет данных.</td></tr>
                                         }
                                         else
                                         {

@@ -85,3 +85,16 @@ UPDATE APV
 	ELSE 3 END)
 	FROM AssetParameterValues APV
 	INNER JOIN AssetParameters AP ON AP.Id = APV.AssetParameterId;
+
+GO
+--Добавляем пароль в юзеры
+IF NOT EXISTS(SELECT 1 FROM sys.columns  
+WHERE Name = N'PWD' 
+AND Object_ID = Object_ID(N'PPUsers')) 
+BEGIN 
+	print('PPUsers.PWD ADDED');
+	ALTER TABLE PPUsers ADD PWD varbinary(MAX) NULL; 
+END;
+GO
+--Устанавливаем все пароли в 1234
+UPDATE PPUsers SET PWD = ENCRYPTBYPASSPHRASE(N'02GD89htgGbWEp98ubrg9oies:DGH:ORGojhg89_@jog;SOgh', N'1234')

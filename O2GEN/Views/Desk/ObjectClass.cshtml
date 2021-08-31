@@ -1,4 +1,4 @@
-﻿@model O2GEN.Models.DeskModels.EmployeeCategoryList
+﻿@model O2GEN.Models.AssetClassFilter
 @{
     ViewData["Title"] = "Классы объектов";
 }
@@ -6,13 +6,23 @@
 
     <div id="placeholder"></div>
     <div class="row-container-left bg-blue">
-        <ul class="ul-list-left-aligned">
-            <li class="li-text-white">
-                <button type="button" class="btn btn-light" data-toggle="modal-toggler" data-target="#ObjectEdit" data-url="@Url.Action("ObjectClassCreate")">
-                    <i class="fa fa-plus"></i> Создать
-                </button>
-            </li>
-        </ul>
+        <form action="ObjectClass" method="post">
+            <ul class="ul-list-left-aligned">
+                <li class="li-text-white">
+                    <button type="button" class="btn btn-light" data-toggle="modal-toggler" data-target="#ObjectEdit" data-url="@Url.Action("ObjectClassCreate")">
+                        <i class="fa fa-plus"></i> Создать
+                    </button>
+                </li>
+                <li>
+                    <input asp-for="DisplayName" class="form-control" placeholder="Название" />
+                </li>
+                <li class="li-text-white">
+                    <button class="btn btn-light" type="submit">
+                        <i class="fa fa-search"></i> Поиск
+                    </button>
+                </li>
+            </ul>
+        </form>
     </div>
 
     <div class="margin-between-above">
@@ -35,7 +45,7 @@
 
             </thead>
             <tbody>
-                @foreach (var item in ViewBag.ObjectClasses)
+                @foreach (var item in ViewBag.Data)
                 {
                     <tr>
 

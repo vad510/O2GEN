@@ -146,11 +146,26 @@ namespace O2GEN.Controllers
             return RedirectToAction("EmployeePosition");
         }
 
+
+
+        [Route("Desk/ObjectClass")]
+        [HttpGet]
         public IActionResult ObjectClass()
         {
-            ViewBag.ObjectClasses = Helpers.DBHelper.GetAssetClasses(_logger);
-            return View();
+            string DisplayName = Request.Cookies["ocn"];
+            ViewBag.Data = Helpers.DBHelper.GetAssetClasses(DisplayName: DisplayName, _logger);
+            Response.Cookies.Append("ocn", (string.IsNullOrEmpty(DisplayName) ? "" : DisplayName));
+            return View(new AssetClassFilter() { DisplayName = DisplayName });
         }
+        [Route("Desk/ObjectClass")]
+        [HttpPost]
+        public IActionResult ObjectClass(AssetClassFilter Model)
+        {
+            ViewBag.Data = Helpers.DBHelper.GetAssetClasses(DisplayName: Model.DisplayName, _logger);
+            Response.Cookies.Append("ocn", (string.IsNullOrEmpty(Model.DisplayName) ? "" : Model.DisplayName));
+            return View(Model);
+        }
+
         [HttpGet]
         public IActionResult ObjectClassCreate()
         {
@@ -238,10 +253,27 @@ namespace O2GEN.Controllers
             return RedirectToAction("Route");
         }
 
+        [Route("Desk/Controls")]
+        [HttpGet]
         public IActionResult Controls()
         {
-            ViewBag.Controls = Helpers.DBHelper.GetControls(_logger);
-            return View();
+            string SAssetParameterTypeId = Request.Cookies["aptid"];
+            string DisplayName = Request.Cookies["apdn"];
+            long Type = 0;
+            long.TryParse(SAssetParameterTypeId, out Type);
+            ViewBag.Data = Helpers.DBHelper.GetControls(AssetParameterTypeId: (Type== 0? null : Type), DisplayName: DisplayName, _logger);
+            Response.Cookies.Append("aptid", Type == 0 ? "" : Type.ToString());
+            Response.Cookies.Append("apdn", (string.IsNullOrEmpty(DisplayName)? "" : DisplayName));
+            return View(new ControlsFilter() { AssetParameterTypeId = (Type == 0 ? null : Type), DisplayName = DisplayName });
+        }
+        [Route("Desk/Controls")]
+        [HttpPost]
+        public IActionResult Controls(ControlsFilter Model)
+        {
+            ViewBag.Data = Helpers.DBHelper.GetControls(AssetParameterTypeId: Model.AssetParameterTypeId, DisplayName: Model.DisplayName, _logger);
+            Response.Cookies.Append("aptid", (Model.AssetParameterTypeId == null ? "" : Model.AssetParameterTypeId.ToString()));
+            Response.Cookies.Append("apdn", (string.IsNullOrEmpty(Model.DisplayName) ? "" : Model.DisplayName));
+            return View(Model);
         }
 
         [HttpGet]
@@ -357,9 +389,9 @@ namespace O2GEN.Controllers
         {
             int id = 0;
             if (int.TryParse(ObjId, out id))
-                return new JsonResult(Helpers.DBHelper.GetAssets(logger: _logger, DeptID: id, NotesOnly: true));
+                return new JsonResult(Helpers.DBHelper.GetSimpleAssets(null, id, _logger));
             else
-                return new JsonResult(new List<Resource>());
+                return new JsonResult(new List<Hierarchy>());
         }
         [HttpGet]
         public JsonResult GetAssetClassParametersJson(string ObjId)
@@ -376,13 +408,13 @@ namespace O2GEN.Controllers
             return new JsonResult(Helpers.DBHelper.GetControls(logger: _logger));
         }
         [HttpGet]
-        public JsonResult GetAssetDetails(string ObjId)
+        public JsonResult GetAssetDetails(string ObjId, string DeptId)
         {
-            int id = 0;
-            if (int.TryParse(ObjId, out id))
-                return new JsonResult(Helpers.DBHelper.GetSimpleAsset(id,_logger));
-            else
-                return new JsonResult(new List<Resource>());
+            int Id = 0;
+            int Dept = 0;
+            int.TryParse(ObjId, out Id);
+            int.TryParse(DeptId, out Dept);
+            return new JsonResult(Helpers.DBHelper.GetSimpleAssets((Id == 0 ? null : Id), (Dept == 0 ? null : Dept), _logger));
         }
         #endregion
     }

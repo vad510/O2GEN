@@ -17,9 +17,6 @@ namespace O2GEN.Models
         [MinLength(1)]
         public string DisplayName { get; set; }
 
-        [Obsolete]
-        [DisplayName("Тип контроля")]
-        public int ValueType { get; set; }
         [DisplayName("Тип контроля")]
         public long AssetParameterTypeId { get; set; }
 

@@ -1,6 +1,6 @@
 ﻿@model O2GEN.Models.Filter
 @{
-    ViewData["Title"] = "Ресурсы";
+    ViewData["Title"] = "Должности";
 }
 <script type="text/javascript" src="~/js/ResourceEdit.js"></script>
 <section class="component-section">
@@ -86,4 +86,32 @@
             </tbody>
         </table>
     </div>
+    <script type="text/javascript">
+
+        function GetEngineersByDept(SelectedObj, elem) {
+            if (SelectedObj != 'undefined') {
+                $.ajax({
+                    method: "GET",
+                    url: "GetEngineersByDept",
+                    dataType: "json",
+                    data: {
+                        "DeptId": SelectedObj.value
+                    },
+                    success: function (data) {
+                        var s = '';
+                        for (var i = 0; i < data.length; i++) {
+                            s += '<option value="' + data[i].id + '">' + data[i].displayName + '</option>';
+                        }
+                        $(elem).html(s);
+                    }
+                })
+            }
+        }
+        function DeptChanged(SelectedObj) {
+            $("#Selected").html('');
+            $("#SelectList1").html('');
+            $("#SelectList2").html('');
+            GetEngineersByDept(SelectedObj,'#SelectList1');
+        }
+    </script>
 </section>

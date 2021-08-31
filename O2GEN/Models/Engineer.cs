@@ -24,7 +24,7 @@ namespace O2GEN.Models
         [DisplayName("Подразделение")]
         public int? DepartmentId { get; set; }
         [DisplayName("График")]
-        public int? CalendarId { get; set; }
+        public int? CalendarId { get; set; } = null;
         public int? PersonId { get; set; }
         [DisplayName("Должность")]
         public int? PersonPositionId { get; set; }

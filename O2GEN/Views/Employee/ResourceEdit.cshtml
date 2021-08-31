@@ -16,7 +16,11 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 </div>
                 @{ 
-                    var parameters = O2GEN.Helpers.DBHelper.GetEngineersList();
+                    List<Engineer> parameters = new List<Engineer>();
+                    if(Model.DepartmentId !=  null)
+                    {
+                        parameters = O2GEN.Helpers.DBHelper.GetEngineersList(Model.DepartmentId);
+                    }
                 }
                 <div class="modal-body">
                     <div id="Selected" style="visibility:collapse;">
@@ -59,7 +63,7 @@
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label asp-for="DepartmentId"></label>
-                            <select asp-for="DepartmentId" class="form-control" required>
+                            <select asp-for="DepartmentId" class="form-control" required onchange="DeptChanged(this);">
                                 <option value="null" selected disabled>Выбрать</option>
                                 @*При смене подразделения нужно чистить список выбранных, и обновлять пул работников*@
                                 @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments())
@@ -116,41 +120,6 @@
                             </select>
                         </div>
                     </div>
-                    @*<div class="form-row">
-                        <div class="form-group col-md-5">
-                            <input class="form-control" id="myInput1" formtarget="_blank" type="text" placeholder="Search..">
-                            <select multiple class="form-control" formtarget="_blank" id="SelectList1">
-                                <option value="6">6</option>
-                                <option value="7">7</option>
-                                <option value="8">8</option>
-                                <option value="9">9</option>
-                                <option value="10">10</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-md-2">
-                            <button type="button" class="btn btn-light" id="right">Вправо</button>
-                            <br />
-                            <button type="button" class="btn btn-light" id="left">Влево</button>
-                        </div>
-                        <div class="form-group col-md-5">
-                            <input class="form-control" id="myInput2" type="text" placeholder="Search..">
-                            <select multiple class="form-control" formtarget="_blank" id="SelectList2">
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select>
-                        </div>
-                    </div>*@
-
-
-                    @*С Поиском
-        <select class="selectpicker" data-live-search="true">
-            <option>Mustard</option>
-            <option>Ketchup</option>
-            <option>Relish</option>
-        </select>*@
                 </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>

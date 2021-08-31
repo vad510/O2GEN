@@ -1,4 +1,4 @@
-﻿@model O2GEN.Models.DeskModels.ControlListModel
+﻿@model O2GEN.Models.ControlsFilter
 @{
     ViewData["Title"] = "Контроли";
 }
@@ -9,13 +9,46 @@
 
     <div id="placeholder"></div>
     <div class="row-container-left bg-blue">
-        <ul class="ul-list-left-aligned">
-            <li class="li-text-white">
-                <button type="button" class="btn btn-light" data-toggle="modal-toggler" data-target="#ObjectEdit" data-url="@Url.Action("ControlCreate")">
-                    <i class="fa fa-plus"></i> Создать
-                </button>
-            </li>
-        </ul>
+        <form action="Controls" method="post">
+            <ul class="ul-list-left-aligned">
+                <li class="li-text-white">
+                    <button type="button" class="btn btn-light" data-toggle="modal-toggler" data-target="#ControlEdit" data-url="@Url.Action("ControlCreate")">
+                        <i class="fa fa-plus"></i> Создать
+                    </button>
+                </li>
+                <li class="li-text-white">
+                    <select asp-for="AssetParameterTypeId" class="form-control">
+                        @if (Model.AssetParameterTypeId == null)
+                        {
+                            <option value="NULL" selected>Выбрать значение</option>
+                        }
+                        else
+                        {
+                            <option value="NULL">Все типы</option>
+                        }
+                        @foreach (AssetParameterType item in O2GEN.Helpers.DBHelper.GetAssetParameterTypes())
+                        {
+                            @if (Model.AssetParameterTypeId == item.Id)
+                            {
+                                <option value="@item.Id" selected>@item.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@item.Id">@item.Name</option>
+                            }
+                        }
+                    </select>
+                </li>
+                <li>
+                    <input asp-for="DisplayName" class="form-control" placeholder="Название"/>
+                </li>
+                <li class="li-text-white">
+                    <button class="btn btn-light" type="submit">
+                        <i class="fa fa-search"></i> Поиск
+                    </button>
+                </li>
+            </ul>
+        </form>
     </div>
 
     <div class="margin-between-above">
@@ -44,9 +77,9 @@
 
             </thead>
             <tbody>
-                @if (ViewBag.Controls == null)
+                @if (ViewBag.Data == null)
                     return;
-                else foreach (var item in ViewBag.Controls)
+                else foreach (var item in ViewBag.Data)
                     {
                         <tr>
                             <td>

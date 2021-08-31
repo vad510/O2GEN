@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using O2GEN.Helpers.ValidationAttributes;
 
 namespace O2GEN.Models
 {
@@ -27,6 +29,7 @@ namespace O2GEN.Models
         public string ObjName { get; set; }
 
         [DisplayName("Тип обхода")]
+        [Required(ErrorMessage = "Укажите тип обхода")]
         public int? SCTypeId { get; set; }
         /// <summary>
         /// Тип Обхода
@@ -41,30 +44,39 @@ namespace O2GEN.Models
         /// Обход
         /// </summary>
         [DisplayName("Обход")]
+        [Required(ErrorMessage = "Укажите название")]
         public string RouteName { get; set; }
         /// <summary>
         /// Обходчик
         /// </summary>
         [DisplayName("Обходчик")]
         public string ResName { get; set; }
-        [DisplayName("Обходчик")]
+        //[DisplayName("Обходчик")]
+        //[Required(ErrorMessage = "Укажите бригаду")]
+        [DisplayName("Должность")]
+        [Required(ErrorMessage = "Укажите должность")]
         public int? ResourceId { get; set; }
 
         [DisplayName("Подразделение")]
         public string Department { get; set; }
 
         [DisplayName("Подразделение")]
+        [Required(ErrorMessage = "Укажите подразделение")]
         public int? DepartmentID { get; set; }
+        [Obsolete]
         [DisplayName("Дни:")]
         public int PeriodDays { get; set; }
+        [Obsolete]
         [DisplayName("Часы:")]
         public int PeriodHours { get; set; }
+        [Obsolete]
         [DisplayName("Минуты:")]
         public int PeriodMinutes { get; set; }
         /// <summary>
         /// Не думаю что имеет смысл в передаче, у нас будет список AssetParameter
         /// </summary>
         [DisplayName("Маршрут")]
+        [Required(ErrorMessage = "Выберите подразделение")]
         public int? AssetParameterSetId { get; set; }
         /// <summary>
         /// Инфа по техпозициям уже существующего обхода.

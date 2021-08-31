@@ -35,9 +35,10 @@ namespace O2GEN.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            string FROMData = Request.Cookies["from"];
-            string TOData = Request.Cookies["to"];
-            string DepartmentIdData = Request.Cookies["did"];
+            string FROMData = Request.Cookies["zrpfrom"];
+            string TOData = Request.Cookies["zrpto"];
+            string DepartmentIdData = Request.Cookies["zrpdid"];
+            string DisplayName = Request.Cookies["zrpn"];
 
             long FromL = 0;
             long ToL = 0;
@@ -54,27 +55,28 @@ namespace O2GEN.Controllers
             DateTime From = new DateTime().AddTicks(Helpers.HandlingHelper.TicksFromJSToNET(long.Parse(FROMData)));
             DateTime To = new DateTime().AddTicks(Helpers.HandlingHelper.TicksFromJSToNET(long.Parse(TOData)));
 
-            ViewBag.ZRPCreated = Helpers.DBHelper.GetZRP(From, To, _logger, (int)Helpers.ZRPStatus.Created, (Did == 0 ? null : Did));
-            ViewBag.ZRPStarted = Helpers.DBHelper.GetZRP(From, To, _logger, (int)Helpers.ZRPStatus.Started, (Did == 0 ? null : Did));
-            ViewBag.ZRPEnded = Helpers.DBHelper.GetZRP(From, To, _logger, (int)Helpers.ZRPStatus.Ended, (Did == 0 ? null : Did));
-            Response.Cookies.Append("from", FROMData);
-            Response.Cookies.Append("to", TOData);
-            Response.Cookies.Append("did", string.IsNullOrEmpty(DepartmentIdData)?"": DepartmentIdData);
-            return View(new Filter() {From = Helpers.HandlingHelper.TicksFromNETToJS(From.Ticks).ToString(), To = Helpers.HandlingHelper.TicksFromNETToJS(To.Ticks).ToString(), DepartmentId = (Did==0 ? null : Did) });
+            //ViewBag.ZRPCreated = Helpers.DBHelper.GetZRP(From, To, _logger, (int)Helpers.ZRPStatus.Created, (Did == 0 ? null : Did));
+            ViewBag.ZRPInWork = Helpers.DBHelper.GetZRP(From, To, _logger, new int[] { (int)Helpers.ZRPStatus.Started, (int)Helpers.ZRPStatus.Created }, DisplayName, (Did == 0 ? null : Did));
+            ViewBag.ZRPDone = Helpers.DBHelper.GetZRP(From, To, _logger, new int[] { (int)Helpers.ZRPStatus.Ended, (int)Helpers.ZRPStatus.Stoped }, DisplayName, (Did == 0 ? null : Did));
+            Response.Cookies.Append("zrpfrom", FROMData);
+            Response.Cookies.Append("zrpto", TOData);
+            Response.Cookies.Append("zrpdid", string.IsNullOrEmpty(DepartmentIdData)?"": DepartmentIdData);
+            Response.Cookies.Append("zrpn", (string.IsNullOrEmpty(DisplayName) ? "" : DisplayName));
+            return View(new ZRPFilter() { From = Helpers.HandlingHelper.TicksFromNETToJS(From.Ticks).ToString(), To = Helpers.HandlingHelper.TicksFromNETToJS(To.Ticks).ToString(), DepartmentId = (Did == 0 ? null : Did), DisplayName = DisplayName });
         }
         [Route("Home/Index")]
         [HttpPost]
-        public IActionResult Index(Filter Model)
+        public IActionResult Index(ZRPFilter Model)
         {
             DateTime From = new DateTime().AddTicks(Helpers.HandlingHelper.TicksFromJSToNET(long.Parse(Model.From)));
             DateTime To = new DateTime().AddTicks(Helpers.HandlingHelper.TicksFromJSToNET(long.Parse(Model.To)));
-            ViewBag.ZRPCreated = Helpers.DBHelper.GetZRP(From, To, _logger, (int)Helpers.ZRPStatus.Created, Model.DepartmentId);
-            ViewBag.ZRPStarted = Helpers.DBHelper.GetZRP(From, To, _logger, (int)Helpers.ZRPStatus.Started, Model.DepartmentId);
-            ViewBag.ZRPEnded = Helpers.DBHelper.GetZRP(From, To, _logger, (int)Helpers.ZRPStatus.Ended, Model.DepartmentId);
+            //ViewBag.ZRPCreated = Helpers.DBHelper.GetZRP(From, To, _logger, (int)Helpers.ZRPStatus.Created, Model.DepartmentId);
+            ViewBag.ZRPInWork = Helpers.DBHelper.GetZRP(From, To, _logger, new int[] { (int)Helpers.ZRPStatus.Started, (int)Helpers.ZRPStatus.Created }, Model.DisplayName, Model.DepartmentId);
+            ViewBag.ZRPDone = Helpers.DBHelper.GetZRP(From, To, _logger, new int[] { (int)Helpers.ZRPStatus.Ended, (int)Helpers.ZRPStatus.Stoped }, Model.DisplayName, Model.DepartmentId);
 
-            Response.Cookies.Append("from", Model.From);
-            Response.Cookies.Append("to", Model.To);
-            Response.Cookies.Append("did", (Model.DepartmentId == null?"": Model.DepartmentId.ToString()));
+            Response.Cookies.Append("zrpfrom", Model.From);
+            Response.Cookies.Append("zrpto", Model.To);
+            Response.Cookies.Append("zrpdid", (Model.DepartmentId == null?"": Model.DepartmentId.ToString()));
             return View(Model);
         }
         #endregion
@@ -97,6 +99,10 @@ namespace O2GEN.Controllers
         [HttpPost]
         public IActionResult ZRPUpdate(ZRP Model)
         {
+            if (!ModelState.IsValid)
+            {
+                return PartialView("ZRPEdit", Model);
+            }
             if (Model.Id == -1)
             {
                 Helpers.DBHelper.CreateZRP(Model, User.Identity.Name, _logger);

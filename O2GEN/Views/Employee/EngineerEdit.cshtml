@@ -21,11 +21,6 @@
                     @Html.Hidden("PersonId", Model.PersonId)
                     <div class="form-row">
                         <div class="form-group col-md-6">
-                            <label asp-for="Surname"></label>
-                            <input asp-for="Surname" class="form-control" required />
-                            <span asp-validation-for="Surname" class="text-danger"></span>
-                        </div>
-                        <div class="form-group col-md-6">
                             <label asp-for="DepartmentId"></label>
                             <select asp-for="DepartmentId" class="form-control" required>
                                 <option value="null" selected disabled>Выбрать</option>
@@ -35,6 +30,11 @@
                                 }
                             </select>
                         </div>
+                        <div class="form-group col-md-6">
+                            <label asp-for="Surname"></label>
+                            <input asp-for="Surname" class="form-control" required />
+                            <span asp-validation-for="Surname" class="text-danger"></span>
+                        </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-6">
@@ -42,22 +42,22 @@
                             <input asp-for="GivenName" class="form-control" required />
                             <span asp-validation-for="GivenName" class="text-danger"></span>
                         </div>
-                        <div class="form-group col-md-6">
-                            <label asp-for="PersonPositionId"></label>
-                            <select asp-for="PersonPositionId" class="form-control" required>
-                                <option value="null" selected disabled>Выбрать</option>
-                                @foreach (PersonPosition item in O2GEN.Helpers.DBHelper.GetPersonPositions())
-                                {
-                                    <option value="@item.Id">@item.DisplayName</option>
-                                }
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-row">
+                        @*<div class="form-group col-md-6">
+            <label asp-for="PersonPositionId"></label>
+            <select asp-for="PersonPositionId" class="form-control" required>
+                <option value="null" selected disabled>Выбрать</option>
+                @foreach (PersonPosition item in O2GEN.Helpers.DBHelper.GetPersonPositions())
+                {
+                    <option value="@item.Id">@item.DisplayName</option>
+                }
+            </select>
+        </div>*@
                         <div class="form-group col-md-6">
                             <label asp-for="MiddleName"></label>
                             <input asp-for="MiddleName" class="form-control" />
                         </div>
+                    </div>
+                    @*<div class="form-row">
                         <div class="form-group col-md-6">
                             <label asp-for="CalendarId"></label>
                             <select asp-for="CalendarId" class="form-control">
@@ -68,7 +68,7 @@
                                 }
                             </select>
                         </div>
-                    </div>
+                    </div>*@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>

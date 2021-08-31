@@ -20,7 +20,7 @@
                         <li class="nav-item active">
                             <a class="nav-link text-black-50 active" href="#obj-tab" data-toggle="tab">Объект</a>
                         </li>
-                        <li class="nav-item controls-tab fadable">
+                        <li class="nav-item controls-tab chld-fadable">
                             <a class="nav-link text-black-50" href="#control-tab" data-toggle="tab">Контроли</a>
                         </li>
                     </ul>
@@ -57,7 +57,34 @@
                                         <label asp-for="DisplayName"></label>
                                         <input asp-for="DisplayName" class="form-control" required />
                                     </div>
-                                    <div class="form-group fadable">
+                                    <div class="form-group par-fadable">
+                                        <label asp-for="AssetStateId"></label>
+                                        <select asp-for="AssetStateId" class="form-control" required">
+                                            @{
+                                                var States = O2GEN.Helpers.DBHelper.GetAssetStates();
+                                                @if (Model.AssetStateId == null)
+                                                {
+                                                    <option value="null" selected>Выбрать статус</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="null">Нет</option>
+                                                }
+                                                @for (int i = 0; i < States.Count; i++)
+                                                {
+                                                    if (i == Model.AssetStateId)
+                                                    {
+                                                        <option value="@States[i].Id" selected>@States[i].DisplayName</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@States[i].Id">@States[i].DisplayName</option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="form-group chld-fadable">
                                         <label asp-for="AssetClassId"></label>
                                         <select asp-for="AssetClassId" class="form-control" required onchange="GetAssetClassParameters(this)">
                                             @{
@@ -76,7 +103,7 @@
                                             }
                                         </select>
                                     </div>
-                                    <div class="form-group fadable">
+                                    <div class="form-group chld-fadable">
                                         <label asp-for="ParentId"></label>
                                         <select asp-for="ParentId" class="form-control">
                                             @if (Model.ParentId == null && Model.DepartmentId == null)
