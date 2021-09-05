@@ -4,7 +4,7 @@
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                @{ 
+                @{
                     var parameters = O2GEN.Helpers.DBHelper.GetControls();
                 }
                 @if (Model.Id == -1)
@@ -72,6 +72,7 @@
                     <button type="submit" class="btn btn-primary" data-save="modal">Применить</button>
                 </div>
             </form>
+            @Html.Partial("ModalBlock")
         </div>
     </div>
 </div>

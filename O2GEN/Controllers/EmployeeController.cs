@@ -93,6 +93,10 @@ namespace O2GEN.Controllers
         [HttpPost]
         public IActionResult EngineerUpdate(Engineer Model)
         {
+            if (!ModelState.IsValid)
+            {
+                return PartialView("EngineerEdit", Model);
+            }
             if (Model.Id == -1)
                 Helpers.DBHelper.CreateEngineer(Model, User.Identity.Name, _logger);
             else

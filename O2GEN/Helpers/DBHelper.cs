@@ -10,7 +10,8 @@ namespace O2GEN.Helpers
 {
     public static class DBHelper
     {
-        //private static string DBConnection = $"Data Source={(Environment.UserName == "Michael" ? "DESKTOP-JFNR95O\\SQLEXPRESS" : "DESKTOP-A17N4G7\\SQLEXPRESS01")};Initial Catalog=UFMDBLUK;Integrated Security=SSPI;";
+
+        private static string ENCR = "02GD89htgGbWEp98ubrg9oies:DGH:ORGojhg89_@jog;SOgh";
         private static string DBConnection = "Data Source=10.201.192.241;Initial Catalog=UFMDBLUK;User ID=sa;Password=Zz123456789;";
 
         private static string GetConnectionString()
@@ -1680,9 +1681,9 @@ namespace O2GEN.Helpers
                 "output inserted.Id into @InsertedPId " +
                 "values" +
                 $"(N'{obj.DisplayName}'," +
-                $"{obj.Latitude}, " +
-                $"{obj.Longitude}, " +
-                $"N'{obj.Address}', " +
+                $"{(obj.Latitude == null?"NULL": obj.Latitude)}, " +
+                $"{(obj.Longitude == null ? "NULL" : obj.Longitude)}, " +
+                $"{(obj.Address == null ? "NULL" : $"N'{obj.Address}'")}, " +
                 $"{(obj.ResourceStateId == null ? "NULL" : obj.ResourceStateId)}, " +
                 $"(isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
                 $"getdate(), " +
@@ -1761,24 +1762,11 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         private static string SelectEngineers(long? ID = null, long? DeptId = null)
         {
-            return "SELECT e.Id, t1.PersonName, e.ObjectUID, e.PersonId, t0.DisplayName as DepartmentName, isnull(t2.IsUser,0) as IsUser , e.DepartmentId, e.PersonId, t1.Surname, t1.GivenName, t1.MiddleName, e.CalendarId, t1.PersonPositionId " +
+            return "SELECT e.Id, CONCAT(P.Surname,' ',P.GivenName,' ', P.MiddleName) as PersonName, e.ObjectUID, e.PersonId, D.DisplayName as DepartmentName, isnull(U.Name,0) as IsUser , e.DepartmentId, e.PersonId, P.Surname, P.GivenName, P.MiddleName, e.CalendarId, P.PersonPositionId, U.Id AS UserId, U.Name AS Login " +
                 "FROM Engineers AS e " +
-                "LEFT JOIN( " +
-                "    SELECT e1.Id, e1.DisplayName " +
-                "    FROM Departments AS e1 " +
-                "    WHERE (e1.IsDeleted <> 1) AND (e1.TenantId = CAST(1 AS bigint)) " +
-                ") AS t0 ON e.DepartmentId = t0.Id " +
-                "LEFT JOIN( " +
-                "    SELECT Id, UserId, CONCAT(Surname,' ',GivenName,' ', MiddleName) as PersonName, PersonPositionId, Surname, GivenName, MiddleName " +
-                "   FROM Persons " +
-                "    WHERE(IsDeleted <> 1) AND TenantId = CAST(1 AS bigint) " +
-                ") AS t1 ON e.PersonId = t1.Id " +
-                "LEFT JOIN( " +
-                "    SELECT id, count(*) as IsUser " +
-                "    FROM PPUsers " +
-                "    WHERE(IsDeleted <> 1) AND TenantId = CAST(1 AS bigint) " +
-                "    GROUP BY Id " +
-                ") AS t2 ON t1.UserId = t2.Id " +
+                "LEFT JOIN Departments AS D ON e.DepartmentId = D.Id AND D.IsDeleted <> 1 " +
+                "LEFT JOIN Persons AS P ON e.PersonId = P.Id AND P.IsDeleted <> 1 " +
+                "LEFT JOIN PPUsers AS U ON P.UserId = U.Id AND U.IsDeleted <> 1 " +
                 "WHERE ((e.IsDeleted <> 1) " +
                 $"{(ID == null ? "" : "AND e.Id = " + ID)} " +
                 $"{(DeptId == null ? "" : "AND e.DepartmentId = " + DeptId)} " +
@@ -1810,7 +1798,7 @@ namespace O2GEN.Helpers
                 "TenantId, " +
                 "PersonPositionId) " +
                 "output inserted.Id into @InsertedPId " +
-                "values" +
+                "VALUES" +
                 "(0, " +
                 "@PRevision, " +
                 $"(isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
@@ -1835,7 +1823,7 @@ namespace O2GEN.Helpers
                 "TenantId, " +
                 "IsDeleted, " +
                 "IsActive)" +
-                "values" +
+                "VALUES " +
                 $"(N'{obj.Surname} {obj.GivenName.Substring(0, 1) + "."} {(!string.IsNullOrEmpty(obj.MiddleName) ? obj.MiddleName.Substring(0, 1) + "." : "")}'," +
                 $"(select top 1 id from @InsertedPId), " +
                 $"{(obj.CalendarId == null ? "NULL" : obj.CalendarId)}, " +
@@ -1848,8 +1836,9 @@ namespace O2GEN.Helpers
                 $"0, " +
                 $"0); " +
 
-                $"UPDATE PPEntityCollections SET Revision = @PRevision WHERE ID = {(int)RevEntry.Person};" +
-                $"UPDATE PPEntityCollections SET Revision = @ERevision WHERE ID = {(int)RevEntry.Engineer};";
+                $"UPDATE PPEntityCollections SET Revision = @PRevision WHERE ID = {(int)RevEntry.Person}; " +
+                $"UPDATE PPEntityCollections SET Revision = @ERevision WHERE ID = {(int)RevEntry.Engineer}; " +
+                $"SELECT TOP 1 Id FROM @InsertedPId; ";
         }
         /// <summary>
         /// Обновление работника
@@ -1894,7 +1883,8 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         private static string DeleteEngineer(int ID, string UserName)
         {
-            return "DECLARE @PRevision bigint, @ERevision bigint; " +
+            return "DECLARE @PRevision bigint, @ERevision bigint, @PPURevision bigint; " +
+                "set @PPURevision = (isnull((SELECT max(revision) id FROM PPUsers ),0)+1); " +
                 "set @PRevision = (isnull((SELECT max(revision) id FROM Persons ),0)+1); " +
                 "set @ERevision = (isnull((SELECT max(revision) id FROM Engineers ),0)+1); " +
 
@@ -1912,6 +1902,14 @@ namespace O2GEN.Helpers
                 "IsDeleted = 1 " +
                 $"WHERE ID = {ID}; " +
 
+                "UPDATE PPUsers SET " +
+                $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
+                "DeletionTime = getdate(), " +
+                "Revision = @PPURevision, " +
+                "IsDeleted = 1 " +
+                $"WHERE ID = (SELECT UserId FROM Person WHERE Id = (select PersonId from Engineers where Id = {ID})); " +
+
+                $"UPDATE PPEntityCollections SET Revision = @PPURevision WHERE ID = {(int)RevEntry.PPUser}; " +
                 $"UPDATE PPEntityCollections SET Revision = @PRevision WHERE ID = {(int)RevEntry.Person}; " +
                 $"UPDATE PPEntityCollections SET Revision = @ERevision WHERE ID = {(int)RevEntry.Engineer};";
         }
@@ -1949,6 +1947,7 @@ namespace O2GEN.Helpers
         {
             return "DECLARE @revision bigint; " +
                 "set @revision = (isnull((SELECT max(revision) id FROM Persons ),0)+1); " +
+                "DECLARE @InsertedPId TABLE(id int); " +
                 "INSERT INTO Persons " +
                 $"(DisplayName, " +
                 $"Surname, " +
@@ -1960,6 +1959,7 @@ namespace O2GEN.Helpers
                 "CreationTime, " +
                 "ObjectUID, " +
                 "Revision)" +
+                "output inserted.Id into @InsertedPId " +
                 "values" +
                 $"(N'{obj.DisplayName}'," +
                 $"N'{obj.Surname}', " +
@@ -2017,7 +2017,96 @@ namespace O2GEN.Helpers
                 $"UPDATE PPEntityCollections SET Revision = @revision WHERE ID = {(int)RevEntry.Person}; ";
         }
 
+        /// <summary>
+        ///  Данные для входа
+        /// </summary>
+        /// <returns></returns>
+        private static string SelectPPUser(int ID)
+        {
+            return $"SELECT Id, Surname, GivenName, MiddleName, UserId, PersonPositionId, ObjectUID FROM Persons WHERE  Id = {ID}";
+        }
+        /// <summary>
+        /// Создание данных для входа
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string CreatePPUser(Engineer obj, string UserName)
+        {
+            return "DECLARE @PPURevision bigint, @PRevision bigint; " +
+                "set @PPURevision = (isnull((SELECT max(revision) id FROM PPUsers ),0)+1); " +
+                "set @PRevision = (isnull((SELECT max(revision) id FROM Persons ),0)+1); " +
+                "DECLARE @InsertedPPUId TABLE(id int); " +
 
+                "INSERT INTO PPUsers " +
+                "(IsDeleted," +
+                "Revision," +
+                "CreatedByUser," +
+                "CreationTime," +
+                "Name," +
+                "DisplayName," +
+                "ObjectUID," +
+                "TenantId," +
+                "PWD)" +
+                "output inserted.Id into @InsertedPPUId " +
+                "VALUES " +
+                "(0, " +
+                "@PPURevision, " +
+                $"(isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
+                $"getdate(), " +
+                $"N'{obj.Login}', " +
+                $"N'{obj.Login}', " +
+                $"'{Guid.NewGuid().ToString("D")}'," +
+                $"1," +
+                $"ENCRYPTBYPASSPHRASE(N'{ENCR}', N'{obj.Password}'));" +
+
+                $"UPDATE Persons SET " +
+                $"UserId = (SELECT TOP 1 Id FROM @InsertedPPUId), " +
+                $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
+                "ModificationTime = getdate()" +
+                $"WHERE Id = {obj.PersonId}; " +
+
+                $"UPDATE PPEntityCollections SET Revision = @PPURevision WHERE ID = {(int)RevEntry.PPUser};"+
+                $"UPDATE PPEntityCollections SET Revision = @PRevision WHERE ID = {(int)RevEntry.Person};";
+        }
+        /// <summary>
+        /// Обновление данных для входа
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string UpdatePPUser(Engineer obj, string UserName)
+        {
+            return "DECLARE @rev bigint; " +
+                "set @rev = (isnull((SELECT max(revision) id FROM PPUsers ),0)+1); " +
+                "UPDATE PPUsers SET " +
+                "Revision = @rev, " +
+                $"PWD = ENCRYPTBYPASSPHRASE(N'{ENCR}', N'{obj.Password}'), " +
+                $"ModifiedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
+                "ModificationTime = getdate() " +
+                $"WHERE ID = {obj.UserId}; " +
+
+                $"UPDATE PPEntityCollections SET Revision = @rev WHERE ID = {(int)RevEntry.PPUser};";
+        }
+        /// <summary>
+        /// Удаление данных для входа
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        private static string DeletePPUser(int ID, string UserName)
+        {
+            return "DECLARE @rev bigint; " +
+                "set @rev = (isnull((SELECT max(revision) id FROM PPUsers ),0)+1); " +
+                "UPDATE PPUsers SET " +
+                $"DeletedByUser = (isnull((SELECT top 1 id FROM PPUsers  where name = {(string.IsNullOrEmpty(UserName) ? "NULL" : $"'{UserName}'")}),-1)), " +
+                "DeletionTime = getdate(), " +
+                "Revision = @rev, " +
+                "IsDeleted = 1 " +
+                $"WHERE ID = {ID}; " +
+
+                $"UPDATE PPEntityCollections SET Revision = @rev WHERE ID = {(int)RevEntry.PPUser}; ";
+        }
 
         #endregion
 
@@ -2081,6 +2170,11 @@ namespace O2GEN.Helpers
         }
         #endregion
 
+
+        private static string LoginIsExist(string Login)
+        {
+            return $"SELECT ISNULL((SELECT TOP 1 ID FROM PPUsers WHERE Name = N'{Login}' AND IsDeleted <> 1),-1);";
+        }
         #endregion
 
         #region Процедуры получения данных
@@ -4499,7 +4593,9 @@ namespace O2GEN.Helpers
                                     PersonPositionId = string.IsNullOrEmpty(row["PersonPositionId"].ToString()) ? (int?)null : int.Parse(row["PersonPositionId"].ToString()),
                                     GivenName = row["GivenName"].ToString(),
                                     MiddleName = row["MiddleName"].ToString(),
-                                    Surname = row["Surname"].ToString()
+                                    Surname = row["Surname"].ToString(),
+                                    UserId = string.IsNullOrEmpty(row["UserId"].ToString()) ? (int?)null : int.Parse(row["UserId"].ToString()),
+                                    Login = row["Login"].ToString()
                                 };
                             }
                         }
@@ -4514,16 +4610,50 @@ namespace O2GEN.Helpers
         }
         public static void CreateEngineer(Engineer obj, string UserName, ILogger logger)
         {
-            ExecuteNonQuery(CreateEngineer(obj, UserName), logger);
+            obj.PersonId = int.Parse(ExecuteScalar(CreateEngineer(obj, UserName), logger));
+            if(obj.IsUser)
+            {
+                CreatePPUser(obj, UserName, logger);
+            }
         }
         public static void UpdateEngineer(Engineer obj, string UserName, ILogger logger)
         {
             ExecuteNonQuery(UpdateEngineer(obj, UserName), logger);
+            if(obj.IsUser && obj.UserId== null)
+            {
+                CreatePPUser(obj, UserName, logger);
+            }
+            else if(obj.IsUser && obj.UserId != null)
+            {
+                if(!string.IsNullOrEmpty(obj.Password))
+                {
+                    UpdatePPUser(obj, UserName, logger);
+                }
+            }
+            else if(!obj.IsUser && obj.UserId != null)
+            {
+                DeletePPUser((int)obj.UserId, UserName, logger);
+            }
         }
         public static void DeleteEngineer(int ID, string UserName, ILogger logger)
         {
             ExecuteNonQuery(DeleteEngineer(ID, UserName), logger);
         }
+
+        public static void CreatePPUser(Engineer obj, string UserName, ILogger logger)
+        {
+            ExecuteNonQuery(CreatePPUser(obj, UserName), logger);
+        }
+        public static void UpdatePPUser(Engineer obj, string UserName, ILogger logger)
+        {
+            ExecuteNonQuery(UpdatePPUser(obj, UserName), logger);
+        }
+        public static void DeletePPUser(int ID, string UserName, ILogger logger)
+        {
+            ExecuteNonQuery(DeletePPUser(ID, UserName), logger);
+        }
+
+        #region Возможно нет нужды
         public static Person GetPerson(int ID, ILogger logger)
         {
             string con = GetConnectionString();
@@ -4581,12 +4711,12 @@ namespace O2GEN.Helpers
         {
             ExecuteScalar(DeletePerson(ID, UserName), logger);
         }
-
+        #endregion
 
         #endregion
 
         #region Отчеты
-        
+
         public static List<Asset> GetAssetsFromAPS(long APSId, ILogger logger = null)
         {
             string con = GetConnectionString();
@@ -4768,6 +4898,17 @@ namespace O2GEN.Helpers
                 logger.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
             }
             return output;
+        }
+
+        /// <summary>
+        /// Возвращает Id указанного логина из таблицы PPUsers. В случае отсутствия -1
+        /// </summary>
+        /// <param name="Login"></param>
+        /// <param name="logger"></param>
+        /// <returns></returns>
+        public static string LoginIsExist(string Login, ILogger logger)
+        {
+            return ExecuteScalar(LoginIsExist(Login), logger);
         }
         #endregion
 

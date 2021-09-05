@@ -161,6 +161,7 @@ function btnClick() {
     const url = this.getAttribute("data-url");
 
     getDataWithXmlHttpRequest(url, placeholder);
+
 };
 
 // xhr for modal data
@@ -245,6 +246,27 @@ function tryCreateModal(placeholder, response) {
             sortHidden();
         }
     });
+    if ($('#EngineerEdit').length == 1) {
+        $("#IsUser").click(function () {
+            if ($("#IsUser").is(":checked")) {
+                $('#logform').fadeIn();
+            }
+            else {
+                console.log(234);
+                $('#logform').fadeOut();
+                $('#Password').val('');
+                $('#ConfirmPassword').val('');
+            }
+        });
+        if ($("#IsUser").is(":checked")) {
+            $('#logform').fadeIn();
+        }
+        else {
+            $('#logform').fadeOut();
+            $('#Password').val('');
+            $('#ConfirmPassword').val('');
+        }
+    }
     /////////////////  JQuery working example for validate modal ///////////////
     //placeholder = $(placeholder);
 
@@ -281,8 +303,12 @@ function tryCreateModal(placeholder, response) {
 
         const xhr = new XMLHttpRequest();
 
+        console.log(123);
+        BlockModal();
         xhr.onload = function (e) {
             TryValidate(xhr.response);
+            UnblockModal();
+            console.log(234);
         }
 
         xhr.open('post', url);
@@ -291,6 +317,16 @@ function tryCreateModal(placeholder, response) {
 
     ControlDetVis();
     AssetSortFade();
+}
+function BlockModal() {
+    if ($('#CoverModal').length == 1) {
+        $('#CoverModal').removeClass('ModalBlockInvisible');
+    }
+}
+function UnblockModal() {
+    if ($('#CoverModal').length == 1) {
+        $('#CoverModal').addClass('ModalBlockInvisible');
+    }
 }
 
 // validate modal before submit

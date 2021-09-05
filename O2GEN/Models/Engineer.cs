@@ -1,5 +1,7 @@
-﻿using System;
+﻿using O2GEN.Helpers.ValidationAttributes;
+using System;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace O2GEN.Models
 {
@@ -19,7 +21,7 @@ namespace O2GEN.Models
         public string AppointName { get; set; }
         public string PersonName { get; set; }
         public string DepartmentName { get; set; }
-        public bool IsUser { get; set; }
+        public bool IsUser { get; set; } = false;
         public Guid ObjectUID { get; set; } = Guid.NewGuid();
         [DisplayName("Подразделение")]
         public int? DepartmentId { get; set; }
@@ -28,5 +30,15 @@ namespace O2GEN.Models
         public int? PersonId { get; set; }
         [DisplayName("Должность")]
         public int? PersonPositionId { get; set; }
+        public int? UserId { get; set; }
+
+        [DisplayName("Логин")]
+        [LoginExists(ErrorMessage ="Пользователь с таким логином уже существует.")]
+        public string Login { get; set; }
+        [DisplayName("Пароль")]
+        public string Password { get; set; }
+        [DisplayName("Подтвердить пароль")]
+        [Compare("Password", ErrorMessage = "Пароли не совпадают")]
+        public string ConfirmPassword { get; set; }
     }
 }

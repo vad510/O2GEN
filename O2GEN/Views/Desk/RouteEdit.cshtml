@@ -6,11 +6,11 @@
             <div class="modal-header">
                 @if (Model.Id == -1)
                 {
-                    <h5>Новая запись</h5>
+                <h5>Новая запись</h5>
                 }
                 else
                 {
-                    <h5>Изменить запись №@Model.Id</h5>
+                <h5>Изменить запись №@Model.Id</h5>
                 }
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
@@ -32,7 +32,7 @@
                         <div id="major-tab" class="tab-pane active p-1 color-black">
                             <div class="form-group">
                                 <label asp-for="DisplayName"></label>
-                                <input asp-for="DisplayName" class="form-control" placeholder="Название"/>
+                                <input asp-for="DisplayName" class="form-control" placeholder="Название" />
                                 <span asp-validation-for="DisplayName" class="text-danger"></span>
                             </div>
                             <div class="form-group">
@@ -41,7 +41,7 @@
                                     <option selected disabled>Выбрать</option>
                                     @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments())
                                     {
-                                        <option value="@item.Id">@item.DisplayName</option>
+                                    <option value="@item.Id">@item.DisplayName</option>
                                     }
                                 </select>
                             </div>
@@ -52,14 +52,14 @@
                                     <select class="form-control" id="Assets">
                                         @if (Model.Id == -1)
                                         {
-                                            <option value="null" selected disabled>Необходимо выбрать подразделение</option>
+                                        <option value="null" selected disabled>Необходимо выбрать подразделение</option>
                                         }
                                         else
                                         {
-                                            <option value="null" selected disabled>Выбрать добавляемый объект</option>
+                                        <option value="null" selected disabled>Выбрать добавляемый объект</option>
                                             foreach (var item in O2GEN.Helpers.DBHelper.GetSimpleAssets(null, Model.DepartmentID))
                                             {
-                                                <option value="@item.Id" >@item.DisplayName</option>
+                                        <option value="@item.Id">@item.DisplayName</option>
                                             }
                                         }
                                     </select>
@@ -84,7 +84,7 @@
                                     <tbody id="SelectedAssets">
                                         @if (Model.Childs.Count == 0)
                                         {
-                                            <tr class="nodata"><td colspan="2">Нет данных.</td></tr>
+                                        <tr class="nodata"><td colspan="2">Нет данных.</td></tr>
                                         }
                                         else
                                         {
@@ -92,88 +92,88 @@
                                             {
                                                 if (Model.Childs[i].Childs == null || Model.Childs[i].Childs.Count == 0)
                                                 {
-                                                    <tr data-level="0">
-                                                        <td>
-                                                            <span>@Model.Childs[i].DisplayName</span>
-                                                            <input type="text" style="display: none;" name="Childs[@i].Id" value="@Model.Childs[i].Id" />
-                                                            @*<input type="text" style="display: none;" name="Childs[@i].DisplayName" value="@Model.Childs[i].DisplayName" />*@
-                                                        </td>
-                                                        <td>
-                                                            <div class="d-flex justify-content-center">
-                                                                <button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this)">
-                                                                    <i class="fa fa-trash"></i>
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
+                                        <tr data-level="0">
+                                            <td>
+                                                <span>@Model.Childs[i].DisplayName</span>
+                                                <input type="text" style="display: none;" name="Childs[@i].Id" value="@Model.Childs[i].Id" />
+                                                @*<input type="text" style="display: none;" name="Childs[@i].DisplayName" value="@Model.Childs[i].DisplayName" />*@
+                                            </td>
+                                            <td>
+                                                <div class="d-flex justify-content-center">
+                                                    <button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this)">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
                                                 }
                                                 else
                                                 {
-                                                    <tr class="parent" data-level="0">
-                                                        <td>
-                                                            <span class="caret"><span class="badge badge-info mr-1">@Model.Childs[i].Childs.Count</span>@Model.Childs[i].DisplayName</span>
-                                                            <input type="text" style="display: none;" name="Childs[@i].Id" value="@Model.Childs[i].Id" />
-                                                            @*<input type="text" style="display: none;" name="Childs[@i].DisplayName" value="@Model.Childs[i].DisplayName" />*@
-                                                        </td>
-                                                        <td>
-                                                            <div class="d-flex justify-content-center">
-                                                                <button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this)">
-                                                                    <i class="fa fa-trash"></i>
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
+                                        <tr class="parent" data-level="0">
+                                            <td>
+                                                <span class="caret"><span class="badge badge-info mr-1">@Model.Childs[i].Childs.Count</span>@Model.Childs[i].DisplayName</span>
+                                                <input type="text" style="display: none;" name="Childs[@i].Id" value="@Model.Childs[i].Id" />
+                                                @*<input type="text" style="display: none;" name="Childs[@i].DisplayName" value="@Model.Childs[i].DisplayName" />*@
+                                            </td>
+                                            <td>
+                                                <div class="d-flex justify-content-center">
+                                                    <button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this)">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
                                                     for (int j = 0; j < Model.Childs[i].Childs.Count; j++)
                                                     {
                                                         if (Model.Childs[i].Childs[j].Childs == null || Model.Childs[i].Childs[j].Childs.Count == 0)
                                                         {
-                                                            <tr class="nested" data-level="2">
-                                                                <td>
-                                                                    <span class="ml-3">@Model.Childs[i].Childs[j].DisplayName</span>
-                                                                    <input type="text" style="display: none;" name="Childs[@i].Childs[j].Id" value="@Model.Childs[i].Childs[j].Id" />
-                                                                    @*<input type="text" style="display: none;" name="Childs[@i].Childs[j].DisplayName" value="@Model.Childs[i].Childs[j].DisplayName" />*@
-                                                                </td>
-                                                                <td>
-                                                                    <div class="d-flex justify-content-center">
-                                                                        <button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this)">
-                                                                            <i class="fa fa-trash"></i>
-                                                                        </button>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
+                                        <tr class="nested" data-level="2">
+                                            <td>
+                                                <span class="ml-3">@Model.Childs[i].Childs[j].DisplayName</span>
+                                                <input type="text" style="display: none;" name="Childs[@i].Childs[j].Id" value="@Model.Childs[i].Childs[j].Id" />
+                                                @*<input type="text" style="display: none;" name="Childs[@i].Childs[j].DisplayName" value="@Model.Childs[i].Childs[j].DisplayName" />*@
+                                            </td>
+                                            <td>
+                                                <div class="d-flex justify-content-center">
+                                                    <button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this)">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
                                                         }
                                                         else
                                                         {
-                                                            <tr class="nested parent" data-level="1">
-                                                                <td>
-                                                                    <span class="ml-3 caret"><span class="badge badge-info mr-1">@Model.Childs[i].Childs[j].Childs.Count</span>@Model.Childs[i].Childs[j].DisplayName</span>
-                                                                    <input type="text" style="display: none;" name="Childs[@i].Childs[@j].Id" value="@Model.Childs[i].Childs[j].Id" />
-                                                                    @*<input type="text" style="display: none;" name="Childs[@i].Childs[@j].DisplayName" value="@Model.Childs[i].Childs[j].DisplayName" />*@
-                                                                </td>
-                                                                <td>
-                                                                    <div class="d-flex justify-content-center">
-                                                                        <button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this)">
-                                                                            <i class="fa fa-trash"></i>
-                                                                        </button>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
+                                        <tr class="nested parent" data-level="1">
+                                            <td>
+                                                <span class="ml-3 caret"><span class="badge badge-info mr-1">@Model.Childs[i].Childs[j].Childs.Count</span>@Model.Childs[i].Childs[j].DisplayName</span>
+                                                <input type="text" style="display: none;" name="Childs[@i].Childs[@j].Id" value="@Model.Childs[i].Childs[j].Id" />
+                                                @*<input type="text" style="display: none;" name="Childs[@i].Childs[@j].DisplayName" value="@Model.Childs[i].Childs[j].DisplayName" />*@
+                                            </td>
+                                            <td>
+                                                <div class="d-flex justify-content-center">
+                                                    <button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this)">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
                                                             for (int k = 0; k < Model.Childs[i].Childs[j].Childs.Count; k++)
                                                             {
-                                                                <tr class="nested" data-level="2">
-                                                                    <td>
-                                                                        <span class="ml-5">@Model.Childs[i].Childs[j].Childs[k].DisplayName</span>
-                                                                        <input type="text" style="display: none;" name="Childs[@i].Childs[@j].Childs[@k].Id" value="@Model.Childs[i].Childs[j].Childs[k].Id" />
-                                                                        @*<input type="text" style="display: none;" name="Childs[@i].Childs[@j].Childs[@k].DisplayName" value="@Model.Childs[i].Childs[j].Childs[k].DisplayName" />*@
-                                                                    </td>
-                                                                    <td>
-                                                                        <div class="d-flex justify-content-center">
-                                                                            <button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this)">
-                                                                                <i class="fa fa-trash"></i>
-                                                                            </button>
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
+                                        <tr class="nested" data-level="2">
+                                            <td>
+                                                <span class="ml-5">@Model.Childs[i].Childs[j].Childs[k].DisplayName</span>
+                                                <input type="text" style="display: none;" name="Childs[@i].Childs[@j].Childs[@k].Id" value="@Model.Childs[i].Childs[j].Childs[k].Id" />
+                                                @*<input type="text" style="display: none;" name="Childs[@i].Childs[@j].Childs[@k].DisplayName" value="@Model.Childs[i].Childs[j].Childs[k].DisplayName" />*@
+                                            </td>
+                                            <td>
+                                                <div class="d-flex justify-content-center">
+                                                    <button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this)">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
                                                             }
                                                         }
                                                     }
@@ -193,6 +193,7 @@
                     <button type="submit" class="btn btn-primary" data-save="modal">Применить</button>
                 </div>
             </form>
+            @Html.Partial("ModalBlock")
         </div>
     </div>
 </div>

@@ -84,25 +84,25 @@
                                             }
                                         </select>
                                     </div>
-                                    <div class="form-group chld-fadable">
-                                        <label asp-for="AssetClassId"></label>
-                                        <select asp-for="AssetClassId" class="form-control" required onchange="GetAssetClassParameters(this)">
-                                            @{
-                                                var classes = O2GEN.Helpers.DBHelper.GetAssetClasses();
-                                                @for (int i = 0; i < classes.Count; i++)
+                                    @*<div class="form-group chld-fadable">
+                                    <label asp-for="AssetClassId"></label>
+                                    <select asp-for="AssetClassId" class="form-control" required onchange="GetAssetClassParameters(this)">
+                                        @{
+                                            var classes = O2GEN.Helpers.DBHelper.GetAssetClasses();
+                                            @for (int i = 0; i < classes.Count; i++)
+                                            {
+                                                if (i == 0)
                                                 {
-                                                    if (i == 0)
-                                                    {
-                                                        <option value="@classes[i].Id" selected>@classes[i].DisplayName</option>
-                                                    }
-                                                    else
-                                                    {
-                                                        <option value="@classes[i].Id">@classes[i].DisplayName</option>
-                                                    }
+                                                    <option value="@classes[i].Id" selected>@classes[i].DisplayName</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@classes[i].Id">@classes[i].DisplayName</option>
                                                 }
                                             }
-                                        </select>
-                                    </div>
+                                        }
+                                    </select>
+                                </div>*@
                                     <div class="form-group chld-fadable">
                                         <label asp-for="ParentId"></label>
                                         <select asp-for="ParentId" class="form-control">
@@ -184,6 +184,7 @@
                     </div>
                 </div>
             </form>
+            @Html.Partial("ModalBlock")
         </div>
     </div>
 </div>

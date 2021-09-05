@@ -7,15 +7,15 @@
                 <div class="modal-header">
                     @if (Model.Id == -1)
                     {
-                        <h5>Новая запись</h5>
+                    <h5>Новая запись</h5>
                     }
                     else
                     {
-                        <h5>Изменить запись №@Model.Id</h5>
+                    <h5>Изменить запись №@Model.Id</h5>
                     }
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 </div>
-                @{ 
+                @{
                     List<Engineer> parameters = new List<Engineer>();
                     if(Model.DepartmentId !=  null)
                     {
@@ -26,18 +26,18 @@
                     <div id="Selected" style="visibility:collapse;">
                         @for (int i = 0; i < Model.Parameters.Count; i++)
                         {
-                            <input id="Parameters[@i]" name="Parameters[@i]" type="hidden" value="@Model.Parameters[i]">
+                        <input id="Parameters[@i]" name="Parameters[@i]" type="hidden" value="@Model.Parameters[i]">
                         }
                     </div>
                     @Html.Hidden("Id", Model.Id)
                     @Html.Hidden("ObjectUID", Model.ObjectUID)
                     <div class="form-row">
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-12">
                             <label asp-for="DisplayName"></label>
                             <input asp-for="DisplayName" class="form-control" required />
                             <span asp-validation-for="DisplayName" class="text-danger"></span>
                         </div>
-                        <div class="form-group col-md-6">
+                        @*<div class="form-group col-md-6">
                             <label asp-for="ResourceTypeId"></label>
                             <select asp-for="ResourceTypeId" class="form-control">
                                 <option value="null" selected disabled>Выбрать</option>
@@ -46,48 +46,48 @@
                     <option value="@item.Id">@item.DisplayName</option>}
                             </select>
                             <span asp-validation-for="ResourceTypeId" class="text-danger"></span>
-                        </div>
+                        </div>*@
                     </div>
-                    <div class="form-group">
-                        <label asp-for="ResourceStateId"></label>
-                        <select asp-for="ResourceStateId" class="form-control" required>
-                            <option value="null" selected disabled>Выбрать</option>
-                            @foreach (ResourceState item in O2GEN.Helpers.DBHelper.GetResourceStates())
-                            {
-                                <option value="@item.Id">@item.DisplayName</option>
-                            }
-                        </select>
-                        <span asp-validation-for="ResourceStateId" class="text-danger"></span>
-                    </div>
+                    @*<div class="form-group">
+                    <label asp-for="ResourceStateId"></label>
+                    <select asp-for="ResourceStateId" class="form-control" required>
+                        <option value="null" selected disabled>Выбрать</option>
+                        @foreach (ResourceState item in O2GEN.Helpers.DBHelper.GetResourceStates())
+                        {
+                            <option value="@item.Id">@item.DisplayName</option>
+                        }
+                    </select>
+                    <span asp-validation-for="ResourceStateId" class="text-danger"></span>
+                </div>*@
 
                     <div class="form-row">
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-12">
                             <label asp-for="DepartmentId"></label>
                             <select asp-for="DepartmentId" class="form-control" required onchange="DeptChanged(this);">
                                 <option value="null" selected disabled>Выбрать</option>
                                 @*При смене подразделения нужно чистить список выбранных, и обновлять пул работников*@
                                 @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments())
                                 {
-                                    <option value="@item.Id">@item.DisplayName</option>
+                                <option value="@item.Id">@item.DisplayName</option>
                                 }
                             </select>
                             <span asp-validation-for="DepartmentId" class="text-danger"></span>
                         </div>
-                        <div class="form-group col-md-6">
-                            <label asp-for="Address"></label>
-                            <input asp-for="Address" class="form-control" />
-                        </div>
+                        @*<div class="form-group col-md-6">
+                        <label asp-for="Address"></label>
+                        <input asp-for="Address" class="form-control" />
+                    </div>*@
                     </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label asp-for="Latitude"></label>
-                            <input asp-for="Latitude" class="form-control" type="number" />
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label asp-for="Longitude"></label>
-                            <input asp-for="Longitude" class="form-control" type="number" />
-                        </div>
+                    @*<div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label asp-for="Latitude"></label>
+                        <input asp-for="Latitude" class="form-control" type="number" />
                     </div>
+                    <div class="form-group col-md-6">
+                        <label asp-for="Longitude"></label>
+                        <input asp-for="Longitude" class="form-control" type="number" />
+                    </div>
+                </div>*@
 
                     <div class="form-row">
                         <div class="form-group col-md-5">
@@ -97,7 +97,7 @@
                                 {
                                     if (!Model.Parameters.Contains(item.Id))
                                     {
-                                        <option value="@item.Id">@item.DisplayName</option>
+                                <option value="@item.Id">@item.DisplayName</option>
                                     }
                                 }
                             </select>
@@ -114,18 +114,19 @@
                                 {
                                     if (Model.Parameters.Contains(item.Id))
                                     {
-                                        <option value="@item.Id">@item.DisplayName</option>
+                                <option value="@item.Id">@item.DisplayName</option>
                                     }
                                 }
                             </select>
                         </div>
                     </div>
                 </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
-                <button type="button" class="btn btn-primary" data-save="modal">Применить</button>
-            </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary" data-save="modal">Применить</button>
+                </div>
             </form>
+            @Html.Partial("ModalBlock")
         </div>
     </div>
 </div>
