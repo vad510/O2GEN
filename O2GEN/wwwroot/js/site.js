@@ -41,88 +41,99 @@ let placeholder = document.getElementById("placeholder");
      const treeViewitems = document.getElementsByClassName("caret");
 
      for (var i = 0; i < treeViewitems.length; i++) {
-         /*if (!treeViewitems[i].querySelector('[data-level="0"]') )*/
-
 
         treeViewitems[i].addEventListener("click", function () {
             this.classList.toggle('caret-down');
             let clickedTr = this.closest('tr');
 
             // find all childs which lvl are greater by 1(one) for clicked row
-            let clickedAttribute = parseInt(clickedTr.dataset.level);
-            let childAttribute = parseInt(clickedTr.dataset.level) + 1;
+            let clickedLevel = parseInt(clickedTr.dataset.level);
+            let allowedLevel = parseInt(clickedTr.dataset.level) + 1;
 
-            console.log("clicked attribute: " + childAttribute);
+            console.log("clicked attribute: " + clickedLevel);
 
             while (clickedTr.nextElementSibling != null) {
                 clickedTr = clickedTr.nextElementSibling;
 
                 let thisTrLevel = parseInt(clickedTr.dataset.level);
 
-                console.log("clicked childAttribute: " + childAttribute + " Compare: " + thisTrLevel);
-                console.log("Next lvl: " + thisTrLevel);
-                console.log("Lvl of childs to show: " + childAttribute);
-                //console.log(parseInt(childAttribute) > parseInt(thisTrLevel));
+                if (thisTrLevel == clickedLevel)
+                    return;
 
-                if (childAttribute == thisTrLevel) {
-                    console.log("Toggled");
+                if (thisTrLevel >= allowedLevel) {
 
-                    // when hide nested elements
+
                     if (clickedTr.classList.contains('active-table')) {
                         clickedTr.classList.remove('active-table');
                         clickedTr.querySelectorAll('.caret-down').forEach(x => x.classList.remove('caret-down'));
-
-                        let head = clickedTr;
-
-                        // for all next elements
-                        while (head.nextElementSibling != null) {
-                            head = head.nextElementSibling;
-
-                            console.log('\n');
-                            console.log('Loop for hide elements');
-
-                            let lvl = parseInt(head.dataset.level);
-                            console.log("Found lvl: " + lvl);
-                            console.log("Clicked element lvl: " + thisTrLevel);
-                            console.log("Clicked element lvl: " + clickedAttribute);
-
-                            if (lvl > clickedAttribute) {
-                                console.log("Found child");
-
-                                head.classList.remove('active-table');
-                                head.querySelectorAll('.caret-down').forEach(x => x.classList.remove('caret-down'));
-                            }
-                            else if (lvl == clickedAttribute)
-                                return;
-                            console.log('\n');
-
-                            //else
-                            //    break;
-                        }
-
-                        break;
                     }
                     else {
                         clickedTr.classList.add('active-table');
                     }
+
                 }
-                else {
 
-                    if (clickedAttribute == thisTrLevel) {
-                        console.log("Breaked cause clicked tr and next tr was same");
-                        break;
-                    }
+                //console.log("clicked childAttribute: " + childAttribute + " Compare: " + thisTrLevel);
+                //console.log("Next lvl: " + thisTrLevel);
+                //console.log("Lvl of childs to show: " + childAttribute);
+                //console.log(parseInt(childAttribute) > parseInt(thisTrLevel));
 
-                    //console.log('\n');
-                    //console.log("Entered another lvl: " + thisTrLevel);
+                //if (childAttribute == thisTrLevel) {
+                //    console.log("Toggled");
 
-                    //if (childAttribute > thisTrLevel) {
-                    //    console.log("clicked level greater");
-                    //    clickedTr.classList.remove('active-table');
-                    //    clickedTr.querySelectorAll('.caret-down').forEach(x => x.classList.remove('caret-down'));
-                    //}
-                    //console.log('\n');
-                }
+                //     //when hide nested elements
+                //    if (clickedTr.classList.contains('active-table')) {
+                //        clickedTr.classList.remove('active-table');
+                //        clickedTr.querySelectorAll('.caret-down').forEach(x => x.classList.remove('caret-down'));
+
+                //        let head = clickedTr;
+
+                //        // for all next elements
+                //        while (head.nextElementSibling != null) {
+                //            head = head.nextElementSibling;
+
+                //            //console.log('\n');
+                //            //console.log('Loop for hide elements');
+
+                //            let lvl = parseInt(head.dataset.level);
+                //            //console.log("Found lvl: " + lvl);
+                //            //console.log("Clicked element lvl: " + thisTrLevel);
+                //            //console.log("Clicked element lvl: " + clickedAttribute);
+
+                //            if (lvl > clickedAttribute) {
+                //                console.log("Found child");
+
+                //                head.classList.remove('active-table');
+                //                head.querySelectorAll('.caret-down').forEach(x => x.classList.remove('caret-down'));
+                //            }
+                //            else if (lvl == clickedAttribute)
+                //                return;
+                //            //console.log('\n');
+                //        }
+
+                //        break;
+                //    }
+                //    else {
+                //        clickedTr.classList.add('active-table');
+                //    }
+                //}
+                //else {
+
+                //    if (clickedAttribute == thisTrLevel) {
+                //        console.log("Breaked cause clicked tr and next tr was same");
+                //        break;
+                //    }
+
+                //    //console.log('\n');
+                //    //console.log("Entered another lvl: " + thisTrLevel);
+
+                //    //if (childAttribute > thisTrLevel) {
+                //    //    console.log("clicked level greater");
+                //    //    clickedTr.classList.remove('active-table');
+                //    //    clickedTr.querySelectorAll('.caret-down').forEach(x => x.classList.remove('caret-down'));
+                //    //}
+                //    //console.log('\n');
+                //}
             }
         });
     }

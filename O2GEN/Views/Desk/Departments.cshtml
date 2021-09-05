@@ -30,7 +30,9 @@
 
             foreach (var item in child.Childs)
             {
-                if (item.Childs != null)
+                Test(item, depth + 1);
+
+                @*if (item.Childs != null)
                 {
                     Test(item, depth + 1);
                 }
@@ -52,7 +54,7 @@
                             </div>
                         </td>
                     </tr>
-                }
+                }*@
             }
         }
         else
