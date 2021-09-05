@@ -37,6 +37,7 @@
 
 let placeholder = document.getElementById("placeholder");
 
+/** Find all elements with 'caret' class and apply listeners for show inner elements. This method requeres 'caret' and 'active-table' classes. Only for HTMLTableElement */
 ﻿function prepareLists() {
      const treeViewitems = document.getElementsByClassName("caret");
 
@@ -62,12 +63,11 @@ let placeholder = document.getElementById("placeholder");
 
                 if (thisTrLevel >= allowedLevel) {
 
-
                     if (clickedTr.classList.contains('active-table')) {
                         clickedTr.classList.remove('active-table');
                         clickedTr.querySelectorAll('.caret-down').forEach(x => x.classList.remove('caret-down'));
                     }
-                    else {
+                    else if (thisTrLevel == allowedLevel) {
                         clickedTr.classList.add('active-table');
                     }
 
@@ -147,7 +147,7 @@ var ready = function (action) {
     console.log("ready created");
 };
 
-// find all buttons which expects to create modal
+/** Find all buttons which have attribute for creating modal */
 ready(function () {
 
     const elems = document.querySelectorAll('[data-toggle="modal-toggler"]');
@@ -161,7 +161,7 @@ ready(function () {
     prepareLists();
 });
 
-// Attempts to create modal
+/** Attempts to create modal into element with Id == placeholder */
 function btnClick() {
     if (document.readyState != "complete")
         return;
@@ -175,7 +175,7 @@ function btnClick() {
 
 };
 
-// xhr for modal data
+/** xhr for bootstrap modal data */
 function getDataWithXmlHttpRequest(url, placeholder) {
     const xhr = new XMLHttpRequest();
     xhr.onloadstart = function (e) {
@@ -218,7 +218,7 @@ function AssetSortFade() {
     }
 }
 
-// create modal
+/** Creates bootstrap modal into giver placeholder. Also adds event listener for OnSave click and performs validation of sended data */
 function tryCreateModal(placeholder, response) {
     placeholder.innerHTML = response;
     const div = placeholder.querySelector(".modal");
@@ -340,7 +340,7 @@ function UnblockModal() {
     }
 }
 
-// validate modal before submit
+/** validate modal on errors before submit */
 function TryValidate(response) {
 
     if (placeholder == null)
@@ -382,7 +382,7 @@ function TryValidate(response) {
     }
 }
 
-// remove modal from screen
+/** remove all bootstrap modals from screen */
 function tryRemoveModals() {
     const modals = document.getElementsByClassName('modal');
 
