@@ -32,7 +32,7 @@ namespace O2GEN.Helpers
         #region Тексты запросов
 
         #region Обходы
-        private static string GetZRP(DateTime From, DateTime To, int[] statuses, string DisplayName, int? DeptId)
+        private static string GetZRP(DateTime From, DateTime To, int[] statuses, string DisplayName, long? DeptId)
         {
             string statusSQL = "";
             if(statuses!= null)
@@ -696,7 +696,7 @@ namespace O2GEN.Helpers
         /// Контроли
         /// </summary>
         /// <returns></returns>
-        private static string SelectControls(int ID = -1, long? AssetParameterTypeId = null, string DisplayName = "")
+        private static string SelectControls(long ID = -1, long? AssetParameterTypeId = null, string DisplayName = "")
         {
             return "SELECT AP.Id, AP.DisplayName, AP.ObjectUID, AP.BottomValue1, AP.TopValue1, AP.BottomValue2, AP.TopValue2, AP.BottomValue3, AP.TopValue3, APT.Id AS AssetParameterTypeId, APT.Name AS ValueTypeName " +
                 "FROM AssetParameters AS AP " +
@@ -820,6 +820,26 @@ namespace O2GEN.Helpers
             return $"SELECT Id, Name " +
                 $"FROM AssetParameterTypes " +
                 $"where IsDeleted <> 1; ";
+        }
+        /// <summary>
+        /// Типы контролей
+        /// </summary>
+        /// <returns></returns>
+        private static string SelectControlStatistic(long? ControlId, DateTime From, DateTime To)
+        {
+            return $"SELECT  APV.Value, isnull(APV.DateTime, APV.ModificationTime) Stamp " +
+                "FROM SchedulingContainers SC " +
+                "LEFT JOIN Tasks T ON T.SchedulingContainerId = SC.Id " +
+                "LEFT JOIN InspectionProtocols IP ON IP.TaskId = T.Id AND IP.IsDeleted <> 1 " +
+                "LEFT JOIN InspectionProtocolItems IPI ON IPI.InspectionProtocolId = IP.Id " +
+                "LEFT JOIN AssetParameterValues APV ON APV.Id = IPI.AssetParameterValueId " +
+                "WHERE SC.SCStatusId = 3 " +
+                "AND SC.IsDeleted <> 1 " +
+                $"AND SC.StartTime >= '{From.ToString("yyyy-MM-dd HH:mm:ss")}' " +
+                $"AND SC.CloseTime <= '{To.ToString("yyyy-MM-dd HH:mm:ss")}' " +
+                "AND APV.Value IS NOT NULL " +
+                $"AND APV.AssetParameterId = {ControlId} " +
+                $"ORDER BY Stamp; ";
         }
         #endregion
 
@@ -2175,11 +2195,23 @@ namespace O2GEN.Helpers
         {
             return $"SELECT ISNULL((SELECT TOP 1 ID FROM PPUsers WHERE Name = N'{Login}' AND IsDeleted <> 1),-1);";
         }
+
+
+        public static string SelectUserData(Credentials data)
+        {
+            return "SELECT e.Id, e.DepartmentId, PPos.DisplayName AppointName, D.DisplayName DepartmentName, P.GivenName, P.MiddleName, P.Surname, Crend.Name " +
+                "FROM PPUsers Crend " +
+                "LEFT JOIN Persons P ON P.UserId = Crend.Id " +
+                "LEFT JOIN Engineers E ON E.PersonId = P.Id " +
+                "LEFT JOIN Departments D ON D.Id = E.DepartmentId " +
+                "LEFT JOIN PersonPositions PPos ON PPos.Id = P.PersonPositionId " +
+                $"where Crend.Name = N'{data.UserName}' AND HASHBYTES('SHA2_256',DECRYPTBYPASSPHRASE(N'{ENCR}', Crend.PWD))  = HASHBYTES('SHA2_256',N'{data.Password}') AND Crend.IsDeleted <> 1; ";
+        }
         #endregion
 
         #region Процедуры получения данных
         #region ЗРП
-        public static List<ZRP> GetZRP(DateTime From, DateTime To, ILogger logger, int[] statuses = null, string DisplayName = "", int? DeptId = null)
+        public static List<ZRP> GetZRP(DateTime From, DateTime To, ILogger logger, int[] statuses = null, string DisplayName = "", long? DeptId = null)
         {
             string con = GetConnectionString();
 
@@ -2782,7 +2814,7 @@ namespace O2GEN.Helpers
             return output;
         }
 
-        public static Control GetControl(int ID, ILogger logger)
+        public static Control GetControl(long ID, ILogger logger)
         {
             string con = GetConnectionString();
 
@@ -2889,6 +2921,47 @@ namespace O2GEN.Helpers
         public static void DeleteControl(int ID, string UserName, ILogger logger)
         {
             ExecuteNonQuery(DeleteControl(ID, UserName), logger);
+        }
+        public static List<ControlStatistic> GetControlStatistic(long? ContolId, DateTime From, DateTime To, ILogger logger = null)
+        {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger?.LogDebug("connection string is null or empty");
+                return null;
+            }
+
+            List<ControlStatistic> output = new List<ControlStatistic>();
+            if (ContolId == null) return output;
+            try
+            {
+                using (var connection = new SqlConnection(con))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectControlStatistic(ContolId, From, To), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output.Add(new ControlStatistic()
+                                {
+                                    y = double.Parse(row["Value"].ToString(), System.Globalization.CultureInfo.InvariantCulture),
+                                    x = DateTimeHelper.TicksFromNETToJS(Convert.ToDateTime(row["Stamp"]).Ticks)
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
         }
         #endregion
 
@@ -4909,6 +4982,56 @@ namespace O2GEN.Helpers
         public static string LoginIsExist(string Login, ILogger logger)
         {
             return ExecuteScalar(LoginIsExist(Login), logger);
+        }
+        #endregion
+
+
+        #region Авторизация
+        public static UserData GetUserData(Credentials data, ILogger logger)
+        {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
+            UserData output = null;
+
+            try
+            {
+                using (var connection = new SqlConnection(con))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectUserData(data), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output = new UserData()
+                                {
+                                    Id = long.Parse(row["Id"].ToString()),
+                                    DeptId = long.Parse(row["DepartmentId"].ToString()),
+                                    AppointName = row["AppointName"].ToString(),
+                                    DepartmentName = row["DepartmentName"].ToString(),
+                                    GivenName = row["GivenName"].ToString(),
+                                    MiddleName = row["MiddleName"].ToString(),
+                                    Surname = row["Surname"].ToString()
+                                };
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
         }
         #endregion
 

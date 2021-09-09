@@ -1,0 +1,204 @@
+﻿@using System.Globalization
+@model O2GEN.Models.ControlTrendsFilter
+@{
+    ViewData["Title"] = "График по данным для контроля";
+}
+<section class="component-section">
+
+    <script src="~/js/canvasjs.min.js"></script>
+    <div class="row-container-left bg-blue">
+        <form action="ControlTrends" method="post">
+            <input asp-for="From" style="display:none" />
+            <input asp-for="To" style="display:none" />
+            <ul class="ul-list-left-aligned">
+                <li class="li-text-white mr-0">
+                    От:
+                </li>
+                <li class="li-text-white ml-0">
+                    <div class="input-group date col-auto" id="datetimepickerFROM" data-target-input="nearest">
+                        <input type="text" class="form-control datetimepicker-input" data-target="#datetimepickerFROM" id="DTPFROM" style="width:150px;" />
+                        <div class="input-group-append" data-target="#datetimepickerFROM" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                        </div>
+                    </div>
+                </li>
+                <li class="li-text-white mr-0">
+                    До:
+                </li>
+                <li class="li-text-white ml-0">
+                    <div class="input-group date col-auto" id="datetimepickerTO" data-target-input="nearest">
+                        <input type="text" class="form-control datetimepicker-input" data-target="#datetimepickerTO" id="DTPTO" style="width:150px;" />
+                        <div class="input-group-append" data-target="#datetimepickerTO" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="li-text-white" style="width:300px">
+                    <select asp-for="ControlId" class="form-control" required>
+                        @foreach (Control item in O2GEN.Helpers.DBHelper.GetControls())
+                        {
+                            if (item.AssetParameterTypeId == 2) continue;
+                            <option value="@item.Id">@item.DisplayName</option>
+                        }
+                    </select>
+                </li>
+                <li class="li-text-white">
+                    <button class="btn btn-light" type="submit">
+                        <i class="fa fa-search"></i> Поиск
+                    </button>
+                </li>
+            </ul>
+        </form>
+    </div>
+
+    <div class="margin-between-above">
+        <div id="chartContainer" style="height: 100%; width: 100%;"></div>
+    </div>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            InitializeDatePicker();
+            //$.noConflict();
+            //$('#SetToday').click('click', SetTodayForTDTs);
+        });
+        function InitializeDatePicker() {
+
+            @if (string.IsNullOrEmpty(Model.From))
+            {
+            <text>
+                var d = new Date(moment().subtract(2, 'days'));
+                var now = new Date(moment());
+            </text>
+            }
+            else
+            {
+                <text>
+                    var d = new Date(@Model.From);
+                    var now = new Date(@Model.To);
+                </text>
+            }
+            $('#datetimepickerFROM').datetimepicker({
+                locale: 'ru',
+                icons: {
+                    time: "fa fa-clock",
+                    date: "fa fa-calendar-alt",
+                    up: "fa fa-arrow-up",
+                    down: "fa fa-arrow-down"
+                }
+            });
+
+            $('#datetimepickerFROM').on("change.datetimepicker", ({ date }) => { $('#From').val(date._d.getTime()); });
+            $('#datetimepickerFROM').datetimepicker('date', new Date(d.getFullYear(), d.getMonth(), d.getDate()));
+
+            $('#datetimepickerTO').datetimepicker({
+                locale: 'ru',
+                icons: {
+                    time: "fa fa-clock",
+                    date: "fa fa-calendar-alt",
+                    up: "fa fa-arrow-up",
+                    down: "fa fa-arrow-down"
+                }
+                });
+            $("#datetimepickerTO").on("change.datetimepicker", ({ date }) => { $('#To').val(date._d.getTime()); });
+            $('#datetimepickerTO').datetimepicker('date', now);
+        }
+        @if(ViewBag.Data!= null && ViewBag.Control.ValueBottom1!="")
+        {
+            <text>
+                window.onload = function () {
+                    var chart = new CanvasJS.Chart("chartContainer", {
+	                    theme: "light2",
+	                    animationEnabled: true,
+	                    title: {
+                            text: "@Html.Raw(ViewBag.Control.DisplayName)"
+	                    },
+	                    axisY: {
+                            maximum: @ViewBag.Maximum.ToString().Replace(",", "."),
+                            minimum: @ViewBag.Minimum.ToString().Replace(",", "."),
+		                    includeZero: true,
+                            gridThickness: 0,
+                            stripLines: [
+                                {
+                                    @if(double.Parse(ViewBag.Control.ValueBottom1, CultureInfo.InvariantCulture) < double.Parse(ViewBag.Control.ValueTop1, CultureInfo.InvariantCulture))
+                                    {
+                                        <text>
+                                        startValue: @ViewBag.Control.ValueBottom1,
+                                        endValue: @ViewBag.Control.ValueTop1,
+                                        </text>
+                                    }else
+                                    {
+                                        <text>
+                                        endValue: @ViewBag.Control.ValueBottom1,
+                                        startValue: @ViewBag.Control.ValueTop1,
+                                        </text>
+                                    }
+                                    color: "#9fffa1",
+                                    label: "Норма",
+                                    labelFontColor: "#c4c4c4",
+                                },
+                                {
+                                    @if(double.Parse(ViewBag.Control.ValueBottom2, CultureInfo.InvariantCulture) < double.Parse(ViewBag.Control.ValueTop2, CultureInfo.InvariantCulture))
+                                    {
+                                        <text>
+                                        startValue: @ViewBag.Control.ValueBottom2,
+                                        endValue: @ViewBag.Control.ValueTop2,
+                                        </text>
+                                    }else
+                                    {
+                                        <text>
+                                        endValue: @ViewBag.Control.ValueBottom2,
+                                        startValue: @ViewBag.Control.ValueTop2,
+                                        </text>
+                                    }
+                                    color: "#fffb9e",
+                                    label: "Отклонение",
+                                    labelFontColor: "#c4c4c4",
+                                },
+                                {
+                                    @if(double.Parse(ViewBag.Control.ValueBottom3, CultureInfo.InvariantCulture) < double.Parse(ViewBag.Control.ValueTop3, CultureInfo.InvariantCulture))
+                                    {
+                                        <text>
+                                        startValue: @ViewBag.Control.ValueBottom3,
+                                        endValue: @ViewBag.Control.ValueTop3,
+                                        </text>
+                                    }else
+                                    {
+                                        <text>
+                                        endValue: @ViewBag.Control.ValueBottom3,
+                                        startValue: @ViewBag.Control.ValueTop3,
+                                        </text>
+                                    }
+                                    color: "#ff9e9e",
+                                    label: "Сильное отклонение",
+                                    labelFontColor: "#c4c4c4",
+                                }
+                            ]
+	                    },
+	                    toolTip: {
+		                    shared: true
+	                    },
+                        data: [{
+                            type: "spline",
+                            color: "#333",
+                            xValueType: "dateTime",
+                            xValueFormatString: "DD.MM.YYYY HH:mm",
+                            dataPoints: [
+                                @for (int i = 0; i < ViewBag.Data.Count; i++)
+                                {
+                                    if (i > 0)
+                                    {
+                                        <text>,</text>
+                                    }
+                                    <text>{ x: @ViewBag.Data[i].x.ToString().Replace(",", "."), y: @ViewBag.Data[i].y.ToString().Replace(",",".") }</text>
+                                }
+                            ]
+	                    }]
+                    });
+                    chart.render();
+                }
+            </text>
+        }
+    </script>
+</section>

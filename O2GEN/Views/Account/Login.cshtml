@@ -1,35 +1,62 @@
-﻿@model O2GEN.ViewModels.LoginViewModel
+﻿@model O2GEN.Models.Credentials
 
 @{
     Layout = "_Layout_NULL";
 }
 
+@{ ViewData["Title"] = "Вход"; }
 
-
-<div class="d-flex align-items-center flex-column justify-content-center h-100" id="header">
-
-
+<div class="container" style="height: 100%; display: flex; justify-content: center; align-items: center;">
+    <div class="jumbotron pt-5 pb-5">
+        <img src="/img/694046.png" class="mb-3" />
+        <h2>Добро пожаловать в СМИК</h2>
+        <h2>(Системы Мобильных Инспекций и Контроля)</h2>
+        <hr class="my-4">
+        <p>Для начала работы Необходимо войти в систему.</p>
+        <form method="post" action="Login">
+            <div class="form-group">
+                <label asp-for="UserName"> Логин</label><br />
+                <input asp-for="UserName" class="form-control" />
+                @if (ViewBag.LoginException != null)
+                {
+                    <span>@ViewBag.LoginException</span>
+                }
+            </div>
+            <div class="form-group">
+                <label asp-for="Password"> Пароль</label><br />
+                <input asp-for="Password" type="password" class="form-control" />
+                @if (ViewBag.PasswordException != null)
+                {
+                    <label class="small mt-2" style="color: red">@ViewBag.PasswordException</label>
+                }
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Войти" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+@*<div class="d-flex align-items-center flex-column justify-content-center h-100" id="header">
     <div>
-
         <img src="~/O2gen-Page-2.png" class="img-fluid" />
         <div>
             <h2>Вход в приложение</h2>
-            <form method="post" asp-controller="Account" asp-action="Login"
-                  asp-route-returnUrl="@Model.ReturnUrl">
-                <div asp-validation-summary="ModelOnly"></div>
+            <form method="post" action="Login">
                 <div>
-                    <label asp-for="Email"> Логин</label><br />
-                    <input asp-for="Email" class="form-control"  />
-                    <span asp-validation-for="Email"></span>
+                    <label asp-for="UserName"> Логин</label><br />
+                    <input asp-for="UserName" class="form-control" />
+                    @if (ViewBag.LoginException != null)
+                    {
+                        <span>@ViewBag.LoginException</span>
+                    }
                 </div>
                 <div>
                     <label asp-for="Password"> Пароль</label><br />
-                    <input asp-for="Password" class="form-control"  />
-                    <span asp-validation-for="Password"></span>
-                </div>
-                <div>
-                    <label asp-for="RememberMe"></label><br />
-                    <input asp-for="RememberMe"  />
+                    <input asp-for="Password" type="password" class="form-control" />
+                    @if (ViewBag.PasswordException != null)
+                    {
+                        <span>@ViewBag.PasswordException</span>
+                    }
                 </div>
                 <div>
                     <input type="submit" value="Войти" class="btn btn-secondary btn-lg btn-block" />
@@ -37,4 +64,4 @@
             </form>
         </div>
     </div>
-</div>
+</div>*@

@@ -76,7 +76,7 @@
             </div>
 
             <ul class="list-unstyled components">
-                @*<p>@User.Identity.Name</p>*@
+                @*<p>@((Credentials)HttpContext.Items["User"]).UserName</p>*@
                 <li class="active">
                     <a asp-action="Index" asp-controller="Home">Главная страница</a>
                 </li>
@@ -95,6 +95,9 @@
                         <li>
                             <a asp-controller="Home" asp-action="DefectsReport">Дефекты</a>
                         </li>
+                        @*<li>
+                            <a asp-controller="Home" asp-action="ControlTrends">График по контролям</a>
+                        </li>*@
                     </ul>
                 </li>
                 <li>
@@ -144,8 +147,8 @@
                         </li>
                         @*Убрано до выяснения надобности*@
                         @*<li>
-                                <a asp-controller="Desk" asp-action="TOTypes">Типы ТО</a>
-                            </li>*@
+                            <a asp-controller="Desk" asp-action="TOTypes">Типы ТО</a>
+                        </li>*@
                     </ul>
                 </li>
 
@@ -181,6 +184,9 @@
                         <ul class="ul-list-right-aligned">
                             <li class="text-white">
                                 <a class="navbar-brand">СМИК</a>
+                            </li>
+                            <li>
+                                <a asp-controller="Account" asp-action="Logout" class="btn btn-outline-danger">Выход</a>
                             </li>
                         </ul>
                     </div>

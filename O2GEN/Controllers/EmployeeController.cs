@@ -57,7 +57,7 @@ namespace O2GEN.Controllers
         {
             string DepartmentIdData = Request.Cookies["engdid"];
             int Dept = 0;
-            int.TryParse(DepartmentIdData, out Dept);
+            if (!int.TryParse(DepartmentIdData, out Dept)) Dept = (int)((Credentials)HttpContext.Items["User"]).DeptId;
             if (Dept == 0)
             {
                 var d = Helpers.DBHelper.GetChildDepartments();
@@ -98,15 +98,15 @@ namespace O2GEN.Controllers
                 return PartialView("EngineerEdit", Model);
             }
             if (Model.Id == -1)
-                Helpers.DBHelper.CreateEngineer(Model, User.Identity.Name, _logger);
+                Helpers.DBHelper.CreateEngineer(Model, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             else
-                Helpers.DBHelper.UpdateEngineer(Model, User.Identity.Name, _logger);
+                Helpers.DBHelper.UpdateEngineer(Model, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             return RedirectToAction("Engineers");
         }
         [HttpGet]
         public IActionResult EngineerDelete(int Id)
         {
-            Helpers.DBHelper.DeleteEngineer(Id, User.Identity.Name, _logger);
+            Helpers.DBHelper.DeleteEngineer(Id, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             return RedirectToAction("Engineers");
         }
 
@@ -125,7 +125,7 @@ namespace O2GEN.Controllers
         {
             string DepartmentIdData = Request.Cookies["resdid"];
             int Dept = 0;
-            int.TryParse(DepartmentIdData, out Dept);
+            if (!int.TryParse(DepartmentIdData, out Dept)) Dept = (int)((Credentials)HttpContext.Items["User"]).DeptId;
             if (Dept == 0)
             {
                 var d = Helpers.DBHelper.GetChildDepartments();
@@ -162,15 +162,15 @@ namespace O2GEN.Controllers
         public IActionResult ResourceUpdate(Resource Model)
         {
             if (Model.Id == -1)
-                Helpers.DBHelper.CreateResource(Model, User.Identity.Name, _logger);
+                Helpers.DBHelper.CreateResource(Model, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             else
-                Helpers.DBHelper.UpdateResource(Model, User.Identity.Name, _logger);
+                Helpers.DBHelper.UpdateResource(Model, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             return RedirectToAction("Resources");
         }
         [HttpGet]
         public IActionResult ResourceDelete(int id)
         {
-            Helpers.DBHelper.DeleteResource(id, User.Identity.Name, _logger);
+            Helpers.DBHelper.DeleteResource(id, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             return RedirectToAction("Resources");
         }
 

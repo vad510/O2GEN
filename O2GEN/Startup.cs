@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using O2GEN.Models;
+using O2GEN.Authorization;
 
 namespace O2GEN
 {
@@ -27,11 +28,15 @@ namespace O2GEN
 
                 services.AddControllersWithViews();
 
+                services.AddMemoryCache();
+                services.AddSession();
+
             // todo cookies for default login path
-            }
+        }
 
             public void Configure(IApplicationBuilder app)
             {
+                app.UseSession();
                 DefaultFilesOptions defaultFilesOptions = new DefaultFilesOptions();
                 defaultFilesOptions.DefaultFileNames.Clear();
                 defaultFilesOptions.DefaultFileNames.Add("index.html");
@@ -43,8 +48,7 @@ namespace O2GEN
 
                 app.UseRouting();
 
-                app.UseAuthentication();    // подключение аутентификации
-                app.UseAuthorization();
+                app.UseMiddleware<JwtMiddleware>();
 
                 app.UseEndpoints(endpoints =>
                 {
@@ -52,6 +56,6 @@ namespace O2GEN
                         name: "default",
                         pattern: "{controller=Home}/{action=Index}/{id?}");
                 });
-            }
+        }
         }
     }

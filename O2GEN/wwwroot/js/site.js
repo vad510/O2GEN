@@ -38,10 +38,10 @@
 let placeholder = document.getElementById("placeholder");
 
 /** Find all elements with 'caret' class and apply listeners for show inner elements. This method requeres 'caret' and 'active-table' classes. Only for HTMLTableElement */
-﻿function prepareLists() {
-     const treeViewitems = document.getElementsByClassName("caret");
+function prepareLists() {
+    const treeViewitems = document.getElementsByClassName("caret");
 
-     for (var i = 0; i < treeViewitems.length; i++) {
+    for (var i = 0; i < treeViewitems.length; i++) {
 
         treeViewitems[i].addEventListener("click", function () {
             this.classList.toggle('caret-down');
@@ -88,6 +88,7 @@ let placeholder = document.getElementById("placeholder");
                     }
                 }
             }
+        });
     }
 }
 
@@ -98,10 +99,10 @@ function expandNestedChilds(allowedLevelToExpand, element, elementLevel) {
 
     let localLevel = parseInt(element.dataset.level);
 
-    console.log("allowedLevelToExpand " + allowedLevelToExpand);
-    console.log("elementLevel " + elementLevel);
-    console.log("localLevel " + localLevel);
-    console.log('\n');
+    //console.log("allowedLevelToExpand " + allowedLevelToExpand);
+    //console.log("elementLevel " + elementLevel);
+    //console.log("localLevel " + localLevel);
+    //console.log('\n');
 
     if (localLevel == allowedLevelToExpand) {
         return;
@@ -127,7 +128,7 @@ var ready = function (action) {
         action();
     else
         document.addEventListener("DOMContentLoaded", action);
-    console.log("ready created");
+    //console.log("ready created");
 };
 
 /** Find all buttons which have attribute for creating modal */
@@ -136,7 +137,7 @@ ready(function () {
     const elems = document.querySelectorAll('[data-toggle="modal-toggler"]');
 
     for (var i = 0; i < elems.length; i++) {
-        console.log("buttons founded: " + i);
+        //console.log("buttons founded: " + i);
         elems[i].addEventListener('click', btnClick);
     }
 
@@ -167,7 +168,7 @@ function getDataWithXmlHttpRequest(url, placeholder) {
         tryCreateModal(placeholder, xhr.response);
     };
     xhr.onerror = function (e) {
-        console.log(e);
+        //console.log(e);
     };
     xhr.open('get', url);
     xhr.send();
@@ -246,7 +247,7 @@ function tryCreateModal(placeholder, response) {
                 $('#logform').fadeIn();
             }
             else {
-                console.log(234);
+                //console.log(234);
                 $('#logform').fadeOut();
                 $('#Password').val('');
                 $('#ConfirmPassword').val('');
@@ -297,12 +298,15 @@ function tryCreateModal(placeholder, response) {
 
         const xhr = new XMLHttpRequest();
 
-        console.log(123);
-        //BlockModal();
+        //console.log(123);
+        BlockModal();
         xhr.onload = function (e) {
             TryValidate(xhr.response);
-            //UnblockModal();
-            console.log(234);
+            UnblockModal();
+            //console.log(234);
+        }
+        xhr.onerror = function (e) {
+            UnblockModal();
         }
 
         xhr.open('post', url);
@@ -342,12 +346,12 @@ function TryValidate(response) {
         const modal = placeholder.querySelector('.modal');
 
         if (modal != null) {
-            console.log("Found existing modal");
+            //console.log("Found existing modal");
 
             tryRemoveModals();
         }
 
-        console.log("No body of modal for placeholder is found");
+        //console.log("No body of modal for placeholder is found");
         return;
     }
 
@@ -356,10 +360,10 @@ function TryValidate(response) {
     const errors = placeholder.querySelectorAll(".field-validation-error");
 
     if (errors.length > 0) {
-        console.log("we have errors");
+        //console.log("we have errors");
     }
     else {
-        console.log("no errors");
+        //console.log("no errors");
         tryRemoveModals();
         window.location.reload(true);
     }

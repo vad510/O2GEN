@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using O2GEN.Models;
-using O2GEN.Models.DeskModels;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace O2GEN.Controllers
 {
@@ -21,7 +19,7 @@ namespace O2GEN.Controllers
         {
             string DepartmentIdData = Request.Cookies["odid"];
             int Dept = 0;
-            int.TryParse(DepartmentIdData, out Dept);
+            if (!int.TryParse(DepartmentIdData, out Dept)) Dept = (int)((Credentials)HttpContext.Items["User"]).DeptId;
             if (Dept == 0)
             {
                 var d = Helpers.DBHelper.GetChildDepartments();
@@ -60,15 +58,15 @@ namespace O2GEN.Controllers
         public IActionResult ObjectUpdate(Asset Model)
         {
             if (Model.Id == -1)
-                Helpers.DBHelper.CreateAsset(Model, User.Identity.Name, _logger);
+                Helpers.DBHelper.CreateAsset(Model, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             else
-                Helpers.DBHelper.UpdateAsset(Model, User.Identity.Name, _logger);
+                Helpers.DBHelper.UpdateAsset(Model, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             return RedirectToAction("Objects");
         }
         [HttpGet]
         public IActionResult ObjectDelete(int Id)
         {
-            Helpers.DBHelper.DeleteAsset(Id, User.Identity.Name, _logger);
+            Helpers.DBHelper.DeleteAsset(Id, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             return RedirectToAction("Objects");
         }
 
@@ -96,15 +94,15 @@ namespace O2GEN.Controllers
         public IActionResult EmployeeCategoryUpdate(PersonCategory Model)
         {
             if (Model.Id == -1)
-                Helpers.DBHelper.CreatePersonCategory(Model, User.Identity.Name, _logger);
+                Helpers.DBHelper.CreatePersonCategory(Model, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             else
-                Helpers.DBHelper.UpdatePersonCategory(Model, User.Identity.Name, _logger);
+                Helpers.DBHelper.UpdatePersonCategory(Model, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             return RedirectToAction("EmployeeCategory");
         }
         [HttpGet]
         public IActionResult EmployeeCategoryDelete(int Id)
         {
-            Helpers.DBHelper.DeletePersonCategory(Id, User.Identity.Name, _logger);
+            Helpers.DBHelper.DeletePersonCategory(Id, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             return RedirectToAction("EmployeeCategory");
         }
 
@@ -131,18 +129,18 @@ namespace O2GEN.Controllers
         {
             if (Model.Id == -1)
             {
-                Helpers.DBHelper.CreatePersonPosition(Model, User.Identity.Name, _logger);
+                Helpers.DBHelper.CreatePersonPosition(Model, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             }
             else
             {
-                Helpers.DBHelper.UpdatePersonPosition(Model, User.Identity.Name, _logger);
+                Helpers.DBHelper.UpdatePersonPosition(Model, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             }
             return RedirectToAction("EmployeePosition");
         }
         [HttpGet]
         public IActionResult EmployeePositionDelete(int Id)
         {
-            Helpers.DBHelper.DeletePersonPosition(Id, User.Identity.Name, _logger);
+            Helpers.DBHelper.DeletePersonPosition(Id, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             return RedirectToAction("EmployeePosition");
         }
 
@@ -184,16 +182,16 @@ namespace O2GEN.Controllers
         public IActionResult ObjectClassUpdate(AssetClass Model)
         {
             if (Model.Id == -1)
-                Helpers.DBHelper.CreateAssetClass(Model, User.Identity.Name, _logger);
+                Helpers.DBHelper.CreateAssetClass(Model, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             else
-                Helpers.DBHelper.UpdateAssetClass(Model, User.Identity.Name, _logger);
+                Helpers.DBHelper.UpdateAssetClass(Model, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             return RedirectToAction("ObjectClass");
         }
 
         [HttpGet]
         public IActionResult ObjectClassDelete(int Id)
         {
-            Helpers.DBHelper.DeleteAssetClass(Id, User.Identity.Name, _logger);
+            Helpers.DBHelper.DeleteAssetClass(Id, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             return RedirectToAction("ObjectClass");
         }
 
@@ -204,7 +202,8 @@ namespace O2GEN.Controllers
         {
             string DepartmentIdData = Request.Cookies["rdid"];
             int Dept = 0;
-            int.TryParse(DepartmentIdData, out Dept);
+
+            if (!int.TryParse(DepartmentIdData, out Dept)) Dept = (int)((Credentials)HttpContext.Items["User"]).DeptId;
             if (Dept == 0)
             {
                 var d = Helpers.DBHelper.GetChildDepartments();
@@ -240,16 +239,16 @@ namespace O2GEN.Controllers
         public IActionResult RouteUpdate(AssetParameterSet Model)
         {
             if (Model.Id == -1)
-                Helpers.DBHelper.CreateAssetParameterSet(Model, User.Identity.Name, _logger);
+                Helpers.DBHelper.CreateAssetParameterSet(Model, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             else
-                Helpers.DBHelper.UpdateAssetParameterSet(Model, User.Identity.Name, _logger);
+                Helpers.DBHelper.UpdateAssetParameterSet(Model, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             return RedirectToAction("Route");
         }
 
         [HttpGet]
         public IActionResult RouteDelete(int Id)
         {
-            Helpers.DBHelper.DeleteAssetParameterSet(Id, User.Identity.Name, _logger);
+            Helpers.DBHelper.DeleteAssetParameterSet(Id, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             return RedirectToAction("Route");
         }
 
@@ -304,11 +303,11 @@ namespace O2GEN.Controllers
 
             if (Model.Id == -1)
             {
-                Helpers.DBHelper.CreateControl(Model, User.Identity.Name, _logger);
+                Helpers.DBHelper.CreateControl(Model, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             }
             else
             {
-                Helpers.DBHelper.UpdateControl(Model, User.Identity.Name, _logger);
+                Helpers.DBHelper.UpdateControl(Model, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             }
             return RedirectToAction("Controls");
         }
@@ -316,7 +315,7 @@ namespace O2GEN.Controllers
         [HttpGet]
         public IActionResult ControlDelete(int Id)
         {
-            Helpers.DBHelper.DeleteControl(Id, User.Identity.Name, _logger);
+            Helpers.DBHelper.DeleteControl(Id, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             return RedirectToAction("Controls");
         }
 
@@ -370,16 +369,16 @@ namespace O2GEN.Controllers
         public IActionResult DepartmentUpdate(Department Model)
         {
             if (Model.Id == -1)
-                Helpers.DBHelper.CreateDepartment(Model, User.Identity.Name, _logger);
+                Helpers.DBHelper.CreateDepartment(Model, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             else
-                Helpers.DBHelper.UpdateDepartment(Model, User.Identity.Name, _logger);
+                Helpers.DBHelper.UpdateDepartment(Model, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             return RedirectToAction("Departments");
         }
 
         [HttpGet]
         public IActionResult DepartmentDelete(int Id)
         {
-            Helpers.DBHelper.DeleteDepartment(Id, User.Identity.Name, _logger);
+            Helpers.DBHelper.DeleteDepartment(Id, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             return RedirectToAction("Departments");
         }
 

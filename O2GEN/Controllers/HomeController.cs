@@ -1,32 +1,26 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using O2GEN.Authorization;
 using O2GEN.Models;
 using O2GEN.Models.HomeModels;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace O2GEN.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private ZprTakenModels zpr;
-        private ControlValueReportListModel _controlValueReports;
-        private ReportOnViewedTechPositionList _reportOnViewedTechPositionList;  
-        private ReportOnViewedTechPositionList _report;
-        private DefectReportListModel _defectReport;
-
-        public ReportModel ReportModel { get; set; }
 
 
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
-
-            GenerateMock();
           
         }
 
@@ -42,34 +36,34 @@ namespace O2GEN.Controllers
 
             long FromL = 0;
             long ToL = 0;
-            int Did = 0;
+            long Did = 0;
             if (string.IsNullOrEmpty(FROMData) || !long.TryParse(FROMData, out FromL)) 
             {
-                FROMData = Helpers.HandlingHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(-2).Ticks).ToString();
+                FROMData = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(-2).Ticks).ToString();
             }
             if (string.IsNullOrEmpty(TOData) || !long.TryParse(TOData, out ToL))
             {
-                TOData = Helpers.HandlingHelper.TicksFromNETToJS(DateTime.Now.Ticks).ToString();
+                TOData = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Ticks).ToString();
             }
-            int.TryParse(DepartmentIdData, out Did);
-            DateTime From = new DateTime().AddTicks(Helpers.HandlingHelper.TicksFromJSToNET(long.Parse(FROMData)));
-            DateTime To = new DateTime().AddTicks(Helpers.HandlingHelper.TicksFromJSToNET(long.Parse(TOData)));
+            if(!long.TryParse(DepartmentIdData, out Did)) Did = ((Credentials)HttpContext.Items["User"]).DeptId;
+            DateTime From = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(FROMData)));
+            DateTime To = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(TOData)));
 
             //ViewBag.ZRPCreated = Helpers.DBHelper.GetZRP(From, To, _logger, (int)Helpers.ZRPStatus.Created, (Did == 0 ? null : Did));
             ViewBag.ZRPInWork = Helpers.DBHelper.GetZRP(From, To, _logger, new int[] { (int)Helpers.ZRPStatus.Started, (int)Helpers.ZRPStatus.Created }, DisplayName, (Did == 0 ? null : Did));
             ViewBag.ZRPDone = Helpers.DBHelper.GetZRP(From, To, _logger, new int[] { (int)Helpers.ZRPStatus.Ended, (int)Helpers.ZRPStatus.Stoped }, DisplayName, (Did == 0 ? null : Did));
             Response.Cookies.Append("zrpfrom", FROMData);
             Response.Cookies.Append("zrpto", TOData);
-            Response.Cookies.Append("zrpdid", string.IsNullOrEmpty(DepartmentIdData)?"": DepartmentIdData);
+            Response.Cookies.Append("zrpdid", string.IsNullOrEmpty(DepartmentIdData)?"" : DepartmentIdData);
             Response.Cookies.Append("zrpn", (string.IsNullOrEmpty(DisplayName) ? "" : DisplayName));
-            return View(new ZRPFilter() { From = Helpers.HandlingHelper.TicksFromNETToJS(From.Ticks).ToString(), To = Helpers.HandlingHelper.TicksFromNETToJS(To.Ticks).ToString(), DepartmentId = (Did == 0 ? null : Did), DisplayName = DisplayName });
+            return View(new ZRPFilter() { From = Helpers.DateTimeHelper.TicksFromNETToJS(From.Ticks).ToString(), To = Helpers.DateTimeHelper.TicksFromNETToJS(To.Ticks).ToString(), DepartmentId = (Did == 0 ? null : Did), DisplayName = DisplayName });
         }
         [Route("Home/Index")]
         [HttpPost]
         public IActionResult Index(ZRPFilter Model)
         {
-            DateTime From = new DateTime().AddTicks(Helpers.HandlingHelper.TicksFromJSToNET(long.Parse(Model.From)));
-            DateTime To = new DateTime().AddTicks(Helpers.HandlingHelper.TicksFromJSToNET(long.Parse(Model.To)));
+            DateTime From = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.From)));
+            DateTime To = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.To)));
             //ViewBag.ZRPCreated = Helpers.DBHelper.GetZRP(From, To, _logger, (int)Helpers.ZRPStatus.Created, Model.DepartmentId);
             ViewBag.ZRPInWork = Helpers.DBHelper.GetZRP(From, To, _logger, new int[] { (int)Helpers.ZRPStatus.Started, (int)Helpers.ZRPStatus.Created }, Model.DisplayName, Model.DepartmentId);
             ViewBag.ZRPDone = Helpers.DBHelper.GetZRP(From, To, _logger, new int[] { (int)Helpers.ZRPStatus.Ended, (int)Helpers.ZRPStatus.Stoped }, Model.DisplayName, Model.DepartmentId);
@@ -91,7 +85,7 @@ namespace O2GEN.Controllers
         [HttpGet]
         public IActionResult ZRPEdit(int id)
         {
-            var res = Helpers.DBHelper.GetZRP(id, User.Identity.Name, _logger);
+            var res = Helpers.DBHelper.GetZRP(id, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             if (res != null)
                 return PartialView("ZRPEdit", res);
             return View();
@@ -105,16 +99,16 @@ namespace O2GEN.Controllers
             }
             if (Model.Id == -1)
             {
-                Helpers.DBHelper.CreateZRP(Model, User.Identity.Name, _logger);
+                Helpers.DBHelper.CreateZRP(Model, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             }
             else
-                Helpers.DBHelper.UpdateZRP(Model, User.Identity.Name, _logger);
+                Helpers.DBHelper.UpdateZRP(Model, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             return RedirectToAction("Index");
         }
         [HttpGet]
         public IActionResult ZRPDelete(int Id)
         {
-            Helpers.DBHelper.DeleteZRP(Id, User.Identity.Name, _logger);
+            Helpers.DBHelper.DeleteZRP(Id, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
             return RedirectToAction("Index", "Home");
         }
 
@@ -135,17 +129,17 @@ namespace O2GEN.Controllers
             int APIdParsed = 0;
             if (string.IsNullOrEmpty(FROMData) || !long.TryParse(FROMData, out FROMParsed))
             {
-                FROMData = Helpers.HandlingHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(-2).Ticks).ToString();
+                FROMData = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(-2).Ticks).ToString();
             }
             if (string.IsNullOrEmpty(TOData) || !long.TryParse(TOData, out TOParsed))
             {
-                TOData = Helpers.HandlingHelper.TicksFromNETToJS(DateTime.Now.Ticks).ToString();
+                TOData = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Ticks).ToString();
             }
-            int.TryParse(DIdData, out DIdParsed);
+            if (!int.TryParse(DIdData, out DIdParsed)) DIdParsed = (int)((Credentials)HttpContext.Items["User"]).DeptId;
             int.TryParse(APSIdData, out APSIdParsed);
             int.TryParse(APIdData, out APIdParsed);
-            DateTime From = new DateTime().AddTicks(Helpers.HandlingHelper.TicksFromJSToNET(long.Parse(FROMData)));
-            DateTime To = new DateTime().AddTicks(Helpers.HandlingHelper.TicksFromJSToNET(long.Parse(TOData)));
+            DateTime From = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(FROMData)));
+            DateTime To = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(TOData)));
 
             ViewBag.Data = null;
             Response.Cookies.Append("RepCVFrom", FROMData);
@@ -155,8 +149,8 @@ namespace O2GEN.Controllers
             Response.Cookies.Append("RepCVAPId", string.IsNullOrEmpty(APIdData) ? "" : APIdData);
             return View(new ControlValueReportFilter()
             {
-                From = Helpers.HandlingHelper.TicksFromNETToJS(From.Ticks).ToString(),
-                To = Helpers.HandlingHelper.TicksFromNETToJS(To.Ticks).ToString(),
+                From = Helpers.DateTimeHelper.TicksFromNETToJS(From.Ticks).ToString(),
+                To = Helpers.DateTimeHelper.TicksFromNETToJS(To.Ticks).ToString(),
                 DepartmentId = (DIdParsed == 0 ? null : DIdParsed),
                 AssetParameterSetId = (APSIdParsed == 0 ? null : APSIdParsed),
                 AssetId = (APIdParsed == 0 ? null : APIdParsed)
@@ -166,8 +160,8 @@ namespace O2GEN.Controllers
         [HttpPost]
         public IActionResult ControlValueReports(ControlValueReportFilter Model)
         {
-            DateTime From = new DateTime().AddTicks(Helpers.HandlingHelper.TicksFromJSToNET(long.Parse(Model.From)));
-            DateTime To = new DateTime().AddTicks(Helpers.HandlingHelper.TicksFromJSToNET(long.Parse(Model.To)));
+            DateTime From = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.From)));
+            DateTime To = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.To)));
             ViewBag.Data = Helpers.DBHelper.GetCVR(From, To, (long)Model.DepartmentId, (long)Model.AssetId, logger: _logger);
 
             Response.Cookies.Append("RepCVFrom", Model.From);
@@ -193,24 +187,24 @@ namespace O2GEN.Controllers
             long TO2Parsed = 0;
             if (string.IsNullOrEmpty(FROM1Data) || !long.TryParse(FROM1Data, out FROM1Parsed))
             {
-                FROM1Data = Helpers.HandlingHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(-2).Ticks).ToString();
+                FROM1Data = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(-2).Ticks).ToString();
             }
             if (string.IsNullOrEmpty(TO1Data) || !long.TryParse(TO1Data, out TO1Parsed))
             {
-                TO1Data = Helpers.HandlingHelper.TicksFromNETToJS(DateTime.Now.Ticks).ToString();
+                TO1Data = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Ticks).ToString();
             }
             if (string.IsNullOrEmpty(FROM2Data) || !long.TryParse(FROM2Data, out FROM2Parsed))
             {
-                FROM2Data = Helpers.HandlingHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(-2).Ticks).ToString();
+                FROM2Data = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(-2).Ticks).ToString();
             }
             if (string.IsNullOrEmpty(TO2Data) || !long.TryParse(TO2Data, out TO2Parsed))
             {
-                TO2Data = Helpers.HandlingHelper.TicksFromNETToJS(DateTime.Now.Ticks).ToString();
+                TO2Data = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Ticks).ToString();
             }
-            DateTime From1 = new DateTime().AddTicks(Helpers.HandlingHelper.TicksFromJSToNET(long.Parse(FROM1Data)));
-            DateTime To1 = new DateTime().AddTicks(Helpers.HandlingHelper.TicksFromJSToNET(long.Parse(TO1Data)));
-            DateTime From2 = new DateTime().AddTicks(Helpers.HandlingHelper.TicksFromJSToNET(long.Parse(FROM2Data)));
-            DateTime To2 = new DateTime().AddTicks(Helpers.HandlingHelper.TicksFromJSToNET(long.Parse(TO2Data)));
+            DateTime From1 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(FROM1Data)));
+            DateTime To1 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(TO1Data)));
+            DateTime From2 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(FROM2Data)));
+            DateTime To2 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(TO2Data)));
 
             ViewBag.Data = null;
             Response.Cookies.Append("RepVAFrom1", FROM1Data);
@@ -219,20 +213,20 @@ namespace O2GEN.Controllers
             Response.Cookies.Append("RepVATo2", TO2Data);
             return View(new AssetsReportFilter()
             {
-                From1 = Helpers.HandlingHelper.TicksFromNETToJS(From1.Ticks).ToString(),
-                To1 = Helpers.HandlingHelper.TicksFromNETToJS(To1.Ticks).ToString(),
-                From2 = Helpers.HandlingHelper.TicksFromNETToJS(From2.Ticks).ToString(),
-                To2 = Helpers.HandlingHelper.TicksFromNETToJS(To2.Ticks).ToString()
+                From1 = Helpers.DateTimeHelper.TicksFromNETToJS(From1.Ticks).ToString(),
+                To1 = Helpers.DateTimeHelper.TicksFromNETToJS(To1.Ticks).ToString(),
+                From2 = Helpers.DateTimeHelper.TicksFromNETToJS(From2.Ticks).ToString(),
+                To2 = Helpers.DateTimeHelper.TicksFromNETToJS(To2.Ticks).ToString()
             });
         }
         [Route("Home/ReportsOnViewedTechPositions")]
         [HttpPost]
         public IActionResult ReportsOnViewedTechPositions(AssetsReportFilter Model)
         {
-            DateTime From1 = new DateTime().AddTicks(Helpers.HandlingHelper.TicksFromJSToNET(long.Parse(Model.From1)));
-            DateTime To1 = new DateTime().AddTicks(Helpers.HandlingHelper.TicksFromJSToNET(long.Parse(Model.To1)));
-            DateTime From2 = new DateTime().AddTicks(Helpers.HandlingHelper.TicksFromJSToNET(long.Parse(Model.From2)));
-            DateTime To2 = new DateTime().AddTicks(Helpers.HandlingHelper.TicksFromJSToNET(long.Parse(Model.To2)));
+            DateTime From1 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.From1)));
+            DateTime To1 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.To1)));
+            DateTime From2 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.From2)));
+            DateTime To2 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.To2)));
 
             ViewBag.Data = new AssetsReportMerge(Helpers.DBHelper.GetDepartments(ClearList: true, logger: _logger), Helpers.DBHelper.GetVA(From1, To1, _logger), Helpers.DBHelper.GetVA(From2, To2, _logger));
 
@@ -258,24 +252,24 @@ namespace O2GEN.Controllers
             long TO2Parsed = 0;
             if (string.IsNullOrEmpty(FROM1Data) || !long.TryParse(FROM1Data, out FROM1Parsed))
             {
-                FROM1Data = Helpers.HandlingHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(-2).Ticks).ToString();
+                FROM1Data = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(-2).Ticks).ToString();
             }
             if (string.IsNullOrEmpty(TO1Data) || !long.TryParse(TO1Data, out TO1Parsed))
             {
-                TO1Data = Helpers.HandlingHelper.TicksFromNETToJS(DateTime.Now.Ticks).ToString();
+                TO1Data = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Ticks).ToString();
             }
             if (string.IsNullOrEmpty(FROM2Data) || !long.TryParse(FROM2Data, out FROM2Parsed))
             {
-                FROM2Data = Helpers.HandlingHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(-2).Ticks).ToString();
+                FROM2Data = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(-2).Ticks).ToString();
             }
             if (string.IsNullOrEmpty(TO2Data) || !long.TryParse(TO2Data, out TO2Parsed))
             {
-                TO2Data = Helpers.HandlingHelper.TicksFromNETToJS(DateTime.Now.Ticks).ToString();
+                TO2Data = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Ticks).ToString();
             }
-            DateTime From1 = new DateTime().AddTicks(Helpers.HandlingHelper.TicksFromJSToNET(long.Parse(FROM1Data)));
-            DateTime To1 = new DateTime().AddTicks(Helpers.HandlingHelper.TicksFromJSToNET(long.Parse(TO1Data)));
-            DateTime From2 = new DateTime().AddTicks(Helpers.HandlingHelper.TicksFromJSToNET(long.Parse(FROM2Data)));
-            DateTime To2 = new DateTime().AddTicks(Helpers.HandlingHelper.TicksFromJSToNET(long.Parse(TO2Data)));
+            DateTime From1 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(FROM1Data)));
+            DateTime To1 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(TO1Data)));
+            DateTime From2 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(FROM2Data)));
+            DateTime To2 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(TO2Data)));
 
             ViewBag.Data = null;
             Response.Cookies.Append("RepNAFrom1", FROM1Data);
@@ -284,20 +278,20 @@ namespace O2GEN.Controllers
             Response.Cookies.Append("RepNATo2", TO2Data);
             return View(new AssetsReportFilter()
             {
-                From1 = Helpers.HandlingHelper.TicksFromNETToJS(From1.Ticks).ToString(),
-                To1 = Helpers.HandlingHelper.TicksFromNETToJS(To1.Ticks).ToString(),
-                From2 = Helpers.HandlingHelper.TicksFromNETToJS(From2.Ticks).ToString(),
-                To2 = Helpers.HandlingHelper.TicksFromNETToJS(To2.Ticks).ToString()
+                From1 = Helpers.DateTimeHelper.TicksFromNETToJS(From1.Ticks).ToString(),
+                To1 = Helpers.DateTimeHelper.TicksFromNETToJS(To1.Ticks).ToString(),
+                From2 = Helpers.DateTimeHelper.TicksFromNETToJS(From2.Ticks).ToString(),
+                To2 = Helpers.DateTimeHelper.TicksFromNETToJS(To2.Ticks).ToString()
             });
         }
         [Route("Home/NumberOfTechPosReports")]
         [HttpPost]
         public IActionResult NumberOfTechPosReports(AssetsReportFilter Model)
         {
-            DateTime From1 = new DateTime().AddTicks(Helpers.HandlingHelper.TicksFromJSToNET(long.Parse(Model.From1)));
-            DateTime To1 = new DateTime().AddTicks(Helpers.HandlingHelper.TicksFromJSToNET(long.Parse(Model.To1)));
-            DateTime From2 = new DateTime().AddTicks(Helpers.HandlingHelper.TicksFromJSToNET(long.Parse(Model.From2)));
-            DateTime To2 = new DateTime().AddTicks(Helpers.HandlingHelper.TicksFromJSToNET(long.Parse(Model.To2)));
+            DateTime From1 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.From1)));
+            DateTime To1 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.To1)));
+            DateTime From2 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.From2)));
+            DateTime To2 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.To2)));
 
             ViewBag.Data = new AssetsReportMerge(Helpers.DBHelper.GetDepartments(ClearList: true, logger: _logger), Helpers.DBHelper.GetNA(From1, To1, _logger), Helpers.DBHelper.GetNA(From2, To2, _logger));
 
@@ -310,7 +304,7 @@ namespace O2GEN.Controllers
 
         public IActionResult DefectsReport()
         {
-            return View(_defectReport);
+            return View();
         }
 
         public IActionResult Privacy()
@@ -324,72 +318,78 @@ namespace O2GEN.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        private void GenerateMock()
+        [Route("Home/ControlTrends")]
+        [HttpGet]
+        public IActionResult ControlTrends()
         {
-            zpr = new();
-            var _test = new ZprTakenModel
+            string FROMData = Request.Cookies["ctfrom"];
+            string TOData = Request.Cookies["ctto"];
+            string ControlIdData = Request.Cookies["ctcid"];
+
+            long FromL = 0;
+            long ToL = 0;
+            int Cid = 0;
+            if (string.IsNullOrEmpty(FROMData) || !long.TryParse(FROMData, out FromL))
             {
-                EquipmentType = "1",
-                Status = "2",
-                Type = "3",
-                Bypass = "4",
-                Bypasser = "5",
-                Start = DateTime.Now,
-                End = DateTime.Now
-            };
-            zpr.ZprTakenModelList.Add(_test);
-
-            _controlValueReports = new ControlValueReportListModel();
-
-            ControlValueReportModel cvrm = new ControlValueReportModel()
+                FROMData = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(-2).Ticks).ToString();
+            }
+            if (string.IsNullOrEmpty(TOData) || !long.TryParse(TOData, out ToL))
             {
-                Control = "1",
-                Node = "2",
-                TechPosition = "3",
-            };
+                TOData = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Ticks).ToString();
+            }
+            int.TryParse(ControlIdData, out Cid);
+            DateTime From = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(FROMData)));
+            DateTime To = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(TOData)));
 
-            _controlValueReports.ControlValueReports.Add(cvrm);
+            //ViewBag.ZRPCreated = Helpers.DBHelper.GetZRP(From, To, _logger, (int)Helpers.ZRPStatus.Created, (Did == 0 ? null : Did));
 
-            _reportOnViewedTechPositionList = new ReportOnViewedTechPositionList();
-            _reportOnViewedTechPositionList.ReportOnViewedTechPositions.Add(new ReportOnViewedTechPosition
+            //ViewBag.ZRPInWork = Helpers.DBHelper.GetZRP(From, To, _logger, new int[] { (int)Helpers.ZRPStatus.Started, (int)Helpers.ZRPStatus.Created }, DisplayName, (Cid == 0 ? null : Cid));
+            //ViewBag.ZRPDone = Helpers.DBHelper.GetZRP(From, To, _logger, new int[] { (int)Helpers.ZRPStatus.Ended, (int)Helpers.ZRPStatus.Stoped }, DisplayName, (Cid == 0 ? null : Cid));
+
+            Response.Cookies.Append("ctfrom", FROMData);
+            Response.Cookies.Append("ctto", TOData);
+            Response.Cookies.Append("ctcid", string.IsNullOrEmpty(ControlIdData) ? "" : ControlIdData);
+            return View(new ControlTrendsFilter() { From = Helpers.DateTimeHelper.TicksFromNETToJS(From.Ticks).ToString(), To = Helpers.DateTimeHelper.TicksFromNETToJS(To.Ticks).ToString(), ControlId = (Cid == 0 ? null : Cid) });
+        }
+        [Route("Home/ControlTrends")]
+        [HttpPost]
+        public IActionResult ControlTrends(ControlTrendsFilter Model)
+        {
+            DateTime From = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.From)));
+            DateTime To = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.To)));
+
+            if (Model.ControlId != null)
             {
-                StationName = "1",
-                FirstInterval = DateTime.Now,
-                SecondInterval = DateTime.Now,
-                Changes = 20
-            });
-            _report = new ReportOnViewedTechPositionList();
+                List<ControlStatistic> data = Helpers.DBHelper.GetControlStatistic(Model.ControlId, From, To, _logger);
+                ViewBag.Data = data;
+                Control control = Helpers.DBHelper.GetControl((long)Model.ControlId, _logger);
+                ViewBag.Control = control;
+                ViewBag.Maximum = 0;
+                ViewBag.Minimum = 0;
+                if (!string.IsNullOrEmpty(control.ValueBottom3) &&
+                    !string.IsNullOrEmpty(control.ValueTop3) &&
+                    !string.IsNullOrEmpty(control.ValueBottom2) &&
+                    !string.IsNullOrEmpty(control.ValueTop2) &&
+                    !string.IsNullOrEmpty(control.ValueBottom1) &&
+                    !string.IsNullOrEmpty(control.ValueTop1))
+                {
+                    ViewBag.Maximum = (double.Parse(control.ValueBottom3, CultureInfo.InvariantCulture) + (Math.Abs(double.Parse(control.ValueTop2, CultureInfo.InvariantCulture) - double.Parse(control.ValueBottom2, CultureInfo.InvariantCulture)))).ToString().Replace(",",".");
+                    ViewBag.Minimum = (double.Parse(control.ValueTop1, CultureInfo.InvariantCulture) - (Math.Abs(double.Parse(control.ValueTop2, CultureInfo.InvariantCulture) - double.Parse(control.ValueBottom2, CultureInfo.InvariantCulture)))).ToString().Replace(",", ".");
+                }
+                if (data.Count > 0)
+                {
+                    ViewBag.Maximum = data.Max(x => x.y);
+                    ViewBag.Minimum = data.Min(x => x.y);
+                }
+            }
 
-            _report.ReportOnViewedTechPositions.Add(new ReportOnViewedTechPosition
-            {
-                StationName = "1",
-                FirstInterval = DateTime.Now,
-                SecondInterval = DateTime.Now,
-                Changes = 20
-            });
+            //ViewBag.ZRPInWork = Helpers.DBHelper.GetZRP(From, To, _logger, new int[] { (int)Helpers.ZRPStatus.Started, (int)Helpers.ZRPStatus.Created }, Model.DisplayName, Model.DepartmentId);
+            //ViewBag.ZRPDone = Helpers.DBHelper.GetZRP(From, To, _logger, new int[] { (int)Helpers.ZRPStatus.Ended, (int)Helpers.ZRPStatus.Stoped }, Model.DisplayName, Model.DepartmentId);
 
-            _defectReport = new DefectReportListModel();
-
-            _defectReport.DefectReportModels.Add(new DefectReportModel()
-            {
-                TechPos = "1",
-                Node = "2",
-                Status = "3",
-                DefectType = "4",
-                Control = "5",
-                Value = 6,
-                DefectFoundedBy = "1",
-                DefectProceededBy = "1",
-                DateDetected = DateTime.Now,
-                Description = "1"
-            });
-
-            ReportModel = new()
-            {
-                ControlValueReportModels = _controlValueReports,
-                DefectReports = _defectReport,
-                ZprTakenModels = zpr
-            };
+            Response.Cookies.Append("ctfrom", Model.From);
+            Response.Cookies.Append("ctpto", Model.To);
+            Response.Cookies.Append("ctcid", (Model.ControlId == null ? "" : Model.ControlId.ToString()));
+            return View(Model);
         }
 
 

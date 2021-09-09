@@ -1,91 +1,65 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using O2GEN.ViewModels;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using O2GEN.Models;
-using Microsoft.AspNetCore.Identity;
+using O2GEN.Helpers;
+using Microsoft.AspNetCore.Http;
+using O2GEN.Authorization;
+using Microsoft.AspNetCore.Routing;
 
 namespace O2GEN.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
+        private readonly ILogger<AccountController> _logger;
+        public AccountController(ILogger<AccountController> logger)
+        {
+            _logger = logger;
+        }
 
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
-        {
-            _userManager = userManager;
-            _signInManager = signInManager;
-        }
+        [AllowAnonymous]
+        [Route("Account/Login")]
         [HttpGet]
-        public IActionResult Register()
+        public IActionResult Login()
         {
-            return View();
+            return View(new Credentials());
         }
+
+        [AllowAnonymous]
+        [Route("Account/Login")]
         [HttpPost]
-        public async Task<IActionResult> Register(RegisterViewModel model)
+        public IActionResult Login(Credentials data)
         {
             if (ModelState.IsValid)
             {
-                User user = new User { Email = model.Email, UserName = model.Email, Year = model.Year };
-                // добавляем пользователя
-                var result = await _userManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
+                UserData reslt = DBHelper.GetUserData(data, _logger);
+                if (reslt == null)
                 {
-                    // установка куки
-                    await _signInManager.SignInAsync(user, false);
-                    return RedirectToAction("Index", "Home");
+                    ViewBag.PasswordException = "Логин или пароль не верны.";
+                    data.Password = "";
+                    return View(data);
                 }
-                else
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-                }
+
+                data.DeptId = reslt.DeptId;
+                data.Id = reslt.Id;
+
+                reslt.JWToken = JwtTokenExtension.GenerateJwtToken(data);
+                //HttpContext.Response.Headers.Add("Authorization", reslt.JWToken);
+                //return View(data);
+                //return Redirect("/Home/Index");
+                CookieHelper.ClearAllCookies(Request.Cookies.Keys, Response);
+                HttpContext.Session.SetString("token", reslt.JWToken);
+                return new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
             }
-            return View(model);
+            return View(data);
         }
+
+        [AllowAnonymous]
+        [Route("Account/Logout")]
         [HttpGet]
-        public IActionResult Login(string returnUrl = null)
+        public IActionResult Logout()
         {
-            return View(new LoginViewModel { ReturnUrl = returnUrl });
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var result =
-                    await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
-                if (result.Succeeded)
-                {
-                    // проверяем, принадлежит ли URL приложению
-                    if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
-                    {
-                        return Redirect(model.ReturnUrl);
-                    }
-                    else
-                    {
-                        return RedirectToAction("Index", "Home");
-                    }
-                }
-                else
-                {
-                    ModelState.AddModelError("", "Неправильный логин и (или) пароль");
-                }
-            }
-            return View(model);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Logout()
-        {
-            // удаляем аутентификационные куки
-            await _signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Home");
+            HttpContext.Session.Remove("token");
+            return new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Account", action = "Login" }));
         }
     }
 }

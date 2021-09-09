@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace O2GEN.Helpers
 {
-    public static class HandlingHelper
+    public static class DateTimeHelper
     {
         public static long TicksFromJSToNET(long Ticks)
         {
