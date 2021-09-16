@@ -14,7 +14,7 @@ namespace O2GEN.Authorization
 
         public async Task Invoke(HttpContext context)
         {
-            string token = context.Session?.GetString("token");// context.Request.Headers["Authorization"].ToString();
+            string token = context.Session?.GetString("token");
             var user = JwtTokenExtension.ValidateJwtToken(token);
             if (user != null)
             {

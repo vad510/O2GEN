@@ -1,7 +1,7 @@
 ﻿@model O2GEN.Models.AssetClass
 
 <div class="modal fade" id="ObjectClassEdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 @{
@@ -69,10 +69,13 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
-                    <button type="submit" class="btn btn-primary" data-save="modal">Применить</button>
+                    @*<button type="submit" class="btn btn-primary" data-save="modal">Сохранить</button>*@
+                    <button type="button" class="btn btn-primary" onclick="$('#SaveChangesModal').modal('show')">Сохранить</button>
                 </div>
             </form>
             @Html.Partial("ModalBlock")
         </div>
     </div>
 </div>
+
+@Html.Partial("ModalSaveAccept")

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace O2GEN.Helpers.ValidationAttributes
 {
@@ -33,17 +34,24 @@ namespace O2GEN.Helpers.ValidationAttributes
             var toValidateWith = (string)property.GetValue(validationContext.ObjectInstance);
             var optionValue = (long?)optionProperty.GetValue(validationContext.ObjectInstance);
 
-            switch (optionValue)
+            try
             {
-                case 2:
-                    { }
-                    break;
+                switch (optionValue)
+                {
+                    case 2:
+                        { }
+                        break;
                     default:
-                    {
-                        if (double.Parse(currentValue.Replace(",", ".")) <= double.Parse(toValidateWith.Replace(",", ".")))
-                            return new ValidationResult(ErrorMessage);
-                    }
-                    break;
+                        {
+                            if (double.Parse(currentValue, CultureInfo.InvariantCulture) <= double.Parse(toValidateWith, CultureInfo.InvariantCulture))
+                                return new ValidationResult(ErrorMessage);
+                        }
+                        break;
+                }
+            }
+            catch
+            {
+                return new ValidationResult(ErrorMessage);
             }
 
             return ValidationResult.Success;

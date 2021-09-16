@@ -298,12 +298,10 @@ function tryCreateModal(placeholder, response) {
 
         const xhr = new XMLHttpRequest();
 
-        //console.log(123);
         BlockModal();
         xhr.onload = function (e) {
             TryValidate(xhr.response);
             UnblockModal();
-            //console.log(234);
         }
         xhr.onerror = function (e) {
             UnblockModal();
@@ -334,7 +332,13 @@ function TryValidate(response) {
         throw new Error("Null reference exception");
 
     //console.log(response);
-
+    if (response == 0) {
+        window.location.reload(true);
+        return;
+    }
+    //if (response.contains("html")) {
+    //    document.innerHTML = response;
+    //}
     const div = document.createElement('div');
     div.innerHTML = response;
 
@@ -357,16 +361,17 @@ function TryValidate(response) {
 
     oldBody.replaceWith(newBody);
 
-    const errors = placeholder.querySelectorAll(".field-validation-error");
+    prepareLists();
+    //const errors = placeholder.querySelectorAll(".field-validation-error");
 
-    if (errors.length > 0) {
-        //console.log("we have errors");
-    }
-    else {
-        //console.log("no errors");
-        tryRemoveModals();
-        window.location.reload(true);
-    }
+    //if (errors.length > 0) {
+    //    //console.log("we have errors");
+    //}
+    //else {
+    //    //console.log("no errors");
+    //    //tryRemoveModals();
+    //    window.location.reload(true);
+    //}
 }
 
 /** remove all bootstrap modals from screen */
@@ -385,6 +390,14 @@ function tryRemoveModals() {
         document.body.removeChild(modalOverlays[i]);
     }
 }
+
+$(document).on('show.bs.modal', '.modal', function (event) {
+    var zIndex = 1040 + (10 * $('.modal:visible').length);
+    $(this).css('z-index', zIndex);
+    setTimeout(function () {
+        $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
+    }, 0);
+});
 
 //function getParents(el, parentSelector) {
 //    if (parentSelector === undefined) {

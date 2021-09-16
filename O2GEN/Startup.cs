@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using O2GEN.Models;
 using O2GEN.Authorization;
+using System;
 
 namespace O2GEN
 {
@@ -20,16 +21,18 @@ namespace O2GEN
 
             public void ConfigureServices(IServiceCollection services)
             {
-                services.AddDbContext<ApplicationContext>(options =>
-                    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+                //services.AddDbContext<ApplicationContext>(options =>
+                //    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-                services.AddIdentity<User, IdentityRole>()
-                    .AddEntityFrameworkStores<ApplicationContext>();
+                //services.AddIdentity<User, IdentityRole>()
+                //    .AddEntityFrameworkStores<ApplicationContext>();
 
                 services.AddControllersWithViews();
 
                 services.AddMemoryCache();
-                services.AddSession();
+                services.AddSession(options => {
+                    options.IdleTimeout = TimeSpan.FromMinutes(60);
+                });
 
             // todo cookies for default login path
         }

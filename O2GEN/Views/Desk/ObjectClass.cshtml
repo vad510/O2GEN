@@ -61,7 +61,10 @@
                                     <i class="fa fa-pen"></i>
                                 </button>
 
-                                <button type="submit" class="btn btn-danger ml-1" onclick="location.href='@Url.Action("ObjectClassDelete", new { id = item.Id })'">
+                                @*<button type="submit" class="btn btn-danger ml-1" onclick="location.href='@Url.Action("ObjectClassDelete", new { id = item.Id })'">
+                                    <i class="fa fa-trash"></i>
+                                </button>*@
+                                <button type="submit" class="btn btn-danger ml-1" onclick="changesModalShow('@Url.Action("ObjectClassDelete", new { id = item.Id })', 'Удаление', 'Вы действительно хотите удалить запись?');">
                                     <i class="fa fa-trash"></i>
                                 </button>
                             </div>

@@ -94,7 +94,7 @@
             <a class="nav-link text-black-50 active" href="#first-tab" data-toggle="tab">Обходы в работе</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link text-black-50" href="#second-tab" data-toggle="tab">Обходы закрытые</a>
+            <a class="nav-link text-black-50" href="#second-tab" data-toggle="tab">Обходы завершенные</a>
         </li>
     </ul>
 
@@ -108,16 +108,16 @@
                     <thead class="color-black">
                         <tr>
                             <th>
-                                <p>Тип оборудований</p>
-                            </th>
-                            <th>
-                                <p>Статус обхода</p>
+                                <p>Тип оборудования</p>
                             </th>
                             <th>
                                 <p>Тип обхода</p>
                             </th>
                             <th>
                                 <p>Обход</p>
+                            </th>
+                            <th>
+                                <p>Должность</p>
                             </th>
                             <th>
                                 <p>Обходчик</p>
@@ -137,28 +137,31 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var item in ViewBag.ZRPInWork)
+                        @foreach (ZRP item in ViewBag.ZRPInWork)
                         {
-            <tr>
-                <td><p>@item.ObjName</p></td>
-                <td><p>@item.SCStatusName</p></td>
-                <td><p>@item.SCTypeName</p></td>
-                <td><p>@item.RouteName</p></td>
-                <td><p>@item.ResName</p></td>
-                <td><p>@item.StartTime.ToString()</p></td>
-                <td><p>@item.EndTime.ToString()</p></td>
-                <td><p> </p></td>
-                <td>
-                    <div class="d-flex justify-content-center">
-                        <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPEdit", new { id = item.Id })">
-                            <i class="fa fa-pen"></i>
-                        </button>
-                        <button type="button" class="btn btn-danger ml-1" onclick="location.href='@Url.Action("ZRPDelete", new { id = item.Id })'">
-                            <i class="fa fa-trash"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
+                        <tr>
+                            <td><p>@item.ObjName</p></td>
+                            <td><p>@item.SCTypeName</p></td>
+                            <td><p>@item.RouteName</p></td>
+                            <td><p>@item.ResName</p></td>
+                            <td><p>@item.PerformerName</p></td>
+                            <td><p>@item.StartTime.ToString()</p></td>
+                            <td><p>@item.EndTime.ToString()</p></td>
+                            <td><p> </p></td>
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPEdit", new { id = item.Id })">
+                                        <i class="fa fa-pen"></i>
+                                    </button>
+                                    @*<button type="button" class="btn btn-danger ml-1" onclick="location.href='@Url.Action("ZRPDelete", new { id = item.Id })'">
+                                        <i class="fa fa-trash"></i>
+                                    </button>*@
+                                    <button type="submit" class="btn btn-danger ml-1" onclick="changesModalShow('@Url.Action("ZRPDelete", new { id = item.Id })', 'Удаление', 'Вы действительно хотите удалить запись?');">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
 }
                     </tbody>
                 </table>
@@ -176,13 +179,13 @@
                                 <p>Тип оборудований</p>
                             </th>
                             <th>
-                                <p>Статус обхода</p>
-                            </th>
-                            <th>
                                 <p>Тип обхода</p>
                             </th>
                             <th>
                                 <p>Обход</p>
+                            </th>
+                            <th>
+                                <p>Должность</p>
                             </th>
                             <th>
                                 <p>Обходчик</p>
@@ -204,26 +207,29 @@
                     <tbody>
                         @foreach (var item in ViewBag.ZRPDone)
                         {
-            <tr>
-                <td><p>@item.ObjName</p></td>
-                <td><p>@item.SCStatusName</p></td>
-                <td><p>@item.SCTypeName</p></td>
-                <td><p>@item.RouteName</p></td>
-                <td><p>@item.ResName</p></td>
-                <td><p>@item.StartTime.ToString()</p></td>
-                <td><p>@item.EndTime.ToString()</p></td>
-                <td><p> </p></td>
-                <td>
-                    <div class="d-flex justify-content-center">
-                        <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPEdit", new { id = item.Id })">
-                            <i class="fa fa-pen"></i>
-                        </button>
-                        <button type="button" class="btn btn-danger ml-1" onclick="location.href='@Url.Action("ZRPDelete", new { id = item.Id })'">
-                            <i class="fa fa-trash"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
+                        <tr>
+                            <td><p>@item.ObjName</p></td>
+                            <td><p>@item.SCTypeName</p></td>
+                            <td><p>@item.RouteName</p></td>
+                            <td><p>@item.ResName</p></td>
+                            <td><p>@item.PerformerName</p></td>
+                            <td><p>@item.StartTime.ToString()</p></td>
+                            <td><p>@item.EndTime.ToString()</p></td>
+                            <td><p> </p></td>
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPEdit", new { id = item.Id })">
+                                        <i class="fa fa-pen"></i>
+                                    </button>
+                                    @*<button type="button" class="btn btn-danger ml-1" onclick="location.href='@Url.Action("ZRPDelete", new { id = item.Id })'">
+                                        <i class="fa fa-trash"></i>
+                                    </button>*@
+                                    <button type="submit" class="btn btn-danger ml-1" onclick="changesModalShow('@Url.Action("ZRPDelete", new { id = item.Id })', 'Удаление', 'Вы действительно хотите удалить запись?');">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
 }
                     </tbody>
                 </table>
@@ -352,7 +358,8 @@
             from.value = formatDate(date);
 
             var to = document.getElementById('DTPTO');
-            var toDate = new Date();
+            var toDate = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+            toDate.setDate(toDate.getDate() + 1);
             to.value = formatDate(toDate);
 
             $('#From').val(date.getTime());
@@ -573,7 +580,7 @@
                                             s +=
                                                 '<tr class="parent nested" data-level="1">' +
                                                     '<td>' +
-                                                        '<span class="caret ml-3"><span class="badge badge-info mr-1">'+data[a].childs.length+'</span>'+data[a].childs[ac].displayName+'</span>' +
+                                                        '<span class="caret ml-3"><span class="badge badge-info mr-1">'+data[a].childs[ac].childs.length+'</span>'+data[a].childs[ac].displayName+'</span>' +
                                                         '<input type="text" style="display: none;" name="NewTechPoz['+a+'].Childs['+ac+'].Id" value="'+data[a].childs[ac].id+'" />' +
                                                         '<input type="text" style="display: none;" name="NewTechPoz['+a+'].Childs['+ac+'].DisplayName" value="'+data[a].childs[ac].displayName+'" />' +
                                                     '</td>' +

@@ -12,5 +12,7 @@ namespace O2GEN.Models
         public DateTime? Date { get; set; }
         [DisplayName("Значение")]
         public string Value { get; set; }
+        [DisplayName("Комментарий")]
+        public string Comment { get; set; }
     }
 }

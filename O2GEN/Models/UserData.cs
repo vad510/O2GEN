@@ -5,6 +5,9 @@ namespace O2GEN.Models
 {
     public class UserData
     {
+        /// <summary>
+        /// Engineers.Id
+        /// </summary>
         public long Id { get; set; }
         public long DeptId { get; set; }
         /// <summary>

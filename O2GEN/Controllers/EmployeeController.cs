@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using O2GEN.Helpers;
 using O2GEN.Models;
 using O2GEN.Models.EmployeeModels;
 using O2GEN.Models.HomeModels;
@@ -65,6 +67,7 @@ namespace O2GEN.Controllers
             }
             ViewBag.Engineers = Helpers.DBHelper.GetEngineers(DeptId: Dept, logger: _logger);
             Response.Cookies.Append("engdid", Dept.ToString());
+            AlertHelper.DisplayMessage(HttpContext.Session, ViewBag);
             return View(new Filter() { DepartmentId = Dept });
         }
         [Route("Employee/Engineers")]
@@ -93,20 +96,29 @@ namespace O2GEN.Controllers
         [HttpPost]
         public IActionResult EngineerUpdate(Engineer Model)
         {
+            AlertModel resp = new AlertModel();
             if (!ModelState.IsValid)
             {
                 return PartialView("EngineerEdit", Model);
             }
             if (Model.Id == -1)
-                Helpers.DBHelper.CreateEngineer(Model, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
+            {
+                Helpers.DBHelper.CreateEngineer(Model, ((Credentials)HttpContext.Items["User"]).Id, _logger);
+                AlertHelper.SaveMessage(HttpContext.Session, AlertType.Success, $"Пользователь {Model.Surname} {Model.GivenName} добавлен.");
+            }
             else
-                Helpers.DBHelper.UpdateEngineer(Model, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
-            return RedirectToAction("Engineers");
+            {
+                Helpers.DBHelper.UpdateEngineer(Model, ((Credentials)HttpContext.Items["User"]).Id, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
+                AlertHelper.SaveMessage(HttpContext.Session, AlertType.Success, $"Пользователь {Model.Surname} {Model.GivenName} обновлен.");
+            }
+            return new JsonResult(0); // RedirectToAction("Engineers");
         }
         [HttpGet]
         public IActionResult EngineerDelete(int Id)
         {
-            Helpers.DBHelper.DeleteEngineer(Id, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
+            AlertModel resp = new AlertModel();
+            Helpers.DBHelper.DeleteEngineer(Id, ((Credentials)HttpContext.Items["User"]).Id, _logger);
+            AlertHelper.SaveMessage(HttpContext.Session, AlertType.Success, "Пользователь удален.");
             return RedirectToAction("Engineers");
         }
 
@@ -133,6 +145,7 @@ namespace O2GEN.Controllers
             }
             ViewBag.Resources = Helpers.DBHelper.GetResources(DeptId: Dept, logger: _logger);
             Response.Cookies.Append("resdid", Dept.ToString());
+            AlertHelper.DisplayMessage(HttpContext.Session, ViewBag);
             return View(new Filter() { DepartmentId = Dept });
         }
         [Route("Employee/Resources")]
@@ -162,15 +175,22 @@ namespace O2GEN.Controllers
         public IActionResult ResourceUpdate(Resource Model)
         {
             if (Model.Id == -1)
-                Helpers.DBHelper.CreateResource(Model, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
+            { 
+                Helpers.DBHelper.CreateResource(Model, ((Credentials)HttpContext.Items["User"]).Id, _logger);
+                AlertHelper.SaveMessage(HttpContext.Session, AlertType.Success, $"Должность {Model.DisplayName} создана.");
+            }
             else
-                Helpers.DBHelper.UpdateResource(Model, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
-            return RedirectToAction("Resources");
+            { 
+                Helpers.DBHelper.UpdateResource(Model, ((Credentials)HttpContext.Items["User"]).Id, _logger);
+                AlertHelper.SaveMessage(HttpContext.Session, AlertType.Success, $"Должность {Model.DisplayName} обновлена.");
+            }
+            return new JsonResult(0);  //return RedirectToAction("Resources");
         }
         [HttpGet]
         public IActionResult ResourceDelete(int id)
         {
-            Helpers.DBHelper.DeleteResource(id, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
+            Helpers.DBHelper.DeleteResource(id, ((Credentials)HttpContext.Items["User"]).Id, _logger);
+            AlertHelper.SaveMessage(HttpContext.Session, AlertType.Success, $"Должность удалена.");
             return RedirectToAction("Resources");
         }
 

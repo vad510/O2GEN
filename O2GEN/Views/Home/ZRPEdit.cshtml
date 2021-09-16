@@ -1,7 +1,7 @@
 ﻿@model O2GEN.Models.ZRP
 
 <div class="modal fade" id="ZRPEdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 @if (Model.Id == -1)
@@ -45,7 +45,7 @@
                                     <div class="form-row">
                                         <div class="form-group col-md-6">
                                             <label asp-for="RouteName"></label>
-                                            <input asp-for="RouteName" class="form-control" required placeholder="Название"/>
+                                            <input asp-for="RouteName" class="form-control" required placeholder="Название" />
                                             <span asp-validation-for="RouteName" class="text-danger"></span>
                                         </div>
 
@@ -55,7 +55,7 @@
                                                 <option selected disabled>Выбрать</option>
                                                 @foreach (SCStatus item in O2GEN.Helpers.DBHelper.GetSCStatuses())
                                                 {
-                                                <option value="@item.Id">@item.DisplayName</option>
+                                                    <option value="@item.Id">@item.DisplayName</option>
                                                 }
                                             </select>
                                             <span asp-validation-for="SCStatusId" class="text-danger"></span>
@@ -69,18 +69,18 @@
                                                 <option selected disabled>Выбрать</option>
                                                 @foreach (SCTypes item in O2GEN.Helpers.DBHelper.GetSCTypes())
                                                 {
-                                                <option value="@item.Id">@item.DisplayName</option>
+                                                    <option value="@item.Id">@item.DisplayName</option>
                                                 }
                                             </select>
                                             <span asp-validation-for="SCTypeId" class="text-danger"></span>
                                         </div>
                                         <div class="form-group col-md-6">
                                             <label asp-for="DepartmentID"></label>
-                                            <select asp-for="DepartmentID" class="form-control" required disabled>
+                                            <select asp-for="DepartmentID" class="form-control" required>
                                                 <option selected disabled>Выбрать</option>
                                                 @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments())
                                                 {
-                                                <option value="@item.Id">@item.DisplayName</option>
+                                                    <option value="@item.Id">@item.DisplayName</option>
                                                 }
                                             </select>
                                             <span asp-validation-for="DepartmentID" class="text-danger"></span>
@@ -105,9 +105,9 @@
                                             <label asp-for="ResourceId"></label>
                                             <select asp-for="ResourceId" class="form-control">
                                                 <option selected disabled>Выбрать</option>
-                                                @foreach (Resource item in O2GEN.Helpers.DBHelper.GetResources(DeptId:Model.DepartmentID))
+                                                @foreach (Resource item in O2GEN.Helpers.DBHelper.GetResources(DeptId: Model.DepartmentID))
                                                 {
-                                                <option value="@item.Id">@item.DisplayName</option>
+                                                    <option value="@item.Id">@item.DisplayName</option>
                                                 }
                                             </select>
                                             <span asp-validation-for="ResourceId" class="text-danger"></span>
@@ -128,7 +128,7 @@
                                                 <option selected disabled>Выбрать</option>
                                                 @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments())
                                                 {
-                                                <option value="@item.Id">@item.DisplayName</option>
+                                                    <option value="@item.Id">@item.DisplayName</option>
                                                 }
                                             </select>
                                             <span asp-validation-for="DepartmentID" class="text-danger"></span>
@@ -142,7 +142,7 @@
                                                 <option selected disabled>Выбрать</option>
                                                 @foreach (SCTypes item in O2GEN.Helpers.DBHelper.GetSCTypes())
                                                 {
-                                                <option value="@item.Id">@item.DisplayName</option>
+                                                    <option value="@item.Id">@item.DisplayName</option>
                                                 }
                                             </select>
                                             <span asp-validation-for="SCTypeId" class="text-danger"></span>
@@ -150,7 +150,18 @@
                                         <div class="form-group col-md-6">
                                             <label asp-for="AssetParameterSetId"></label>
                                             <select asp-for="AssetParameterSetId" class="form-control" onchange="GetRouteDetails(this);" required>
-                                                <option selected disabled>Необходимо выбрать подразделение</option>
+                                                @if (Model.DepartmentID != null)
+                                                {
+                                                    <option selected disabled>Выбрать</option>
+                                                    @foreach (AssetParameterSet item in O2GEN.Helpers.DBHelper.GetAssetParameterSets(DeptID:Model.DepartmentID))
+                                                    {
+                                                        <option value="@item.Id">@item.DisplayName</option>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <option selected disabled>Необходимо выбрать подразделение</option>
+                                                }
                                             </select>
                                             <span asp-validation-for="AssetParameterSetId" class="text-danger"></span>
                                         </div>
@@ -171,7 +182,18 @@
                                         <div class="form-group col-md-6">
                                             <label asp-for="ResourceId"></label>
                                             <select asp-for="ResourceId" class="form-control" required>
-                                                <option selected disabled>Необходимо выбрать подразделение</option>
+                                                @if (Model.DepartmentID != null)
+                                                {
+                                                    <option selected disabled>Выбрать</option>
+                                                    @foreach (Resource item in O2GEN.Helpers.DBHelper.GetResources(DeptId: Model.DepartmentID))
+                                                    {
+                                                        <option value="@item.Id">@item.DisplayName</option>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <option selected disabled>Необходимо выбрать подразделение</option>
+                                                }
                                             </select>
                                             <span asp-validation-for="ResourceId" class="text-danger"></span>
                                         </div>
@@ -222,7 +244,7 @@
                                                 {
                                                     <tr class="nested" data-level="1">
                                                         <td colspan="2">
-                                                            <table>
+                                                            <table style="width: 100%;">
                                                                 <thead>
                                                                     <tr>
                                                                         <th>
@@ -240,6 +262,11 @@
                                                                                 Значение
                                                                             </p>
                                                                         </th>
+                                                                        <th>
+                                                                            <p>
+                                                                                Комментарий
+                                                                            </p>
+                                                                        </th>
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
@@ -250,8 +277,13 @@
                                                                                 <span>@item.Name</span>
                                                                             </td>
                                                                             <td>
+                                                                                <span>@(item.Date!= null? ((DateTime)item.Date).ToString("yyyy-MM-dd HH:mm:ss"):"")</span>
                                                                             </td>
                                                                             <td>
+                                                                                <span>@item.Value</span>
+                                                                            </td>
+                                                                            <td>
+                                                                                <span>@item.Comment</span>
                                                                             </td>
                                                                         </tr>
                                                                     }
@@ -264,7 +296,112 @@
                                         }
                                         else
                                         {
-                                            <tr><td colspan="2"> Нет данных.</td></tr>
+                                            if (Model.AssetParameterSetId != null)
+                                            {
+                                                List<Hierarchy> data = O2GEN.Helpers.DBHelper.GetAssetParameterSetDetails((int)Model.AssetParameterSetId);
+                                                if (data.Count == 0)
+                                                {
+                                                    <tr><td colspan="2"> Нет данных.</td></tr>
+                                                }
+                                                else
+                                                {
+                                                    for (int a = 0; a < data.Count; a++)
+                                                    {
+                                                        if(data[a].Childs.Count == 0)
+                                                        {
+                                                            <tr class="parent" data-level="0">
+                                                                <td>
+                                                                    <span>@data[a].DisplayName</span>
+                                                                    <input type="text" style="display: none;" name="NewTechPoz[@a].Id" value="@data[a].Id" />
+                                                                    <input type="text" style="display: none;" name="NewTechPoz[@a].DisplayName" value="@data[a].DisplayName" />
+                                                                </td>
+                                                                <td>
+                                                                    <div class="d-flex justify-content-center">
+                                                                        <button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this); sortInputsForCreate();">
+                                                                            <i class="fa fa-trash"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                        else
+                                                        {
+                                                            <tr class="parent" data-level="0"> 
+                                                                <td> 
+                                                                    <span class="caret"><span class="badge badge-info mr-1">@data[a].Childs.Count</span>@data[a].DisplayName</span> 
+                                                                    <input type="text" style="display: none;" name="NewTechPoz[@a].Id" value="@data[a].Id" /> 
+                                                                    <input type="text" style="display: none;" name="NewTechPoz[@a].DisplayName" value="@data[a].DisplayName" /> 
+                                                                </td> 
+                                                                <td> 
+                                                                    <div class="d-flex justify-content-center"> 
+                                                                        <button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this); sortInputsForCreate();"> 
+                                                                            <i class="fa fa-trash"></i> 
+                                                                        </button> 
+                                                                    </div> 
+                                                                </td> 
+                                                            </tr>
+                                                        }
+                                                        for (int ac = 0; ac < data[a].Childs.Count; ac++)
+                                                        {
+                                                            if (data[a].Childs.Count == 0)
+                                                            {
+                                                                <tr class="nested" data-level="1"> 
+                                                                    <td> 
+                                                                        <span class="ml-3">@data[a].Childs[ac].DisplayName</span>
+                                                                        <input type="text" style="display: none;" name="NewTechPoz[@a].Childs[@ac].Id" value="@data[a].Childs[ac].Id" />
+                                                                        <input type="text" style="display: none;" name="NewTechPoz[@a].Childs[@ac].DisplayName" value="@data[a].Childs[ac].DisplayName" />
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="d-flex justify-content-center">
+                                                                            <button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this); sortInputsForCreate();">
+                                                                                <i class="fa fa-trash"></i> 
+                                                                            </button> 
+                                                                        </div> 
+                                                                    </td> 
+                                                                </tr>
+                                                            }
+                                                            else
+                                                            {
+                                                                <tr class="parent nested" data-level="1"> 
+                                                                    <td> 
+                                                                        <span class="caret ml-3"><span class="badge badge-info mr-1">@data[a].Childs[ac].Childs.Count</span>@data[a].Childs[ac].DisplayName</span> 
+                                                                        <input type="text" style="display: none;" name="NewTechPoz[@a].Childs[@ac].Id" value="@data[a].Childs[ac].Id" /> 
+                                                                        <input type="text" style="display: none;" name="NewTechPoz[@a].Childs[@ac].DisplayName" value="@data[a].Childs[ac].DisplayName" /> 
+                                                                    </td> 
+                                                                    <td> 
+                                                                        <div class="d-flex justify-content-center"> 
+                                                                            <button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this); sortInputsForCreate();"> 
+                                                                                <i class="fa fa-trash"></i> 
+                                                                            </button> 
+                                                                        </div> 
+                                                                    </td> 
+                                                                </tr>
+                                                            }
+                                                            for (int ap = 0; ap < data[a].Childs[ac].Childs.Count; ap++)
+                                                            {
+                                                                <tr class="nested" data-level="2"> 
+                                                                    <td> 
+                                                                        <span class="ml-5">@data[a].Childs[ac].Childs[ap].DisplayName</span> 
+                                                                        <input type="text" style="display: none;" name="NewTechPoz[@a].Childs[@ac].Childs[@ap].Id" value="@data[a].Childs[ac].Childs[ap].Id" /> 
+                                                                        <input type="text" style="display: none;" name="NewTechPoz[@a].Childs[@ac].Childs[@ap].DisplayName" value="@data[a].Childs[ac].Childs[ap].DisplayName" /> 
+                                                                    </td> 
+                                                                    <td> 
+                                                                        <div class="d-flex justify-content-center"> 
+                                                                            <button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this); sortInputsForCreate();"> 
+                                                                                <i class="fa fa-trash"></i> 
+                                                                            </button> 
+                                                                        </div> 
+                                                                    </td> 
+                                                                </tr>
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr><td colspan="2"> Нет данных.</td></tr>
+                                            }
                                         }
                                     </tbody>
                                 </table>
@@ -275,7 +412,7 @@
                         {
                             <div id="defect-tab" class="tab-pane">
 
-                                <div class="margin-between-above">
+                                <div class="margin-between-above" style="height:500px; overflow:auto;">
                                     <table class="table table-bordered table-hover">
                                         <thead>
                                             <tr>
@@ -315,7 +452,7 @@
 
                             <div id="attachment-tab" class="tab-pane">
 
-                                <div class="margin-between-above">
+                                <div class="margin-between-above" style="height:500px; overflow:auto;">
                                     <table class="table table-bordered table-hover">
                                         <thead>
                                             <tr>
@@ -340,6 +477,33 @@
                                                 </th>
                                             </tr>
                                         </thead>
+                                        <tbody>
+                                            @foreach (Attachment item in Model.Attachments)
+                                            {
+                                            <tr>
+                                                <td>
+                                                    <span>@item.IPName</span>
+                                                </td>
+
+                                                <td>
+                                                    <span>@item.IPIName</span>
+                                                </td>
+
+                                                <td>
+                                                    <span>@item.APName</span>
+                                                </td>
+
+                                                <td>
+                                                    <span>@item.CreationTime.ToString("yyyy.MM.dd HH:mm:ss")</span>
+                                                </td>
+
+                                                <td>
+                                                    <span>@item.FileName</span>
+                                                    <a class="btn btn-primary" href="/Home/GetFile?guid=@(item.FileRef.ToString())" rel="nofollow">Скачать</a>
+                                                </td>
+                                            </tr>
+                                            }
+                                        </tbody>
                                     </table>
                                 </div>
                             </div>
@@ -348,10 +512,13 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
-                    <button type="submit" class="btn btn-primary" data-save="modal" >Применить</button>
+                    @*<button type="submit" class="btn btn-primary" data-save="modal">Сохранить</button>*@
+                    <button type="button" class="btn btn-primary" onclick="$('#SaveChangesModal').modal('show')">Сохранить</button>
                 </div>
             </form>
             @Html.Partial("ModalBlock")
         </div>
     </div>
 </div>
+
+@Html.Partial("ModalSaveAccept")

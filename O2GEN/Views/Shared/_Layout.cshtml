@@ -1,4 +1,5 @@
 ﻿@using O2GEN.Helpers.Static;
+@using O2GEN.ViewModels
 
 <!DOCTYPE html>
 <html lang="en">
@@ -59,6 +60,22 @@
             width: 30px !important;
             padding: 0px !important;
         }
+
+        .alert-message {
+            position: fixed;
+            bottom: 5px;
+            right: 5px;
+            max-width:350px;
+        }
+        .alert-message .alert-icon {
+            width: 3rem;
+        }
+
+        .alert-message .close {
+            font-size: 1rem;
+            color: #a6a6a6;
+        }
+
     </style>
 
 </head>
@@ -107,15 +124,15 @@
                             <a asp-controller="Employee" asp-action="Engineers">Работники</a>
                         </li>
                         @*<li>
-                            <a asp-controller="Employee" asp-action="Roles">Роли</a>
-                        </li>*@
+                                <a asp-controller="Employee" asp-action="Roles">Роли</a>
+                            </li>*@
                         @*???
                             <li>
                                 <a asp-controller="Employee" asp-action="Resources">Ресурсы</a>
                             </li>*@
                         @*<li>
-                            <a href="#">Рабочие календари</a>
-                        </li>*@
+                                <a href="#">Рабочие календари</a>
+                            </li>*@
                         <li>
                             <a asp-controller="Employee" asp-action="Resources">Должности</a>
                         </li>
@@ -130,15 +147,15 @@
                         <li>
                             <a asp-controller="Desk" asp-action="Objects">Объекты</a>
                         </li>
-                        <li>
+                        @*<li>
                             <a asp-controller="Desk" asp-action="EmployeeCategory">Категории персонала</a>
-                        </li>
-                        @*<li>
-                            <a asp-controller="Desk" asp-action="EmployeePosition">Должность</a>
                         </li>*@
                         @*<li>
-                            <a asp-controller="Desk" asp-action="ObjectClass">Классы объектов</a>
-                        </li>*@
+                                <a asp-controller="Desk" asp-action="EmployeePosition">Должность</a>
+                            </li>*@
+                        @*<li>
+                                <a asp-controller="Desk" asp-action="ObjectClass">Классы объектов</a>
+                            </li>*@
                         <li>
                             <a asp-controller="Desk" asp-action="Route">Маршруты</a>
                         </li>
@@ -147,8 +164,8 @@
                         </li>
                         @*Убрано до выяснения надобности*@
                         @*<li>
-                            <a asp-controller="Desk" asp-action="TOTypes">Типы ТО</a>
-                        </li>*@
+                                <a asp-controller="Desk" asp-action="TOTypes">Типы ТО</a>
+                            </li>*@
                     </ul>
                 </li>
 
@@ -183,10 +200,11 @@
 
                         <ul class="ul-list-right-aligned">
                             <li class="text-white">
-                                <a class="navbar-brand">СМИК</a>
+                                @*<a class="navbar-brand">СМИК</a>*@
+                                <p class="navbar-brand">Добро пожаловать @(((Credentials)Context.Items["User"]).DisplayName)</p>
                             </li>
                             <li>
-                                <a asp-controller="Account" asp-action="Logout" class="btn btn-outline-danger">Выход</a>
+                                <a asp-controller="Account" asp-action="Logout" class="btn btn-danger">Выход</a>
                             </li>
                         </ul>
                     </div>
@@ -205,7 +223,53 @@
     <div class="overlay">
 
     </div>
-
+    <div class="modal fade" id="changesModal" tabindex="-1" role="dialog" aria-labelledby="changesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="changesModalLabel">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p id="changesModalMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Нет</button>
+                    <button type="button" id="changesModalAccept" class="btn btn-primary" onclick="">Да</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @if (ViewBag.AlertType != null)
+    {
+        <div class="alert @(ViewBag.AlertType==AlertType.Success? "alert-success": (ViewBag.AlertType==AlertType.Warning? "alert-warning": (ViewBag.AlertType==AlertType.Error? "alert-danger": "alert-primary")) ) alert-success alert-message d-flex rounded p-0" role="alert">
+            <div class="alert-icon d-flex justify-content-center align-items-center flex-grow-0 flex-shrink-0 py-3">
+                @switch (ViewBag.AlertType)
+                {
+                    case AlertType.Success:
+                        <i class="fas fa-check"></i>
+                        break;
+                    case AlertType.Warning:
+                        <i class="fas fa-warning"></i>
+                        break;
+                    case AlertType.Error:
+                        <i class="fas fa-bullhorn"></i>
+                        break;
+                    default:
+                        <i class="fas fa-bullhorn"></i>
+                        break;
+                }
+            </div>
+            <div class="d-flex align-items-center py-2 px-3">
+                @ViewBag.AlertMessage
+            </div>
+            <a href="#" class="close d-flex ml-auto justify-content-center align-items-center px-3" data-dismiss="alert">
+                <i class="fas fa-times"></i>
+            </a>
+        </div>
+    }
 
 
     <script type="text/javascript">
@@ -265,38 +329,44 @@
 
         $(document).ready(Initializer);
 
-                //$(document).ready(function () {
-                //    $("#sidebar").mCustomScrollbar({
-                //        theme: "minimal"
-                //    });
+        //$(document).ready(function () {
+        //    $("#sidebar").mCustomScrollbar({
+        //        theme: "minimal"
+        //    });
 
-                //    $('#dismiss, .overlay').on('click', function () {
-                //        $('#sidebar').removeClass('active');
-                //        $('.overlay').removeClass('active');
-                //    });
+        //    $('#dismiss, .overlay').on('click', function () {
+        //        $('#sidebar').removeClass('active');
+        //        $('.overlay').removeClass('active');
+        //    });
 
-                //    $('#sidebarCollapse').on('click', function () {
-                //        $('#sidebar').addClass('active');
-                //        $('.overlay').addClass('active');
-                //        $('.collapse.in').toggleClass('in');
-                //        $('a[aria-expanded=true]').attr('aria-expanded', 'false');
-                //    });
-                //});
+        //    $('#sidebarCollapse').on('click', function () {
+        //        $('#sidebar').addClass('active');
+        //        $('.overlay').addClass('active');
+        //        $('.collapse.in').toggleClass('in');
+        //        $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+        //    });
+        //});
 
-                //$.noConflict();
-                //jQuery(document).ready(function ($) {
-                //    $('#datetimepicker2').datetimepicker({
-                //        defaultDate: moment().subtract(2, 'days'),
-                //        locale: 'ru',
-                //        icons: {
-                //            time: "fa fa-clock",
-                //            date: "fa fa-calendar-alt",
-                //            up: "fa fa-arrow-up",
-                //            down: "fa fa-arrow-down"
-                //        },
-                //        maxDate: moment()
-                //    });
-                //});
+        //$.noConflict();
+        //jQuery(document).ready(function ($) {
+        //    $('#datetimepicker2').datetimepicker({
+        //        defaultDate: moment().subtract(2, 'days'),
+        //        locale: 'ru',
+        //        icons: {
+        //            time: "fa fa-clock",
+        //            date: "fa fa-calendar-alt",
+        //            up: "fa fa-arrow-up",
+        //            down: "fa fa-arrow-down"
+        //        },
+        //        maxDate: moment()
+        //    });
+        //});
+        function changesModalShow(ref, head, msg) {
+            $('#changesModalLabel').html(head);
+            $('#changesModalMessage').html(msg);
+            $('#changesModalAccept').on('click', function () { location.href = ref; });
+            $('#changesModal').modal('show');
+        }
     </script>
 
     <script src="~/js/site.js" asp-append-version="true"></script>

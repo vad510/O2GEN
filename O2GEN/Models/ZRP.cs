@@ -76,7 +76,7 @@ namespace O2GEN.Models
         /// Не думаю что имеет смысл в передаче, у нас будет список AssetParameter
         /// </summary>
         [DisplayName("Маршрут")]
-        [Required(ErrorMessage = "Выберите подразделение")]
+        [RequiedIfAttribute("Id","-1", ErrorMessage = "Выберите маршрут")]
         public int? AssetParameterSetId { get; set; }
         /// <summary>
         /// Инфа по техпозициям уже существующего обхода.
@@ -86,5 +86,11 @@ namespace O2GEN.Models
         /// Инфа по техпозициям для создаваемой пачки обходов.
         /// </summary>
         public List<Hierarchy> NewTechPoz { get; set; } = new List<Hierarchy>();
+        /// <summary>
+        /// Исполнитель
+        /// </summary>
+        public string PerformerName { get; set; }
+
+        public List<Attachment> Attachments { get; set; } = new List<Attachment>();
     }
 }

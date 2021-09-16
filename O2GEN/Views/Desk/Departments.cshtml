@@ -21,7 +21,10 @@
                         <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#DepartmentsEdit" data-url="@Url.Action("DepartmentEdit", new { id = child.Id })">
                             <i class="fa fa-pen"></i>
                         </button>
-                        <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("DepartmentDelete", new { id = child.Id })">
+                        @*<button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("DepartmentDelete", new { id = child.Id })">
+                            <i class="fa fa-trash"></i>
+                        </button>*@
+                        <button type="submit" class="btn btn-danger ml-1" onclick="changesModalShow('@Url.Action("DepartmentDelete", new { id = child.Id })', 'Удаление', 'Вы действительно хотите удалить запись?');">
                             <i class="fa fa-trash"></i>
                         </button>
                     </div>
@@ -69,7 +72,10 @@
                         <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#DepartmentsEdit" data-url="@Url.Action("DepartmentEdit", new { id = child.Id })">
                             <i class="fa fa-pen"></i>
                         </button>
-                        <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("DepartmentDelete", new { id = child.Id })">
+                        @*<button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("DepartmentDelete", new { id = child.Id })">
+                            <i class="fa fa-trash"></i>
+                        </button>*@
+                        <button type="submit" class="btn btn-danger ml-1" onclick="changesModalShow('@Url.Action("DepartmentDelete", new { id = child.Id })', 'Удаление', 'Вы действительно хотите удалить запись?');">
                             <i class="fa fa-trash"></i>
                         </button>
                     </div>
@@ -238,7 +244,10 @@
                                     <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#DepartmentsEdit" data-url="@Url.Action("DepartmentEdit", new { id = item.Id })">
                                         <i class="fa fa-pen"></i>
                                     </button>
-                                    <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("DepartmentDelete", new { id = item.Id })">
+                                    @*<button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("DepartmentDelete", new { id = item.Id })">
+                                        <i class="fa fa-trash"></i>
+                                    </button>*@
+                                    <button type="submit" class="btn btn-danger ml-1" onclick="changesModalShow('@Url.Action("DepartmentDelete", new { id = item.Id })', 'Удаление', 'Вы действительно хотите удалить запись?');">
                                         <i class="fa fa-trash"></i>
                                     </button>
                                 </div>
@@ -257,7 +266,10 @@
                                     <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#DepartmentsEdit" data-url="@Url.Action("DepartmentEdit", new { id = item.Id })">
                                         <i class="fa fa-pen"></i>
                                     </button>
-                                    <button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("DepartmentDelete", new { id = item.Id })">
+                                    @*<button type="submit" class="btn btn-danger ml-1" data-url="@Url.Action("DepartmentDelete", new { id = item.Id })">
+                                        <i class="fa fa-trash"></i>
+                                    </button>*@
+                                    <button type="submit" class="btn btn-danger ml-1" onclick="changesModalShow('@Url.Action("DepartmentDelete", new { id = item.Id })', 'Удаление', 'Вы действительно хотите удалить запись?');">
                                         <i class="fa fa-trash"></i>
                                     </button>
                                 </div>

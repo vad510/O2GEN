@@ -38,7 +38,7 @@ namespace O2GEN.Controllers
                     data.Password = "";
                     return View(data);
                 }
-
+                data.DisplayName = $"{reslt.Surname} {(!string.IsNullOrEmpty(reslt.GivenName) ? $"{reslt.GivenName.Substring(0, 1)}." : "")}{(!string.IsNullOrEmpty(reslt.MiddleName) ? $"{reslt.MiddleName.Substring(0, 1)}." : "")}";
                 data.DeptId = reslt.DeptId;
                 data.Id = reslt.Id;
 

@@ -24,6 +24,7 @@ namespace O2GEN.Models
         public bool IsUser { get; set; } = false;
         public Guid ObjectUID { get; set; } = Guid.NewGuid();
         [DisplayName("Подразделение")]
+        [Required(ErrorMessage = "Укажите подразделение")]
         public int? DepartmentId { get; set; }
         [DisplayName("График")]
         public int? CalendarId { get; set; } = null;

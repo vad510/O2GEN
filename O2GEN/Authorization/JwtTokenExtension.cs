@@ -23,7 +23,8 @@ namespace O2GEN.Authorization
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")),
                 new Claim(ClaimsIdentity.DefaultNameClaimType, user.UserName),
                 new Claim("id", user.Id.ToString()),
-                new Claim("did", user.DeptId.ToString())
+                new Claim("did", user.DeptId.ToString()),
+                new Claim("uname", user.DisplayName.ToString())
             };
 
             // Create the credentials used to generate the token
@@ -91,6 +92,7 @@ namespace O2GEN.Authorization
                 }
                 output.DeptId = tmp;
                 output.UserName = sec.Claims.First(c => c.Type == ClaimTypes.Name).Value;
+                output.DisplayName = sec.Claims.First(c => c.Type == "uname").Value;
 
                 IPrincipal principal = tokenHandler.ValidateToken(token, validateParameters, out securityToken);
                 output.TokenException = Authorization.TokenExceprion.Ok;

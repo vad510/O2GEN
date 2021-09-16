@@ -16,6 +16,7 @@ namespace O2GEN.Helpers.ValidationAttributes
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
+            if(value==null) return ValidationResult.Success;
             string login = value.ToString();
             int Id = 0;
             int.TryParse(validationContext.ObjectType.GetProperty("UserId").GetValue(validationContext.ObjectInstance)?.ToString(), out Id);

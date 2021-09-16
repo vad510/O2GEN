@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using O2GEN.Authorization;
+using O2GEN.Helpers;
 using O2GEN.Models;
 using O2GEN.Models.HomeModels;
 using System;
@@ -43,7 +44,7 @@ namespace O2GEN.Controllers
             }
             if (string.IsNullOrEmpty(TOData) || !long.TryParse(TOData, out ToL))
             {
-                TOData = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Ticks).ToString();
+                TOData = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(1).Ticks).ToString();
             }
             if(!long.TryParse(DepartmentIdData, out Did)) Did = ((Credentials)HttpContext.Items["User"]).DeptId;
             DateTime From = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(FROMData)));
@@ -56,6 +57,7 @@ namespace O2GEN.Controllers
             Response.Cookies.Append("zrpto", TOData);
             Response.Cookies.Append("zrpdid", string.IsNullOrEmpty(DepartmentIdData)?"" : DepartmentIdData);
             Response.Cookies.Append("zrpn", (string.IsNullOrEmpty(DisplayName) ? "" : DisplayName));
+            AlertHelper.DisplayMessage(HttpContext.Session, ViewBag);
             return View(new ZRPFilter() { From = Helpers.DateTimeHelper.TicksFromNETToJS(From.Ticks).ToString(), To = Helpers.DateTimeHelper.TicksFromNETToJS(To.Ticks).ToString(), DepartmentId = (Did == 0 ? null : Did), DisplayName = DisplayName });
         }
         [Route("Home/Index")]
@@ -85,7 +87,7 @@ namespace O2GEN.Controllers
         [HttpGet]
         public IActionResult ZRPEdit(int id)
         {
-            var res = Helpers.DBHelper.GetZRP(id, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
+            var res = Helpers.DBHelper.GetZRP(id, ((Credentials)HttpContext.Items["User"]).Id, _logger);
             if (res != null)
                 return PartialView("ZRPEdit", res);
             return View();
@@ -99,16 +101,21 @@ namespace O2GEN.Controllers
             }
             if (Model.Id == -1)
             {
-                Helpers.DBHelper.CreateZRP(Model, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
+                Helpers.DBHelper.CreateZRP(Model, ((Credentials)HttpContext.Items["User"]).Id, _logger);
+                AlertHelper.SaveMessage(HttpContext.Session, AlertType.Success, $"Обход {Model.RouteName} добавлен.");
             }
             else
-                Helpers.DBHelper.UpdateZRP(Model, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
-            return RedirectToAction("Index");
+            {
+                Helpers.DBHelper.UpdateZRP(Model, ((Credentials)HttpContext.Items["User"]).Id, _logger);
+                AlertHelper.SaveMessage(HttpContext.Session, AlertType.Success, $"Обход {Model.RouteName} обновлен.");
+            }
+            return new JsonResult(0);  //return RedirectToAction("Index");
         }
         [HttpGet]
         public IActionResult ZRPDelete(int Id)
         {
-            Helpers.DBHelper.DeleteZRP(Id, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
+            Helpers.DBHelper.DeleteZRP(Id, ((Credentials)HttpContext.Items["User"]).Id, _logger);
+            AlertHelper.SaveMessage(HttpContext.Session, AlertType.Success, $"Обход удален.");
             return RedirectToAction("Index", "Home");
         }
 
@@ -322,13 +329,21 @@ namespace O2GEN.Controllers
         [HttpGet]
         public IActionResult ControlTrends()
         {
-            string FROMData = Request.Cookies["ctfrom"];
-            string TOData = Request.Cookies["ctto"];
-            string ControlIdData = Request.Cookies["ctcid"];
+            string FROMData = Request.Cookies["ctfrom"],
+            TOData = Request.Cookies["ctto"],
+            DIdData = Request.Cookies["ctdid"],
+            APSIdData = Request.Cookies["ctapsid"],
+            AIdData = Request.Cookies["ctaid"],
+            ACIdData = Request.Cookies["ctacid"],
+            APIdData = Request.Cookies["ctapid"];
 
-            long FromL = 0;
-            long ToL = 0;
-            int Cid = 0;
+            long FromL = 0,
+            ToL = 0,
+            DId = 0,
+            APSId = 0,
+            AId = 0,
+            ACId = 0,
+            APId = 0;
             if (string.IsNullOrEmpty(FROMData) || !long.TryParse(FROMData, out FromL))
             {
                 FROMData = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(-2).Ticks).ToString();
@@ -337,19 +352,33 @@ namespace O2GEN.Controllers
             {
                 TOData = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Ticks).ToString();
             }
-            int.TryParse(ControlIdData, out Cid);
             DateTime From = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(FROMData)));
             DateTime To = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(TOData)));
-
-            //ViewBag.ZRPCreated = Helpers.DBHelper.GetZRP(From, To, _logger, (int)Helpers.ZRPStatus.Created, (Did == 0 ? null : Did));
-
-            //ViewBag.ZRPInWork = Helpers.DBHelper.GetZRP(From, To, _logger, new int[] { (int)Helpers.ZRPStatus.Started, (int)Helpers.ZRPStatus.Created }, DisplayName, (Cid == 0 ? null : Cid));
-            //ViewBag.ZRPDone = Helpers.DBHelper.GetZRP(From, To, _logger, new int[] { (int)Helpers.ZRPStatus.Ended, (int)Helpers.ZRPStatus.Stoped }, DisplayName, (Cid == 0 ? null : Cid));
+            if(!long.TryParse(DIdData, out DId)) DId = (int)((Credentials)HttpContext.Items["User"]).DeptId;
+            long.TryParse(DIdData, out DId);
+            long.TryParse(APSIdData, out APSId);
+            long.TryParse(AIdData, out AId);
+            long.TryParse(ACIdData, out ACId);
+            long.TryParse(APIdData, out APId);
 
             Response.Cookies.Append("ctfrom", FROMData);
             Response.Cookies.Append("ctto", TOData);
-            Response.Cookies.Append("ctcid", string.IsNullOrEmpty(ControlIdData) ? "" : ControlIdData);
-            return View(new ControlTrendsFilter() { From = Helpers.DateTimeHelper.TicksFromNETToJS(From.Ticks).ToString(), To = Helpers.DateTimeHelper.TicksFromNETToJS(To.Ticks).ToString(), ControlId = (Cid == 0 ? null : Cid) });
+            Response.Cookies.Append("ctdid", string.IsNullOrEmpty(DIdData) ? "" : DIdData);
+            Response.Cookies.Append("ctapsid", string.IsNullOrEmpty(APSIdData) ? "" : APSIdData);
+            Response.Cookies.Append("ctaid", string.IsNullOrEmpty(AIdData) ? "" : AIdData);
+            Response.Cookies.Append("ctacid", string.IsNullOrEmpty(ACIdData) ? "" : ACIdData);
+            Response.Cookies.Append("ctapid", string.IsNullOrEmpty(APIdData) ? "" : APIdData);
+            return View(
+                new ControlTrendsFilter() 
+                { 
+                    From = Helpers.DateTimeHelper.TicksFromNETToJS(From.Ticks).ToString(), 
+                    To = Helpers.DateTimeHelper.TicksFromNETToJS(To.Ticks).ToString(), 
+                    DepartmentId = (DId == 0? null:DId),
+                    AssetParameterSetId = (APSId == 0 ? null : APSId),
+                    AssetId = (AId == 0 ? null : AId),
+                    AssetChildId = (ACId == 0 ? null : ACId),
+                    AssetParameterId = (APId == 0 ? null : APId)
+                });
         }
         [Route("Home/ControlTrends")]
         [HttpPost]
@@ -357,12 +386,19 @@ namespace O2GEN.Controllers
         {
             DateTime From = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.From)));
             DateTime To = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.To)));
-
-            if (Model.ControlId != null)
+            if(Model.DepartmentId is null ||
+                Model.AssetParameterSetId is null ||
+                Model.AssetId is null ||
+                Model.AssetChildId is null ||
+                Model.AssetParameterId is null )
             {
-                List<ControlStatistic> data = Helpers.DBHelper.GetControlStatistic(Model.ControlId, From, To, _logger);
+                ViewBag.Error = "";
+            }
+            else
+            {
+                List<ControlStatistic> data = Helpers.DBHelper.GetControlStatistic(Model.DepartmentId, Model.AssetParameterSetId, Model.AssetId, Model.AssetChildId, Model.AssetParameterId, From, To, _logger);
                 ViewBag.Data = data;
-                Control control = Helpers.DBHelper.GetControl((long)Model.ControlId, _logger);
+                Control control = Helpers.DBHelper.GetControl((long)Model.AssetParameterId, _logger);
                 ViewBag.Control = control;
                 ViewBag.Maximum = 0;
                 ViewBag.Minimum = 0;
@@ -383,12 +419,13 @@ namespace O2GEN.Controllers
                 }
             }
 
-            //ViewBag.ZRPInWork = Helpers.DBHelper.GetZRP(From, To, _logger, new int[] { (int)Helpers.ZRPStatus.Started, (int)Helpers.ZRPStatus.Created }, Model.DisplayName, Model.DepartmentId);
-            //ViewBag.ZRPDone = Helpers.DBHelper.GetZRP(From, To, _logger, new int[] { (int)Helpers.ZRPStatus.Ended, (int)Helpers.ZRPStatus.Stoped }, Model.DisplayName, Model.DepartmentId);
-
             Response.Cookies.Append("ctfrom", Model.From);
             Response.Cookies.Append("ctpto", Model.To);
-            Response.Cookies.Append("ctcid", (Model.ControlId == null ? "" : Model.ControlId.ToString()));
+            Response.Cookies.Append("ctdid", (Model.DepartmentId == null ? "" : Model.DepartmentId.ToString()));
+            Response.Cookies.Append("ctapsid", (Model.AssetParameterSetId == null ? "" : Model.AssetParameterSetId.ToString()));
+            Response.Cookies.Append("ctaid", (Model.AssetId == null ? "" : Model.AssetId.ToString()));
+            Response.Cookies.Append("ctacid", (Model.AssetChildId == null ? "" : Model.AssetChildId.ToString()));
+            Response.Cookies.Append("ctapid", (Model.AssetParameterId == null ? "" : Model.AssetParameterId.ToString()));
             return View(Model);
         }
 
@@ -397,6 +434,14 @@ namespace O2GEN.Controllers
         public IActionResult Start()
         {
             return View();
+        }
+
+        [HttpGet]
+        public IActionResult GetFile(Guid guid)
+        {
+            AttachmentData data = DBHelper.GetAttachment(guid);
+            if (data == null) return new JsonResult(new {result = "Файла не существует." });
+            return File(data.Data, System.Net.Mime.MediaTypeNames.Application.Octet, data.FileName);
         }
 
         #region AJAX!
