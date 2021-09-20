@@ -769,7 +769,7 @@ namespace O2GEN.Helpers
                 $"{obj.ValueTop1.Replace(',', '.')}, " +
                 $"{obj.ValueTop2.Replace(',', '.')}, " +
                 $"{obj.ValueTop3.Replace(',', '.')}, " +
-                $"'{GetControlType(obj.AssetParameterTypeId)}', " +
+                $"'{GetControlType((long)obj.AssetParameterTypeId)}', " +
                 $"0, " +
                 $"0, " +
                 $"0, " +
@@ -797,7 +797,7 @@ namespace O2GEN.Helpers
                 $"TopValue1 = {obj.ValueTop1.Replace(',', '.')}, " +
                 $"TopValue2 = {obj.ValueTop2.Replace(',', '.')}, " +
                 $"TopValue3 = {obj.ValueTop3.Replace(',', '.')}, " +
-                $"ValueType = '{GetControlType(obj.AssetParameterTypeId)}', " +
+                $"ValueType = '{GetControlType((long)obj.AssetParameterTypeId)}', " +
                 $"AssetParameterTypeId = {obj.AssetParameterTypeId} " +
                 $"WHERE ID = {obj.Id}; " +
 

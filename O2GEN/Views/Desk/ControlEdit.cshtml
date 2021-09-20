@@ -9,8 +9,8 @@
                     @if (Model.Id == -1)
                     {
         <h5>Новая запись</h5> }
-    else
-    {
+                    else
+                    {
 <h5>Изменить запись №@Model.Id</h5>}
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 </div>
@@ -26,13 +26,17 @@
                             <select asp-for="AssetParameterTypeId" class="form-control" required onchange="ControlDetVis()">
                                 <option value="null" selected disabled>Тип контроля</option>
                                 @foreach (var item in O2GEN.Helpers.DBHelper.GetAssetParameterTypes())
-                                {
+                {
                     <option value="@item.Id">@item.Name</option>}
                             </select>
-                            <span asp-validation-for="DisplayName" class="text-danger"></span>
+                            <span asp-validation-for="AssetParameterTypeId" class="text-danger"></span>
                         </div>
                     </div>
-                    <div id="ContolDetails">
+                    @{ 
+                        string controldetStyle = "";
+                        if (Model.AssetParameterTypeId == null || Model.AssetParameterTypeId == 2) controldetStyle = "display:none;";
+                    }
+                    <div id="ContolDetails" style="@controldetStyle" >
                         <h4>Уставки</h4>
                         <h5>Норма</h5>
                         <div class="form-row">

@@ -115,7 +115,18 @@
     </div>
 
     <div class="margin-between-above">
-        <div id="chartContainer" style="height: 100%; width: 100%;"></div>
+        <div id="chartContainer" style="height: 100%; width: 100%;">
+            @if(ViewBag.Message!= null)
+            {
+            <div class="d-flex align-items-center justify-content-center h-100">
+                <div class="d-flex flex-column">
+                    <p class="h3 align-self-center p-2">
+                        @ViewBag.Message
+                    </p>
+                </div>
+            </div>
+            }
+        </div>
     </div>
 
     <script type="text/javascript">

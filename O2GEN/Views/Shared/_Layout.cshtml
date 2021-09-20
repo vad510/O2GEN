@@ -362,10 +362,15 @@
         //    });
         //});
         function changesModalShow(ref, head, msg) {
+            console.log(1);
             $('#changesModalLabel').html(head);
+            console.log(2);
             $('#changesModalMessage').html(msg);
+            console.log(3);
             $('#changesModalAccept').on('click', function () { location.href = ref; });
+            console.log(4);
             $('#changesModal').modal('show');
+            console.log(5);
         }
     </script>
 

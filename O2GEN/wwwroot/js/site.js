@@ -311,7 +311,7 @@ function tryCreateModal(placeholder, response) {
         xhr.send(dataToSend2);
     });
 
-    ControlDetVis();
+    //ControlDetVis();
     AssetSortFade();
 }
 function BlockModal() {

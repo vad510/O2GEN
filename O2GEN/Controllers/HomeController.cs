@@ -439,6 +439,10 @@ namespace O2GEN.Controllers
                     ViewBag.Maximum = data.Max(x => x.y);
                     ViewBag.Minimum = data.Min(x => x.y);
                 }
+                else
+                {
+                    ViewBag.Message = "Данные для указанного фильтра не найдены.";
+                }
             }
 
             Response.Cookies.Append("ctfrom", Model.From);
