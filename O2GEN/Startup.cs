@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using O2GEN.Models;
 using O2GEN.Authorization;
 using System;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace O2GEN
 {
@@ -32,6 +33,10 @@ namespace O2GEN
                 services.AddMemoryCache();
                 services.AddSession(options => {
                     options.IdleTimeout = TimeSpan.FromMinutes(60);
+                });
+                services.Configure<FormOptions>(x =>
+                {
+                    x.ValueCountLimit = 4096;
                 });
 
             // todo cookies for default login path

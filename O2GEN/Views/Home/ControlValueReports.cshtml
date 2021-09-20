@@ -62,8 +62,8 @@
                 </li>
 
                 <li class="li-text-white">
-                    <select asp-for="AssetParameterSetId" class="form-control" required onchange="GetAssets(this);">
-                        @if (Model.AssetParameterSetId != null)
+                    <select asp-for="AssetParameterSetId" class="form-control" onchange="GetAssets(this);" required>
+                        @if (Model.DepartmentId != null)
                         {
                             <option value="NULL" selected disabled>Выбрать значение</option>
                             foreach (AssetParameterSet APS in O2GEN.Helpers.DBHelper.GetAssetParameterSets(DeptID: (int)Model.DepartmentId))
@@ -211,6 +211,8 @@
                             s += '<option value="' + data[i].id + '">' + data[i].displayName + '</option>';
                         }
                         $("#AssetParameterSetId").html(s);
+                        $("#AssetId").html('<option value="NULL" selected disabled>Выберите Тех. позицию</option>');
+
                     }
                 })
             }

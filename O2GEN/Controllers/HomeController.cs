@@ -93,6 +93,7 @@ namespace O2GEN.Controllers
             return View();
         }
         [HttpPost]
+        [DisableRequestSizeLimit]
         public IActionResult ZRPUpdate(ZRP Model)
         {
             if (!ModelState.IsValid)
@@ -162,11 +163,33 @@ namespace O2GEN.Controllers
                 AssetParameterSetId = (APSIdParsed == 0 ? null : APSIdParsed),
                 AssetId = (APIdParsed == 0 ? null : APIdParsed)
             });
+            
         }
         [Route("Home/ControlValueReports")]
         [HttpPost]
         public IActionResult ControlValueReports(ControlValueReportFilter Model)
         {
+            
+            string message = "";
+            if (Model.DepartmentId == null)
+            {
+                message += "Не указано подразделение. " + Environment.NewLine;
+            }
+            if (Model.AssetParameterSetId == null)
+            {
+                if (!string.IsNullOrEmpty(message)) message += Environment.NewLine;
+                message += "Не указан маршрут. " + Environment.NewLine;
+            }
+            if(Model.AssetId == null)
+            {
+                if (!string.IsNullOrEmpty(message)) message += Environment.NewLine;
+                message += "Не указана тех. позиция.  ";
+            }
+            if (!string.IsNullOrEmpty(message))
+            {
+                AlertHelper.DisplayMessage(HttpContext.Session, ViewBag, AlertType.Warning, message);
+                return View(Model);
+            }
             DateTime From = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.From)));
             DateTime To = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.To)));
             ViewBag.Data = Helpers.DBHelper.GetCVR(From, To, (long)Model.DepartmentId, (long)Model.AssetId, logger: _logger);
@@ -355,7 +378,6 @@ namespace O2GEN.Controllers
             DateTime From = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(FROMData)));
             DateTime To = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(TOData)));
             if(!long.TryParse(DIdData, out DId)) DId = (int)((Credentials)HttpContext.Items["User"]).DeptId;
-            long.TryParse(DIdData, out DId);
             long.TryParse(APSIdData, out APSId);
             long.TryParse(AIdData, out AId);
             long.TryParse(ACIdData, out ACId);
@@ -489,6 +511,24 @@ namespace O2GEN.Controllers
                 return new JsonResult(Helpers.DBHelper.GetAssetsFromAPS(id, _logger));
             else
                 return new JsonResult(new List<Asset>());
+        }
+        [HttpGet]
+        public JsonResult GetAssetChilds(string ObjId)
+        {
+            int id = 0;
+            if (int.TryParse(ObjId, out id))
+                return new JsonResult(Helpers.DBHelper.GetAssetChildsFromAsset(id, _logger));
+            else
+                return new JsonResult(new List<Hierarchy>());
+        }
+        [HttpGet]
+        public JsonResult GetControlsByAssetChilds(string ObjId)
+        {
+            int id = 0;
+            if (int.TryParse(ObjId, out id))
+                return new JsonResult(Helpers.DBHelper.GetControlsFromAssetChilds(id, _logger));
+            else
+                return new JsonResult(new List<Hierarchy>());
         }
         #endregion
     }

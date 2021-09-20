@@ -109,12 +109,12 @@
                         <li>
                             <a asp-controller="Home" asp-action="NumberOfTechPosReports">Количество тех. позиций</a>
                         </li>
-                        <li>
-                            <a asp-controller="Home" asp-action="DefectsReport">Дефекты</a>
-                        </li>
                         @*<li>
-                            <a asp-controller="Home" asp-action="ControlTrends">График по контролям</a>
+                            <a asp-controller="Home" asp-action="DefectsReport">Дефекты</a>
                         </li>*@
+                        <li>
+                            <a asp-controller="Home" asp-action="ControlTrends">График по контролям</a>
+                        </li>
                     </ul>
                 </li>
                 <li>
@@ -252,7 +252,7 @@
                         <i class="fas fa-check"></i>
                         break;
                     case AlertType.Warning:
-                        <i class="fas fa-warning"></i>
+                        <i class="fas fa-exclamation"></i>
                         break;
                     case AlertType.Error:
                         <i class="fas fa-bullhorn"></i>

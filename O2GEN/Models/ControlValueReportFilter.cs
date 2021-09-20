@@ -1,4 +1,6 @@
-﻿namespace O2GEN.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace O2GEN.Models
 {
     /// <summary>
     /// Фильтр для Отчета по значениям контролей

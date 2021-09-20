@@ -115,69 +115,72 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model.DefectReportModels)
+                @if (ViewBag.Data != null)
                 {
-                    <tr>
-                        <td>
-                            <p>
-                                @item.TechPos
-                            </p>
-                        </td>
+                    @foreach (var item in ViewBag.Data)
+                    {
+                        <tr>
+                            <td>
+                                <p>
+                                    @item.TechPos
+                                </p>
+                            </td>
 
-                        <td>
-                            <p>
-                                @item.Node
-                            </p>
-                        </td>
+                            <td>
+                                <p>
+                                    @item.Node
+                                </p>
+                            </td>
 
-                        <td>
-                            <p>
-                                @item.Status
-                            </p>
-                        </td>
+                            <td>
+                                <p>
+                                    @item.Status
+                                </p>
+                            </td>
 
-                        <td>
-                            <p>
-                                @item.DefectType
-                            </p>
-                        </td>
+                            <td>
+                                <p>
+                                    @item.DefectType
+                                </p>
+                            </td>
 
-                        <td>
-                            <p>
-                                @item.Control
-                            </p>
-                        </td>
+                            <td>
+                                <p>
+                                    @item.Control
+                                </p>
+                            </td>
 
-                        <td>
-                            <p>
-                                @item.Value
-                            </p>
-                        </td>
+                            <td>
+                                <p>
+                                    @item.Value
+                                </p>
+                            </td>
 
-                        <td>
-                            <p>
-                                @item.DefectFoundedBy
-                            </p>
-                        </td>
+                            <td>
+                                <p>
+                                    @item.DefectFoundedBy
+                                </p>
+                            </td>
 
-                        <td>
-                            <p>
-                                @item.DefectProceededBy
-                            </p>
-                        </td>
+                            <td>
+                                <p>
+                                    @item.DefectProceededBy
+                                </p>
+                            </td>
 
-                        <td>
-                            <p>
-                                @item.DateDetected
-                            </p>
-                        </td>
+                            <td>
+                                <p>
+                                    @item.DateDetected
+                                </p>
+                            </td>
 
-                        <td>
-                            <p>
-                                @item.Description
-                            </p>
-                        </td>
-                    </tr>
+                            <td>
+                                <p>
+                                    @item.Description
+                                </p>
+                            </td>
+                        </tr>
+                    }
                 }
             </tbody>
         </table>

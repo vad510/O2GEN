@@ -839,11 +839,11 @@ namespace O2GEN.Helpers
                 "LEFT JOIN InspectionProtocols IP ON IP.TaskId = T.Id AND IP.IsDeleted <> 1 " +
                 "LEFT JOIN InspectionProtocolItems IPI ON IPI.InspectionProtocolId = IP.Id " +
                 "LEFT JOIN AssetParameterValues APV ON APV.Id = IPI.AssetParameterValueId " +
-                $"INNER JOIN AssetParameterSetRecords APSR ON APSR.AssetParameterSetId = {AssetParameterSetId} AND IP.AssetId = APSR.AssetId AND APSR.AssetComponentId = APV.AssetId AND APSR.AssetParameterId = APV.AssetParameterId" +
+                $"INNER JOIN AssetParameterSetRecords APSR ON APSR.AssetParameterSetId = {AssetParameterSetId} AND IP.AssetId = APSR.AssetId AND APSR.AssetComponentId = APV.AssetId AND APSR.AssetParameterId = APV.AssetParameterId " +
                 "WHERE SC.SCStatusId = 3 " +
                 "AND SC.IsDeleted <> 1 " +
-                $"AND SC.StartTime >= '{From.ToString("yyyy-MM-dd HH:mm:ss")}' " +
-                $"AND SC.CloseTime <= '{To.ToString("yyyy-MM-dd HH:mm:ss")}' " +
+                $"AND SC.StartTime <= '{To.ToString("yyyy-MM-dd HH:mm:ss")}' " +
+                $"AND SC.CloseTime >= '{From.ToString("yyyy-MM-dd HH:mm:ss")}' " +
                 "AND APV.Value IS NOT NULL " +
                 $"AND SC.DepartmentId = {DepartmentId} " +
                 $"AND IP.AssetId = {AssetId} " +
@@ -2167,6 +2167,21 @@ namespace O2GEN.Helpers
                 "INNER JOIN Assets AS A ON A.Id = APSR.AssetId AND A.IsDeleted <> 1 " +
                 "WHERE APSR.IsDeleted <> 1 " +
                 $"AND APSR.AssetParameterSetId = {APSId}";
+        }
+        private static string SelectAssetChildsFromAsset(long AssetId)
+        {
+            return "SELECT A.Id, A.DisplayName " +
+                "FROM Assets AS A " +
+                "WHERE A.IsDeleted <> 1 " +
+                $"AND A.ParentId = {AssetId}";
+        }
+        private static string SelectControlsFromAssetChilds(long AssetChildId)
+        {
+            return "SELECT AP.Id, AP.DisplayName " +
+                "FROM AssetParameterPair AS APP " +
+                "INNER JOIN AssetParameters AS AP ON AP.Id = APP.AssetParameterId AND AP.IsDeleted <> 1 " +
+                "WHERE APP.IsDeleted <> 1 " +
+                $"AND APP.AssetId = {AssetChildId}";
         }
         /// <summary>
         /// Отчет по осмотренным Тех. позициям
@@ -4869,6 +4884,86 @@ namespace O2GEN.Helpers
                             foreach (var row in dataReader.Select(row => row))
                             {
                                 output.Add( new Asset()
+                                {
+                                    Id = int.Parse(row["Id"].ToString()),
+                                    DisplayName = row["DisplayName"].ToString()
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
+        public static List<Hierarchy> GetAssetChildsFromAsset(long AssetId, ILogger logger = null)
+        {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger?.LogDebug("connection string is null or empty");
+                return null;
+            }
+
+            List<Hierarchy> output = new List<Hierarchy>();
+            try
+            {
+                using (var connection = new SqlConnection(con))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectAssetChildsFromAsset(AssetId), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output.Add(new Hierarchy()
+                                {
+                                    Id = int.Parse(row["Id"].ToString()),
+                                    DisplayName = row["DisplayName"].ToString()
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
+        public static List<Hierarchy> GetControlsFromAssetChilds(long AssetChildId, ILogger logger = null)
+        {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger?.LogDebug("connection string is null or empty");
+                return null;
+            }
+
+            List<Hierarchy> output = new List<Hierarchy>();
+            try
+            {
+                using (var connection = new SqlConnection(con))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectControlsFromAssetChilds(AssetChildId), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output.Add(new Hierarchy()
                                 {
                                     Id = int.Parse(row["Id"].ToString()),
                                     DisplayName = row["DisplayName"].ToString()
