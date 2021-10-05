@@ -31,7 +31,7 @@ namespace O2GEN.Helpers
                 Session.SetString("AlertMessage", "");
             }
         }
-        public static void DisplayMessage(ISession Session, dynamic ViewBag, AlertType AlertType, string Message)
+        public static void DisplayMessage(dynamic ViewBag, AlertType AlertType, string Message)
         {
             ViewBag.AlertType = AlertType;
             ViewBag.AlertMessage = Message;

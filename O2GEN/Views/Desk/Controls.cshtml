@@ -20,7 +20,7 @@
                     <select asp-for="AssetParameterTypeId" class="form-control">
                         @if (Model.AssetParameterTypeId == null)
                         {
-                            <option value="NULL" selected>Выбрать значение</option>
+                            <option value="NULL" selected>Все типы</option>
                         }
                         else
                         {
@@ -40,7 +40,30 @@
                     </select>
                 </li>
                 <li>
-                    <input asp-for="DisplayName" class="form-control" placeholder="Название"/>
+                    <select asp-for="DepartmentId" class="form-control" required>
+                        @if (Model.DepartmentId == null)
+                        {
+                            <option value="NULL" selected>Все подразделения</option>
+                        }
+                        else
+                        {
+                    <option value="NULL">Все подразделения</option>
+                        }
+                        @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments())
+                        {
+                            @if (Model.DepartmentId == item.Id)
+                            {
+                                <option value="@item.Id" selected>@item.DisplayName</option>
+                            }
+                            else
+                            {
+                                <option value="@item.Id">@item.DisplayName</option>
+                            }
+                        }
+                    </select>
+                </li>
+                <li>
+                    <input asp-for="DisplayName" class="form-control" placeholder="Название" />
                 </li>
                 <li class="li-text-white">
                     <button class="btn btn-light" type="submit">
@@ -63,6 +86,12 @@
 
                     <th>
                         <p>
+                            Описание
+                        </p>
+                    </th>
+
+                    <th>
+                        <p>
                             Тип
                         </p>
                     </th>
@@ -79,35 +108,40 @@
             <tbody>
                 @if (ViewBag.Data == null)
                     return;
-                else foreach (var item in ViewBag.Data)
+                else foreach (Control item in ViewBag.Data)
                     {
-                        <tr>
-                            <td>
-                                <p>
-                                    @item.DisplayName
-                                </p>
-                            </td>
-                            <td>
-                                <p>
-                                    @item.DisplayValueType
-                                </p>
-                            </td>
-                            <td>
-                                <div class="d-flex justify-content-center">
-                                    <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#ControlEdit" data-url="@Url.Action("ControlEdit", new { id = item.Id })">
-                                        <i class="fa fa-pen"></i>
-                                    </button>
+                <tr>
+                    <td>
+                        <p>
+                            @item.DisplayName
+                        </p>
+                    </td>
+                    <td>
+                        <p>
+                            @item.Description
+                        </p>
+                    </td>
+                    <td>
+                        <p>
+                            @item.DisplayValueType
+                        </p>
+                    </td>
+                    <td>
+                        <div class="d-flex justify-content-center">
+                            <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#ControlEdit" data-url="@Url.Action("ControlEdit", new { id = item.Id })">
+                                <i class="fa fa-pen"></i>
+                            </button>
 
-                                    @*<button type="submit" class="btn btn-danger ml-1" onclick="location.href='@Url.Action("ControlDelete", new { id = item.Id })'">
-                                        <i class="fa fa-trash"></i>
-                                    </button>*@
-                                    <button type="submit" class="btn btn-danger ml-1" onclick="changesModalShow('@Url.Action("ControlDelete", new { id = item.Id })', 'Удаление', 'Вы действительно хотите удалить запись?');">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
+                            @*<button type="submit" class="btn btn-danger ml-1" onclick="location.href='@Url.Action("ControlDelete", new { id = item.Id })'">
+                    <i class="fa fa-trash"></i>
+                </button>*@
+                            <button type="submit" class="btn btn-danger ml-1" onclick="changesModalShow('@Url.Action("ControlDelete", new { id = item.Id })', 'Удаление', 'Вы действительно хотите удалить запись?');">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
 
-                        </tr>
+                </tr>
                     }
             </tbody>
         </table>

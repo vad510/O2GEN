@@ -50,14 +50,14 @@
                             <input asp-for="MiddleName" class="form-control" />
                         </div>
                     </div>
-                    @if (Model.Login == ((Credentials)Context.Items["User"]).UserName)
+                    @if (Model.Login == ((Credentials)Context.Items["User"]).UserName || "UFMAdmin" == ((Credentials)Context.Items["User"]).UserName)
                     {
-        <div class="form-row">
-            <div class="form-group col-md-12">
-                <label>Аккаунт</label>
-                @Html.CheckBox("IsUser", Model.IsUser)
-            </div>
-        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-12">
+                                <label>Аккаунт</label>
+                                @Html.CheckBox("IsUser", Model.IsUser)
+                            </div>
+                        </div>
                         <div id="logform">
                             <div class="form-row">
                                 <div class="form-group col-md-12">

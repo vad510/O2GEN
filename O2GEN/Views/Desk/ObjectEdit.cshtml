@@ -149,11 +149,11 @@
                                 <div class="form-group col-md-5">
                                     <input class="form-control mb-1" id="myInput1" type="text" placeholder="Поиск">
                                     <select multiple class="form-control" formtarget="_blank" id="SelectList1" style="height: 400px">
-                                        @foreach (var item in parameters)
+                                        @foreach (Control item in parameters)
                                         {
                                             if (!Model.Parameters.Contains(item.Id))
                                             {
-                                                <option value="@item.Id">@item.DisplayName</option>
+                                                <option value="@item.Id">@item.DisplayName @(string.IsNullOrEmpty(item.Description)?"":$" ({item.Description})")</option>
                                             }
                                         }
                                     </select>
@@ -170,7 +170,7 @@
                                         {
                                             if (Model.Parameters.Contains(item.Id))
                                             {
-                                                <option value="@item.Id">@item.DisplayName</option>
+                                                <option value="@item.Id">@item.DisplayName  @(string.IsNullOrEmpty(item.Description)?"":$" ({item.Description})")</option>
                                             }
                                         }
                                     </select>

@@ -5,5 +5,6 @@
         public string From { get; set; }
         public string To { get; set; }
         public int? DepartmentId { get; set; }
+        public string DisplayName { get; set; }
     }
 }

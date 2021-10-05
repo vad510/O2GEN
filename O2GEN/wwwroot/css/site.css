@@ -160,3 +160,16 @@ body {
     display: block;
     opacity: 1;
 }
+
+#SelectList1 option {
+    white-space: pre-wrap;
+}
+#SelectList1 option:nth-child(2n) {
+    background-color: rgba(0,0,0,.05);
+}
+#SelectList2 option {
+    white-space: pre-wrap;
+}
+#SelectList2 option:nth-child(2n) {
+    background-color: rgba(0,0,0,.05);
+}

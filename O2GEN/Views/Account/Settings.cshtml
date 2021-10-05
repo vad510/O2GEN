@@ -1,0 +1,76 @@
+﻿@model O2GEN.Models.Engineer
+@{
+    ViewData["Title"] = "Аккаунт";
+}
+<section class="component-section">
+    <div id="placeholder"></div>
+    <div class="container">
+        <div class="jumbotron mt-2">
+            <form action="Settings" method="post">
+                @Html.Hidden("Id", Model.Id)
+                @Html.Hidden("ObjectUID", Model.ObjectUID)
+                @Html.Hidden("PersonId", Model.PersonId)
+                @Html.Hidden("UserId", Model.UserId)
+                @Html.Hidden("IsUser", Model.IsUser)
+                @Html.Hidden("Login", Model.Login)
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label asp-for="DepartmentId"></label>
+                        <select asp-for="DepartmentId" class="form-control" required>
+                            <option value="null" selected disabled>Выбрать</option>
+                            @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments())
+                            {
+                                <option value="@item.Id">@item.DisplayName</option>
+                            }
+                        </select>
+                        <span asp-validation-for="DepartmentId" class="text-danger small"></span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label asp-for="Surname"></label>
+                        <input asp-for="Surname" class="form-control" required />
+                        <span asp-validation-for="Surname" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label asp-for="GivenName"></label>
+                        <input asp-for="GivenName" class="form-control" required />
+                        <span asp-validation-for="GivenName" class="text-danger small"></span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label asp-for="MiddleName"></label>
+                        <input asp-for="MiddleName" class="form-control" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label asp-for="Login"></label>
+                        <input value="@Model.Login" class="form-control" disabled />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label class="h5">Сменить пароль</label>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label asp-for="Password"></label>
+                        <input type="password" asp-for="Password" class="form-control" />
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label asp-for="ConfirmPassword"></label>
+                        <input type="password" asp-for="ConfirmPassword" class="form-control" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </form>
+        </div>
+    </div>
+
+</section>

@@ -187,7 +187,7 @@ namespace O2GEN.Controllers
             }
             if (!string.IsNullOrEmpty(message))
             {
-                AlertHelper.DisplayMessage(HttpContext.Session, ViewBag, AlertType.Warning, message);
+                AlertHelper.DisplayMessage(ViewBag, AlertType.Warning, message);
                 return View(Model);
             }
             DateTime From = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.From)));

@@ -88,15 +88,15 @@
                                     </div>
 
                                     <div class="form-row">
-                                        <div class="form-group col-md-6">
+                                        <div class="form-group col-md-12">
                                             <label asp-for="StartTime"></label>
                                             <input asp-for="StartTime" class="form-control" />
                                         </div>
 
-                                        <div class="form-group col-md-6">
+                                        @*<div class="form-group col-md-6">
                                             <label asp-for="EndTime"></label>
                                             <input asp-for="EndTime" class="form-control" />
-                                        </div>
+                                        </div>*@
                                     </div>
 
 
@@ -168,15 +168,15 @@
                                     </div>
 
                                     <div class="form-row">
-                                        <div class="form-group col-md-6">
+                                        <div class="form-group col-md-12">
                                             <label>Обход начать</label>
                                             <input asp-for="StartTime" class="form-control" required />
                                         </div>
 
-                                        <div class="form-group col-md-6">
+                                        @*<div class="form-group col-md-6">
                                             <label>Обход закончить</label>
                                             <input asp-for="EndTime" class="form-control" required />
-                                        </div>
+                                        </div>*@
                                     </div>
                                     <div class="form-row">
                                         <div class="form-group col-md-6">
@@ -213,11 +213,11 @@
                                                 </p>
                                             </th>
 
-                                            <th width="100px">
+                                            @*<th width="100px">
                                                 <p>
                                                     Удалить
                                                 </p>
-                                            </th>
+                                            </th>*@
                                         </tr>
                                     </thead>
                                     <tbody id="tp_table_cont">
@@ -232,13 +232,13 @@
                                                         <input type="hidden" name="InsProt[@i].Name" value="@Model.InsProt[i].Name" />
                                                     </td>
 
-                                                    <td>
+                                                    @*<td>
                                                         <div class="d-flex justify-content-center">
                                                             <button type="submit" class="btn btn-danger ml-1" onclick="RemoveNode(this); sortInputsForUpdate();">
                                                                 <i class="fa fa-trash"></i>
                                                             </button>
                                                         </div>
-                                                    </td>
+                                                    </td>*@
                                                 </tr>
                                                 if (Model.InsProt[i].Items.Count > 0)
                                                 {
@@ -437,14 +437,46 @@
                                                 </th>
 
                                                 <th>
-                                                    <p>Дефект обработал</p>
+                                                    <p>Время обнаружения</p>
                                                 </th>
 
                                                 <th>
-                                                    <p>Время обнаружения</p>
+                                                    <p>Комментарий</p>
                                                 </th>
                                             </tr>
                                         </thead>
+                                        <tbody>
+                                            @foreach (Deffect item in Model.Deffects)
+                                            {
+                                            <tr>
+                                                <td>
+                                                    <span>@item.AName</span>
+                                                </td>
+                                                <td>
+                                                    <span>@item.ACName</span>
+                                                </td>
+
+                                                <td>
+                                                    <span>@item.APVName</span>
+                                                </td>
+
+                                                <td>
+                                                    <span>@item.Value</span>
+                                                </td>
+
+                                                <td>
+                                                    <span>@item.UserName</span>
+                                                </td>
+
+                                                <td>
+                                                    <span>@item.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</span>
+                                                </td>
+                                                <td>
+                                                    <span>@item.Comment</span>
+                                                </td>
+                                            </tr>
+                                            }
+                                        </tbody>
                                     </table>
                                 </div>
 

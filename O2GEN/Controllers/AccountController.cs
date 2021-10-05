@@ -61,5 +61,35 @@ namespace O2GEN.Controllers
             HttpContext.Session.Remove("token");
             return new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Account", action = "Login" }));
         }
+
+        [Authorize]
+        [Route("Account/Settings")]
+        [HttpGet]
+        public IActionResult Settings()
+        {
+            Engineer Data = DBHelper.GetEngineer((int)((Credentials)HttpContext.Items["User"]).Id, _logger);
+            return View(Data);
+        }
+
+        [Authorize]
+        [Route("Account/Settings")]
+        [HttpPost]
+        public IActionResult Settings(Engineer data)
+        {
+            if (ModelState.IsValid)
+            {
+                DBHelper.UpdateEngineer(data, ((Credentials)HttpContext.Items["User"]).Id, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
+                Credentials usData = (Credentials)HttpContext.Items["User"];
+                usData.DeptId = (long)data.DepartmentId;
+                usData.DisplayName = $"{data.Surname} {(!string.IsNullOrEmpty(data.GivenName) ? $"{data.GivenName.Substring(0, 1)}." : "")}{(!string.IsNullOrEmpty(data.MiddleName) ? $"{data.MiddleName.Substring(0, 1)}." : "")}";
+                HttpContext.Session.SetString("token", JwtTokenExtension.GenerateJwtToken(usData));
+                AlertHelper.DisplayMessage(ViewBag,AlertType.Success,"Данные сохранены.");
+            }
+            else
+            {
+                AlertHelper.DisplayMessage(ViewBag, AlertType.Warning, "Ошибка на сохранении.");
+            }
+            return View(data);
+        }
     }
 }

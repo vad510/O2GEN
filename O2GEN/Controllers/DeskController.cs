@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using O2GEN.Authorization;
 using O2GEN.Helpers;
 using O2GEN.Models;
 using System;
@@ -7,6 +8,7 @@ using System.Collections.Generic;
 
 namespace O2GEN.Controllers
 {
+    [Authorize]
     public class DeskController : Controller
     {
         private readonly ILogger<DeskController> _logger;
@@ -20,6 +22,7 @@ namespace O2GEN.Controllers
         public IActionResult Objects()
         {
             string DepartmentIdData = Request.Cookies["odid"];
+            string DisplayName = Request.Cookies["on"];
             int Dept = 0;
             if (!int.TryParse(DepartmentIdData, out Dept)) Dept = (int)((Credentials)HttpContext.Items["User"]).DeptId;
             if (Dept == 0)
@@ -27,8 +30,9 @@ namespace O2GEN.Controllers
                 var d = Helpers.DBHelper.GetChildDepartments();
                 if (d.Count > 0) Dept = d[0].Id;
             }
-            ViewBag.Objects = Helpers.DBHelper.GetAssets(_logger, Dept);
+            ViewBag.Objects = Helpers.DBHelper.GetAssets(logger: _logger, DeptID: Dept, DisplayName: DisplayName) ;
             Response.Cookies.Append("odid", Dept.ToString());
+            Response.Cookies.Append("on", (string.IsNullOrEmpty(DisplayName) ? "" : DisplayName));
             AlertHelper.DisplayMessage(HttpContext.Session, ViewBag);
             return View(new Filter() { DepartmentId = Dept });
         }
@@ -36,8 +40,9 @@ namespace O2GEN.Controllers
         [HttpPost]
         public IActionResult Objects(Filter Model)
         {
-            ViewBag.Objects = Helpers.DBHelper.GetAssets(_logger, Model.DepartmentId);
+            ViewBag.Objects = Helpers.DBHelper.GetAssets(logger: _logger, DeptID: Model.DepartmentId, DisplayName: Model.DisplayName);
             Response.Cookies.Append("odid", (Model.DepartmentId == null ? "" : Model.DepartmentId.ToString()));
+            Response.Cookies.Append("on", (string.IsNullOrEmpty(Model.DisplayName) ? "" : Model.DisplayName));
             return View(Model);
         }
 
@@ -295,11 +300,15 @@ namespace O2GEN.Controllers
         {
             string SAssetParameterTypeId = Request.Cookies["aptid"];
             string DisplayName = Request.Cookies["apdn"];
+            string DepartmentIdData = Request.Cookies["apdid"];
             long Type = 0;
             long.TryParse(SAssetParameterTypeId, out Type);
-            ViewBag.Data = Helpers.DBHelper.GetControls(AssetParameterTypeId: (Type == 0 ? null : Type), DisplayName: DisplayName, _logger);
+            long DepartmentId = 0;
+            long.TryParse(DepartmentIdData, out DepartmentId);
+            ViewBag.Data = Helpers.DBHelper.GetControls(AssetParameterTypeId: (Type == 0 ? null : Type), DisplayName: DisplayName, DeptId: (DepartmentId == 0 ? null : DepartmentId), logger: _logger);
             Response.Cookies.Append("aptid", Type == 0 ? "" : Type.ToString());
             Response.Cookies.Append("apdn", (string.IsNullOrEmpty(DisplayName) ? "" : DisplayName));
+            Response.Cookies.Append("apdid", Type == 0 ? "" :DepartmentId.ToString());
             AlertHelper.DisplayMessage(HttpContext.Session, ViewBag);
             return View(new ControlsFilter() { AssetParameterTypeId = (Type == 0 ? null : Type), DisplayName = DisplayName });
         }
@@ -307,9 +316,10 @@ namespace O2GEN.Controllers
         [HttpPost]
         public IActionResult Controls(ControlsFilter Model)
         {
-            ViewBag.Data = Helpers.DBHelper.GetControls(AssetParameterTypeId: Model.AssetParameterTypeId, DisplayName: Model.DisplayName, _logger);
+            ViewBag.Data = Helpers.DBHelper.GetControls(AssetParameterTypeId: Model.AssetParameterTypeId, DisplayName: Model.DisplayName, DeptId:Model.DepartmentId, logger: _logger);
             Response.Cookies.Append("aptid", (Model.AssetParameterTypeId == null ? "" : Model.AssetParameterTypeId.ToString()));
             Response.Cookies.Append("apdn", (string.IsNullOrEmpty(Model.DisplayName) ? "" : Model.DisplayName));
+            Response.Cookies.Append("apdid", (Model.DepartmentId == null ? "" : Model.DepartmentId.ToString()));
             return View(Model);
         }
 

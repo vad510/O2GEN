@@ -1,6 +1,6 @@
 ﻿@model O2GEN.Models.Filter
 @{
-    ViewData["Title"] = "Объекты";
+    ViewData["Title"] = "Тех. позиции";
 }
 
 @functions{
@@ -147,6 +147,9 @@
                             }
                         }
                     </select>
+                </li>
+                <li>
+                    <input asp-for="DisplayName" class="form-control" placeholder="Название" />
                 </li>
                 <li class="li-text-white">
                     <button class="btn btn-light" type="submit">

@@ -45,7 +45,14 @@ namespace O2GEN.Models
         [DoubleCompareAttribute("ValueBottom3", "AssetParameterTypeId", ErrorMessage = "Значение 'Значение 'Сильное отклонение от' должно быть меньше 'Сильное отклонение до'")]
         public string ValueTop3 { get; set; } = "300";
 
+        /// <summary>
+        /// Подразделение, указывать не обязательно
+        /// </summary>
+        [DisplayName("Подразделение")]
+        public long? DepartmentId { get; set; }
 
+        [DisplayName("Коментарий")]
+        public string Description { get; set; } = "";
 
         public Guid ObjectUID { get; set; } = Guid.NewGuid();
     }

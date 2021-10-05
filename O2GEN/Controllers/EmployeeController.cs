@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using O2GEN.Authorization;
 using O2GEN.Helpers;
 using O2GEN.Models;
 using O2GEN.Models.EmployeeModels;
@@ -10,6 +11,7 @@ using System.Linq;
 
 namespace O2GEN.Controllers
 {
+    [Authorize]
     public class EmployeeController : Controller
     {
         private readonly ILogger<EmployeeController> _logger;

@@ -148,3 +148,12 @@ GO
 	INSERT INTO PPEntityCollections (IsDeleted, Name, DisplayName, Revision, SchemaRevision) 
 	VALUES 
 	(0, N'AttachedData', N'AttachedData', 1, 1);
+
+
+--Добавляем столбик для фиксирования получения тех позиции через NFC метку
+ALTER TABLE InspectionProtocols
+        ADD NFCReceived Bit NOT NULL
+ CONSTRAINT D_InspectionProtocols_NFCReceived DEFAULT (0)
+
+--Добавляем необязательную связь по подразделению
+ALTER TABLE AssetParameters ADD DepartmentId BIGINT NULL

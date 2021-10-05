@@ -20,6 +20,7 @@ namespace O2GEN.Models
         /// Дата  окончания
         /// </summary>
         [DisplayName("Дата окончания (план)")]
+        [Obsolete]
         public DateTime EndTime { get; set; } = DateTime.Now.Date.AddDays(1);
         public int ObjId { get; set; }
         /// <summary>
@@ -92,5 +93,6 @@ namespace O2GEN.Models
         public string PerformerName { get; set; }
 
         public List<Attachment> Attachments { get; set; } = new List<Attachment>();
+        public List<Deffect> Deffects { get; set; } = new List<Deffect>();
     }
 }
