@@ -223,21 +223,21 @@
     <div class="overlay">
 
     </div>
-    <div class="modal fade" id="changesModal" tabindex="-1" role="dialog" aria-labelledby="changesModalLabel" aria-hidden="true">
+    <div class="modal fade" id="changesMainModal" tabindex="-1" role="dialog" aria-labelledby="changesMainModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="changesModalLabel">Modal title</h5>
+                    <h5 class="modal-title" id="changesMainModalLabel">Modal title</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <p id="changesModalMessage"></p>
+                    <p id="changesMainModalMessage"></p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Нет</button>
-                    <button type="button" id="changesModalAccept" class="btn btn-primary" onclick="">Да</button>
+                    <button type="button" id="changesMainModalAccept" class="btn btn-primary" onclick="">Да</button>
                 </div>
             </div>
         </div>
@@ -362,15 +362,10 @@
         //    });
         //});
         function changesModalShow(ref, head, msg) {
-            console.log(1);
-            $('#changesModalLabel').html(head);
-            console.log(2);
-            $('#changesModalMessage').html(msg);
-            console.log(3);
-            $('#changesModalAccept').on('click', function () { location.href = ref; });
-            console.log(4);
-            $('#changesModal').modal('show');
-            console.log(5);
+            $('#changesMainModalLabel').html(head);
+            $('#changesMainModalMessage').html(msg);
+            $('#changesMainModalAccept').on('click', function () { location.href = ref; });
+            $('#changesMainModal').modal('show');
         }
     </script>
 

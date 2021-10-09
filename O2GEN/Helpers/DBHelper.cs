@@ -4817,7 +4817,7 @@ namespace O2GEN.Helpers
         public static void UpdateEngineer(Engineer obj, long EngId, string CurrentLogin, ILogger logger)
         {
             ExecuteNonQuery(UpdateEngineer(obj, EngId), logger);
-            if(CurrentLogin == obj.Login)
+            if(CurrentLogin == obj.Login|| CurrentLogin.ToLower() == "ufmadmin")
             {
                 if (obj.IsUser && obj.UserId == null)
                 {
