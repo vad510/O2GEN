@@ -30,6 +30,10 @@ namespace O2GEN.Models
         public long? AssetStateId { get; set; }
         public List<int> Parameters { get; set; } = new List<int>();
 
+        [DisplayName("Создан")]
+        public DateTime CreateStamp { get; set; }
+        [DisplayName("Редактирован")]
+        public DateTime ModifyStamp { get; set; }
 
     }
 }

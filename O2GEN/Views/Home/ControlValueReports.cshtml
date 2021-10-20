@@ -7,37 +7,32 @@
         <form action="ControlValueReports" method="post">
             <input asp-for="From" style="display:none" />
             <input asp-for="To" style="display:none" />
-            <ul class="ul-list-left-aligned">
-                <li class="li-text-white">
+            <div class="d-flex flex-wrap m-2">
+                <div class="mb-2 mr-2">
                     <button class="btn btn-light" type="button" id="SetToday">
                         <i class="fa fa-calendar-day"></i>
                         Сегодня
                     </button>
-                </li>
-
-                <li class="li-text-white mr-0">
-                    От:
-                </li>
-                <li class="li-text-white ml-0">
+                </div>
+                <span class="li-text-white mr-0 mb-2">От:</span>
+                <div class="mb-2 mr-2">
                     <div class="input-group date col-auto" id="datetimepickerFROM" data-target-input="nearest">
                         <input type="text" class="form-control datetimepicker-input" data-target="#datetimepickerFROM" id="DTPFROM" style="width:150px;" />
                         <div class="input-group-append" data-target="#datetimepickerFROM" data-toggle="datetimepicker">
                             <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                         </div>
                     </div>
-                </li>
-                <li class="li-text-white mr-0">
-                    До:
-                </li>
-                <li class="li-text-white ml-0">
+                </div>
+                <span class="li-text-white mr-0 mb-2">До:</span>
+                <div class="mb-2 mr-2">
                     <div class="input-group date col-auto" id="datetimepickerTO" data-target-input="nearest">
                         <input type="text" class="form-control datetimepicker-input" data-target="#datetimepickerTO" id="DTPTO" style="width:150px;" />
                         <div class="input-group-append" data-target="#datetimepickerTO" data-toggle="datetimepicker">
                             <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                         </div>
                     </div>
-                </li>
-                <li class="li-text-white">
+                </div>
+                <div class="mb-2 mr-2">
                     <select asp-for="DepartmentId" class="form-control" required onchange="GetAssetParameterSets(this);">
                         @if (Model.DepartmentId == null)
                         {
@@ -59,19 +54,22 @@
                             }
                         }
                     </select>
-                </li>
-
-                <li class="li-text-white">
+                </div>
+                <div class="mb-2 mr-2">
                     <select asp-for="AssetParameterSetId" class="form-control" onchange="GetAssets(this);" required>
                         @if (Model.DepartmentId != null)
                         {
                             <option value="NULL" selected disabled>Выбрать значение</option>
                             foreach (AssetParameterSet APS in O2GEN.Helpers.DBHelper.GetAssetParameterSets(DeptID: (int)Model.DepartmentId))
                             {
-                                if(APS.Id == Model.AssetParameterSetId)
-                                {<option value="@APS.Id" selected>@APS.DisplayName</option> }
+                                if (APS.Id == Model.AssetParameterSetId)
+                                {
+                                    <option value="@APS.Id" selected>@APS.DisplayName</option>
+                                }
                                 else
-                                {<option value="@APS.Id">@APS.DisplayName</option> }
+                                {
+                                    <option value="@APS.Id">@APS.DisplayName</option>
+                                }
                             }
                         }
                         else
@@ -79,19 +77,22 @@
                             <option value="NULL" selected disabled>Выберите маршрут</option>
                         }
                     </select>
-                </li>
-
-                <li class="li-text-white">
+                </div>
+                <div class="mb-2 mr-2">
                     <select asp-for="AssetId" class="form-control" required>
                         @if (Model.AssetParameterSetId != null)
                         {
                             <option value="NULL" selected disabled>Выбрать значение</option>
                             foreach (Asset A in O2GEN.Helpers.DBHelper.GetAssetsFromAPS((long)Model.AssetParameterSetId))
                             {
-                                if(A.Id == Model.AssetId)
-                                {<option value="@A.Id" selected>@A.DisplayName</option> }
+                                if (A.Id == Model.AssetId)
+                                {
+                                    <option value="@A.Id" selected>@A.DisplayName</option>
+                                }
                                 else
-                                {<option value="@A.Id">@A.DisplayName</option> }
+                                {
+                                    <option value="@A.Id">@A.DisplayName</option>
+                                }
                             }
                         }
                         else
@@ -99,20 +100,22 @@
                             <option value="NULL" selected disabled>Выберите Тех. позицию</option>
                         }
                     </select>
-                </li>
-            </ul>
-            <ul class="ul-list-left-aligned">
-                <li class="li-text-white">
+                </div>
+
+            </div>
+            <div class="d-flex flex-wrap m-2">
+                <div class="mb-2 mr-2">
                     <button class="btn btn-light" type="submit">
                         <i class="fa fa-th-list"></i> Сформировать
                     </button>
-                </li>
-                <li class="li-text-white">
+                </div>
+                <div class="mb-2 mr-2">
                     <button type="button" disabled class="btn btn-light" data-toggle="modal-toggler">
                         <i class="fa fa-file-excel"></i> Выгрузить в Excel
                     </button>
-                </li>
-            </ul>
+                </div>
+            </div>
+                
         </form>
     </div>
 

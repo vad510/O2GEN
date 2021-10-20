@@ -414,7 +414,7 @@ namespace O2GEN.Controllers
                 Model.AssetChildId is null ||
                 Model.AssetParameterId is null )
             {
-                ViewBag.Error = "";
+                ViewBag.Message = "Данные для указанного фильтра не найдены.";
             }
             else
             {
@@ -422,8 +422,8 @@ namespace O2GEN.Controllers
                 ViewBag.Data = data;
                 Control control = Helpers.DBHelper.GetControl((long)Model.AssetParameterId, _logger);
                 ViewBag.Control = control;
-                ViewBag.Maximum = 0;
-                ViewBag.Minimum = 0;
+                ViewBag.Maximum = "0";
+                ViewBag.Minimum = "0";
                 if (!string.IsNullOrEmpty(control.ValueBottom3) &&
                     !string.IsNullOrEmpty(control.ValueTop3) &&
                     !string.IsNullOrEmpty(control.ValueBottom2) &&
@@ -431,13 +431,25 @@ namespace O2GEN.Controllers
                     !string.IsNullOrEmpty(control.ValueBottom1) &&
                     !string.IsNullOrEmpty(control.ValueTop1))
                 {
-                    ViewBag.Maximum = (double.Parse(control.ValueBottom3, CultureInfo.InvariantCulture) + (Math.Abs(double.Parse(control.ValueTop2, CultureInfo.InvariantCulture) - double.Parse(control.ValueBottom2, CultureInfo.InvariantCulture)))).ToString().Replace(",",".");
-                    ViewBag.Minimum = (double.Parse(control.ValueTop1, CultureInfo.InvariantCulture) - (Math.Abs(double.Parse(control.ValueTop2, CultureInfo.InvariantCulture) - double.Parse(control.ValueBottom2, CultureInfo.InvariantCulture)))).ToString().Replace(",", ".");
+                    List<double> ustavki = new List<double>();
+                    ustavki.Add(double.Parse(control.ValueBottom3, CultureInfo.InvariantCulture));
+                    ustavki.Add(double.Parse(control.ValueBottom2, CultureInfo.InvariantCulture));
+                    ustavki.Add(double.Parse(control.ValueBottom1, CultureInfo.InvariantCulture));
+                    ustavki.Add(double.Parse(control.ValueTop3, CultureInfo.InvariantCulture));
+                    ustavki.Add(double.Parse(control.ValueTop2, CultureInfo.InvariantCulture));
+                    ustavki.Add(double.Parse(control.ValueTop1, CultureInfo.InvariantCulture));
+                    if (ustavki.Count > 0)
+                    {
+                        ViewBag.Maximum = ustavki.Max().ToString().Replace(",", ".");
+                        ViewBag.Minimum = ustavki.Min().ToString().Replace(",", ".");
+                    }
                 }
-                if (data.Count > 0)
+                if (data != null && data.Count > 0)
                 {
-                    ViewBag.Maximum = data.Max(x => x.y);
-                    ViewBag.Minimum = data.Min(x => x.y);
+                    double? tmp = data.Max(x => x.y) + data.Max(x => x.y) * 0.1;
+                    ViewBag.Maximum = (tmp > double.Parse(ViewBag.Maximum, CultureInfo.InvariantCulture)) ? tmp.ToString().Replace(",", ".") : ViewBag.Maximum;
+                    tmp = data.Min(x => x.y) - data.Min(x => x.y) * 0.1;
+                    ViewBag.Minimum = (tmp < double.Parse(ViewBag.Minimum, CultureInfo.InvariantCulture)) ? tmp.ToString().Replace(",", ".") : ViewBag.Minimum;
                 }
                 else
                 {

@@ -11,20 +11,13 @@
     <div id="placeholder"></div>
     <div class="row-container-left bg-blue">
         <form action="Engineers" method="post">
-            <ul class="ul-list-left-aligned">
-                <li class="li-text-white">
+            <div class="d-flex flex-wrap m-2">
+                <div class="mb-2 mr-2">
                     <button type="button" class="btn btn-light" data-toggle="modal-toggler" data-target="#EngineerEdit" data-url="@Url.Action("EngineerCreate")">
                         <i class="fa fa-plus"></i> Создать
                     </button>
-                </li>
-
-                @*<li class="li-text-white">
-                    <button class="btn btn-light">
-                        <i class="fa fa-plus"></i>
-                        Считать NFC карту
-                    </button>
-                </li>*@
-                <li class="li-text-white">
+                </div>
+                <div class="mb-2 mr-2">
                     <select asp-for="DepartmentId" class="form-control" required>
                         @if (Model.DepartmentId == null)
                         {
@@ -46,13 +39,13 @@
                             }
                         }
                     </select>
-                </li>
-                <li class="li-text-white">
+                </div>
+                <div class="mb-2 mr-2">
                     <button class="btn btn-light" type="submit">
                         <i class="fa fa-search"></i> Поиск
                     </button>
-                </li>
-            </ul>
+                </div>
+            </div>
         </form>
     </div>
 
@@ -71,13 +64,16 @@
                             Подразделение
                         </p>
                     </th>
-
-                    @*<th>
+                    <th>
                         <p>
-                            Пользователь
+                            Создан
                         </p>
-                    </th>*@
-
+                    </th>
+                    <th>
+                        <p>
+                            Редактирован
+                        </p>
+                    </th>
                     <th width="300">
                         <p class="text-center">
                             Изменить/Удалить
@@ -87,42 +83,42 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in ViewBag.Engineers)
+                @foreach (Engineer item in ViewBag.Engineers)
                 {
-                    <tr>
-                        <td>
-                            <p>
-                                @item.PersonName
-                            </p>
-                        </td>
+                <tr>
+                    <td>
+                        <p>
+                            @item.PersonName
+                        </p>
+                    </td>
 
-                        <td>
-                            <p>
-                                @item.DepartmentName
-                            </p>
-                        </td>
+                    <td>
+                        <p>
+                            @item.DepartmentName
+                        </p>
+                    </td>
+                    <td>
+                        <p>
+                            @item.CreateStamp.ToString("yyyy-MM-dd HH:mm")
+                        </p>
+                    </td>
+                    <td>
+                        <p>
+                            @item.ModifyStamp.ToString("yyyy-MM-dd HH:mm")
+                        </p>
+                    </td>
+                    <td>
 
-                        @*<td>
-                            <p>
-                                @item.IsUser
-                            </p>
-                        </td>*@
-
-                        <td>
-
-                            <div class="d-flex justify-content-center">
-                                <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#EngineerEdit" data-url="@Url.Action("EngineerEdit", new { id = item.Id })">
-                                    <i class="fa fa-pen"></i>
-                                </button>
-                                @*<button type="submit" class="btn btn-danger ml-1" onclick="location.href='@Url.Action("EngineerDelete", new { id = item.Id })'">
-                                    <i class="fa fa-trash"></i>
-                                </button>*@
-                                <button type="submit" class="btn btn-danger ml-1" onclick="changesModalShow('@Url.Action("EngineerDelete", new { id = item.Id })', 'Удаление', 'Вы действительно хотите удалить запись работника?');">
-                                    <i class="fa fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
+                        <div class="d-flex justify-content-center">
+                            <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#EngineerEdit" data-url="@Url.Action("EngineerEdit", new { id = item.Id })">
+                                <i class="fa fa-pen"></i>
+                            </button>
+                            <button type="submit" class="btn btn-danger ml-1" onclick="changesModalShow('@Url.Action("EngineerDelete", new { id = item.Id })', 'Удаление', 'Вы действительно хотите удалить запись работника?');">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
                 }
             </tbody>
         </table>

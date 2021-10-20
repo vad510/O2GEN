@@ -14,5 +14,6 @@ namespace O2GEN.Models
         public string Value { get; set; }
         [DisplayName("Комментарий")]
         public string Comment { get; set; }
+        public bool IsPen { get; set; }
     }
 }

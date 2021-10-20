@@ -55,5 +55,10 @@ namespace O2GEN.Models
         public string Description { get; set; } = "";
 
         public Guid ObjectUID { get; set; } = Guid.NewGuid();
+
+        [DisplayName("Создан")]
+        public DateTime CreateStamp { get; set; }
+        [DisplayName("Редактирован")]
+        public DateTime ModifyStamp { get; set; }
     }
 }

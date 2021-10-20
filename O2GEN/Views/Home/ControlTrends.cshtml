@@ -1,4 +1,6 @@
 ﻿@using System.Globalization
+@using O2GEN.Helpers
+@using System
 @model O2GEN.Models.ControlTrendsFilter
 @{
     ViewData["Title"] = "График по данным для контроля";
@@ -116,7 +118,7 @@
 
     <div class="margin-between-above">
         <div id="chartContainer" style="height: 100%; width: 100%;">
-            @if(ViewBag.Message!= null)
+            @if(!string.IsNullOrEmpty(ViewBag.Message))
             {
             <div class="d-flex align-items-center justify-content-center h-100">
                 <div class="d-flex flex-column">
@@ -177,7 +179,7 @@
             $("#datetimepickerTO").on("change.datetimepicker", ({ date }) => { $('#To').val(date._d.getTime()); });
             $('#datetimepickerTO').datetimepicker('date', now);
         }
-        @if(ViewBag.Data!= null && ViewBag.Control.ValueBottom1!="")
+        @if(ViewBag.Data!= null && ViewBag.Data.Count > 0)
         {
             <text>
                 window.onload = function () {
@@ -186,66 +188,50 @@
 	                    animationEnabled: true,
 	                    title: {
                             text: "@Html.Raw(ViewBag.Control.DisplayName)"
-	                    },
-	                    axisY: {
+                        },
+                        axisX: {
+                            valueFormatString: "DD.MM.YYYY HH:mm",
+                        },
+                        axisY: {
                             maximum: @ViewBag.Maximum.ToString().Replace(",", "."),
                             minimum: @ViewBag.Minimum.ToString().Replace(",", "."),
-		                    includeZero: true,
+                            includeZero: true,
                             gridThickness: 0,
                             stripLines: [
+                                @if(!string.IsNullOrEmpty(ViewBag.Control.ValueBottom1) && !string.IsNullOrEmpty(ViewBag.Control.ValueTop1))
                                 {
-                                    @if(double.Parse(ViewBag.Control.ValueBottom1, CultureInfo.InvariantCulture) < double.Parse(ViewBag.Control.ValueTop1, CultureInfo.InvariantCulture))
+                                    <text>
                                     {
-                                        <text>
-                                        startValue: @ViewBag.Control.ValueBottom1,
-                                        endValue: @ViewBag.Control.ValueTop1,
-                                        </text>
-                                    }else
-                                    {
-                                        <text>
-                                        endValue: @ViewBag.Control.ValueBottom1,
-                                        startValue: @ViewBag.Control.ValueTop1,
-                                        </text>
-                                    }
+                                    startValue: @ViewBag.Control.ValueBottom1.Replace(",", "."),
+                                    endValue: @ViewBag.Control.ValueTop1.Replace(",", "."),
                                     color: "#9fffa1",
                                     label: "Норма",
-                                    labelFontColor: "#c4c4c4",
+                                    labelFontColor: "#c4c4c4"
                                 },
+                                    </text>
+                                }
+                                @if(!string.IsNullOrEmpty(ViewBag.Control.ValueBottom2) && !string.IsNullOrEmpty(ViewBag.Control.ValueTop2))
                                 {
-                                    @if(double.Parse(ViewBag.Control.ValueBottom2, CultureInfo.InvariantCulture) < double.Parse(ViewBag.Control.ValueTop2, CultureInfo.InvariantCulture))
+                                    <text>
                                     {
-                                        <text>
-                                        startValue: @ViewBag.Control.ValueBottom2,
-                                        endValue: @ViewBag.Control.ValueTop2,
-                                        </text>
-                                    }else
-                                    {
-                                        <text>
-                                        endValue: @ViewBag.Control.ValueBottom2,
-                                        startValue: @ViewBag.Control.ValueTop2,
-                                        </text>
-                                    }
-                                    color: "#fffb9e",
-                                    label: "Отклонение",
-                                    labelFontColor: "#c4c4c4",
+                                    startValue: @ViewBag.Control.ValueBottom2.Replace(",", "."),
+                                    endValue: @ViewBag.Control.ValueTop2.Replace(",", "."),
+                                        color: "#fffb9e",
+                                        label: "Отклонение",
+                                        labelFontColor: "#c4c4c4",
                                 },
+                                    </text>
+                                }
+                                @if(!string.IsNullOrEmpty(ViewBag.Control.ValueBottom3) && !string.IsNullOrEmpty(ViewBag.Control.ValueTop3))
                                 {
-                                    @if(double.Parse(ViewBag.Control.ValueBottom3, CultureInfo.InvariantCulture) < double.Parse(ViewBag.Control.ValueTop3, CultureInfo.InvariantCulture))
+                                    <text>
                                     {
-                                        <text>
-                                        startValue: @ViewBag.Control.ValueBottom3,
-                                        endValue: @ViewBag.Control.ValueTop3,
-                                        </text>
-                                    }else
-                                    {
-                                        <text>
-                                        endValue: @ViewBag.Control.ValueBottom3,
-                                        startValue: @ViewBag.Control.ValueTop3,
-                                        </text>
-                                    }
-                                    color: "#ff9e9e",
-                                    label: "Сильное отклонение",
-                                    labelFontColor: "#c4c4c4",
+                                    startValue: @ViewBag.Control.ValueBottom3.Replace(",", "."),
+                                    endValue: @ViewBag.Control.ValueTop3.Replace(",", "."),
+                                        color: "#ff9e9e",
+                                        label: "Сильное отклонение",
+                                        labelFontColor: "#c4c4c4"},
+                                    </text>
                                 }
                             ]
 	                    },
@@ -255,8 +241,8 @@
                         data: [{
                             type: "spline",
                             color: "#333",
-                            xValueType: "dateTime",
                             xValueFormatString: "DD.MM.YYYY HH:mm",
+                            name: "@Html.Raw(ViewBag.Control.DisplayName)",
                             dataPoints: [
                                 @for (int i = 0; i < ViewBag.Data.Count; i++)
                                 {
@@ -264,7 +250,7 @@
                                     {
                                         <text>,</text>
                                     }
-                                    <text>{ x: @ViewBag.Data[i].x.ToString().Replace(",", "."), y: @ViewBag.Data[i].y.ToString().Replace(",",".") }</text>
+                                    <text>{ x: new Date(@ViewBag.Data[i].x.ToString().Replace(",",".")), y: @ViewBag.Data[i].y.ToString().Replace(",",".") }</text>
                                 }
                             ]
 	                    }]

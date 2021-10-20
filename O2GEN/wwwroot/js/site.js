@@ -43,52 +43,52 @@ function prepareLists() {
 
     for (var i = 0; i < treeViewitems.length; i++) {
 
-        treeViewitems[i].addEventListener("click", function () {
-            this.classList.toggle('caret-down');
-            let clickedTr = this.closest('tr');
+            treeViewitems[i].onclick = function () {
+                this.classList.toggle('caret-down');
+                let clickedTr = this.closest('tr');
 
-            // find all childs which lvl are greater by 1(one) for clicked row
-            let clickedLevel = parseInt(clickedTr.dataset.level);
-            let allowedLevel = clickedLevel + 1;
+                // find all childs which lvl are greater by 1(one) for clicked row
+                let clickedLevel = parseInt(clickedTr.dataset.level);
+                let allowedLevel = clickedLevel + 1;
 
-            if (this.classList.contains('caret-down')) {
+                if (this.classList.contains('caret-down')) {
 
-                while (clickedTr != null && clickedTr.nextElementSibling != null) {
+                    while (clickedTr != null && clickedTr.nextElementSibling != null) {
 
-                    clickedTr = clickedTr.nextElementSibling;
+                        clickedTr = clickedTr.nextElementSibling;
 
-                    let thisTrLevel = parseInt(clickedTr.dataset.level);
+                        let thisTrLevel = parseInt(clickedTr.dataset.level);
 
-                    if (thisTrLevel == clickedLevel) {
-                        return;
+                        if (thisTrLevel == clickedLevel) {
+                            return;
+                        }
+
+                        if (thisTrLevel > allowedLevel) {
+                            continue;
+                        }
+
+                        expandNestedChilds(clickedLevel, clickedTr, allowedLevel);
                     }
 
-                    if (thisTrLevel > allowedLevel) {
-                        continue;
-                    }
-
-                    expandNestedChilds(clickedLevel, clickedTr, allowedLevel);
                 }
+                else {
+                    while (clickedTr != null && clickedTr.nextElementSibling != null) {
+                        clickedTr = clickedTr.nextElementSibling;
 
-            }
-            else {
-                while (clickedTr != null && clickedTr.nextElementSibling != null) {
-                    clickedTr = clickedTr.nextElementSibling;
+                        let thisTrLevel = parseInt(clickedTr.dataset.level);
 
-                    let thisTrLevel = parseInt(clickedTr.dataset.level);
+                        if (thisTrLevel == clickedLevel) {
+                            return;
+                        }
 
-                    if (thisTrLevel == clickedLevel) {
-                        return;
-                    }
-
-                    if (thisTrLevel >= allowedLevel) {
-                        if (clickedTr.classList.contains('active-table')) {
-                            clickedTr.classList.remove('active-table');
+                        if (thisTrLevel >= allowedLevel) {
+                            if (clickedTr.classList.contains('active-table')) {
+                                clickedTr.classList.remove('active-table');
+                            }
                         }
                     }
                 }
-            }
-        });
+            };
     }
 }
 

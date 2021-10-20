@@ -41,9 +41,10 @@
                                     <option selected disabled>Выбрать</option>
                                     @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments())
                                     {
-                                        <option value="@item.Id">@item.DisplayName</option>
+                                    <option value="@item.Id">@item.DisplayName</option>
                                     }
                                 </select>
+                                <span asp-validation-for="DepartmentID" class="text-danger"></span>
                             </div>
                         </div>
                         <div id="techpos-tab" class="tab-pane p-1 color-black">
@@ -190,7 +191,6 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
-                    @*<button type="submit" class="btn btn-primary" data-save="modal">Сохранить</button>*@
                     <button type="button" class="btn btn-primary" onclick="$('#SaveChangesModal').modal('show')">Сохранить</button>
                 </div>
             </form>

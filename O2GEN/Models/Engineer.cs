@@ -41,5 +41,9 @@ namespace O2GEN.Models
         [DisplayName("Подтвердить пароль")]
         [Compare("Password", ErrorMessage = "Пароли не совпадают")]
         public string ConfirmPassword { get; set; }
+        [DisplayName("Создан")]
+        public DateTime CreateStamp { get; set; }
+        [DisplayName("Редактирован")]
+        public DateTime ModifyStamp { get; set; }
     }
 }

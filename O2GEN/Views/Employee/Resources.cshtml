@@ -8,13 +8,13 @@
     <div id="placeholder"></div>
     <div class="row-container-left bg-blue">
         <form action="Resources" method="post">
-            <ul class="ul-list-left-aligned">
-                <li class="li-text-white">
+            <div class="d-flex flex-wrap m-2">
+                <div class="mb-2 mr-2">
                     <button type="button" class="btn btn-light" data-toggle="modal-toggler" data-target="#ResourceEdit" data-url="@Url.Action("ResourceCreate")">
                         <i class="fa fa-plus"></i> Создать
                     </button>
-                </li>
-                <li class="li-text-white">
+                </div>
+                <div class="mb-2 mr-2">
                     <select asp-for="DepartmentId" class="form-control" required>
                         @if (Model.DepartmentId == null)
                         {
@@ -36,13 +36,13 @@
                             }
                         }
                     </select>
-                </li>
-                <li class="li-text-white">
+                </div>
+                <div class="mb-2 mr-2">
                     <button class="btn btn-light" type="submit">
                         <i class="fa fa-search"></i> Поиск
                     </button>
-                </li>
-            </ul>
+                </div>
+            </div>
         </form>
     </div>
 
@@ -55,6 +55,16 @@
                             Отображаемое название
                         </p>
                     </th>
+                    <th>
+                        <p>
+                            Создан
+                        </p>
+                    </th>
+                    <th>
+                        <p>
+                            Редактирован
+                        </p>
+                    </th>
                     <th width="300">
                         <p class="text-center">
                             Изменить/Удалить
@@ -65,26 +75,33 @@
             <tbody>
                 @foreach (var item in ViewBag.Resources)
                 {
-                    <tr>
-                        <td>
-                            <p>
-                                @item.DisplayName
-                            </p>
-                        </td>
-                        <td>
-                            <div class="d-flex justify-content-center">
-                                <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#ResourceEdit" data-url="@Url.Action("ResourceEdit", new { id = item.Id })">
-                                    <i class="fa fa-pen"></i>
-                                </button>
-                                @*<button type="submit" class="btn btn-danger ml-1" onclick="location.href='@Url.Action("ResourceDelete", new { id = item.Id })'">
-                                    <i class="fa fa-trash"></i>
-                                </button>*@
-                                <button type="submit" class="btn btn-danger ml-1" onclick="changesModalShow('@Url.Action("ResourceDelete", new { id = item.Id })', 'Удаление', 'Вы действительно хотите удалить запись?');">
-                                    <i class="fa fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
+                <tr>
+                    <td>
+                        <p>
+                            @item.DisplayName
+                        </p>
+                    </td>
+                    <td>
+                        <p>
+                            @item.CreateStamp.ToString("yyyy-MM-dd HH:mm")
+                        </p>
+                    </td>
+                    <td>
+                        <p>
+                            @item.ModifyStamp.ToString("yyyy-MM-dd HH:mm")
+                        </p>
+                    </td>
+                    <td>
+                        <div class="d-flex justify-content-center">
+                            <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#ResourceEdit" data-url="@Url.Action("ResourceEdit", new { id = item.Id })">
+                                <i class="fa fa-pen"></i>
+                            </button>
+                            <button type="submit" class="btn btn-danger ml-1" onclick="changesModalShow('@Url.Action("ResourceDelete", new { id = item.Id })', 'Удаление', 'Вы действительно хотите удалить запись?');">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
                 }
             </tbody>
         </table>

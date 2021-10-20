@@ -157,3 +157,13 @@ ALTER TABLE InspectionProtocols
 
 --Добавляем необязательную связь по подразделению
 ALTER TABLE AssetParameters ADD DepartmentId BIGINT NULL
+
+
+--Флаг замера по ручке
+ALTER TABLE AssetParameterValues ADD IsPen BIT NULL
+ALTER TABLE AssetParameterValues ADD CONSTRAINT D_AssetParameterValues_IsPen DEFAULT (0) FOR IsPen
+UPDATE AssetParameterValues SET IsPen = 0
+ALTER TABLE AssetParameterValues ALTER COLUMN IsPen BIT NOT NULL
+--Ссылка на словарь деффектов
+ALTER TABLE AssetParameterValues ADD DefectTypeId BIGINT NULL
+

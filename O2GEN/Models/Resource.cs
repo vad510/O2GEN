@@ -28,6 +28,10 @@ namespace O2GEN.Models
         /// <summary>
         /// Список Emngineer.Id для текущей сущности
         /// </summary>
-        public List<int> Parameters { get; set; } = new List<int>(); 
+        public List<int> Parameters { get; set; } = new List<int>();
+        [DisplayName("Создан")]
+        public DateTime CreateStamp { get; set; }
+        [DisplayName("Редактирован")]
+        public DateTime ModifyStamp { get; set; }
     }
 }

@@ -616,7 +616,6 @@ namespace O2GEN.Helpers
             $"UPDATE PPEntityCollections SET Revision = @IDRev WHERE ID = {(int)RevEntry.InspectionDocument}; " +
             $"UPDATE PPEntityCollections SET Revision = @ARev WHERE ID = {(int)RevEntry.Assignment}; ";
         }
-#warning Метка  времени для контроля  тянется из AssetParameterValues.ModificationTime что не отражает действительности. Планирую использовать  поле DateTime
         private static string GetInspectionProtocols(int SchedContID)
         {
             return "select IPs.Id, " +
@@ -627,7 +626,9 @@ namespace O2GEN.Helpers
             "CASE APV.AssetParameterTypeId " + //Визуальный
             "WHEN 2 THEN (CASE APV.Value WHEN N'0' THEN N'Норма' WHEN N'1' THEN N'Отклонение' WHEN N'2' THEN N'Сильное отклонение' ELSE N'' END) " +
             "ELSE APV.Value END AS ItemValue, " +
-            "APV.Comment " +
+            "APV.Comment, " +
+            "IPs.NFCReceived, " +
+            "APV.IsPen " +
             "from InspectionProtocolItems AS IPI " +
             "inner join InspectionProtocols AS IPs on IPI.InspectionProtocolId = IPs.Id " +
             "inner join AssetParameterValues AS APV on IPI.AssetParameterValueId = APV.Id " +
@@ -704,7 +705,7 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         private static string SelectControls(long ID = -1, long? AssetParameterTypeId = null, string DisplayName = "", long? DeptId = null)
         {
-            return "SELECT AP.Id, AP.DisplayName, AP.ObjectUID, AP.BottomValue1, AP.TopValue1, AP.BottomValue2, AP.TopValue2, AP.BottomValue3, AP.TopValue3, APT.Id AS AssetParameterTypeId, APT.Name AS ValueTypeName, AP.Description, AP.DepartmentId " +
+            return "SELECT AP.Id, AP.DisplayName, AP.ObjectUID, AP.BottomValue1, AP.TopValue1, AP.BottomValue2, AP.TopValue2, AP.BottomValue3, AP.TopValue3, APT.Id AS AssetParameterTypeId, APT.Name AS ValueTypeName, AP.Description, AP.DepartmentId, AP.CreationTime, ISNULL(AP.ModificationTime, AP.CreationTime) AS ModificationTime " +
                 "FROM AssetParameters AS AP " +
                 "INNER JOIN AssetParameterTypes AS APT ON AP.AssetParameterTypeId = APT.Id " +
                 "WHERE(AP.IsDeleted <> 1) AND(AP.TenantId = CAST(1 AS bigint)) " +
@@ -867,7 +868,7 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         private static string SelectAssetParameterSets(int ID = -1, int? DeptId = null)
         {
-            return "SELECT e.Id, e.DisplayName, e.ObjectUID, t.id as DepartmentID, t.DisplayName as DepartmentName  " +
+            return "SELECT e.Id, e.DisplayName, e.ObjectUID, t.id as DepartmentID, t.DisplayName as DepartmentName, e.CreationTime, ISNULL(e.ModificationTime, e.CreationTime) AS ModificationTime " +
                 "FROM AssetParameterSets AS e " +
                 "LEFT JOIN( " +
                 "    SELECT * " +
@@ -879,15 +880,15 @@ namespace O2GEN.Helpers
                 $"{(DeptId == null ? "" : $"AND e.DepartmentId = {DeptId} ")}" +
                 "ORDER BY e.DisplayName";
         }
-        private static string SelectAssetParameterSetsByDepartment(int DeptId)
-        {
-            return "SELECT e.Id, e.DisplayName, e.ObjectUID, e.DepartmentId, t.DisplayName as DepartmentName  " +
-                "FROM AssetParameterSets AS e " +
-                "LEFT JOIN Departments t ON e.DepartmentId = t.Id AND (t.IsDeleted<> 1) AND(t.TenantId = CAST(1 AS bigint)) " +
-                "WHERE e.IsDeleted <> 1 " +
-                $"AND e.DepartmentId = {DeptId} " +
-                "ORDER BY e.DisplayName";
-        }
+        //private static string SelectAssetParameterSetsByDepartment(int DeptId)
+        //{
+        //    return "SELECT e.Id, e.DisplayName, e.ObjectUID, e.DepartmentId, t.DisplayName as DepartmentName  " +
+        //        "FROM AssetParameterSets AS e " +
+        //        "LEFT JOIN Departments t ON e.DepartmentId = t.Id AND (t.IsDeleted<> 1) AND(t.TenantId = CAST(1 AS bigint)) " +
+        //        "WHERE e.IsDeleted <> 1 " +
+        //        $"AND e.DepartmentId = {DeptId} " +
+        //        "ORDER BY e.DisplayName";
+        //}
 
         /// <summary>
         /// Создание маршрута
@@ -1313,7 +1314,7 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         private static string SelectAssets(int? DeptID = -1, bool NotesOnly = false)
         {
-            return "SELECT e.Id, e.DisplayName, e.Description, e.ExternalId, e.ObjectUID, e.ParentId,  t1.DisplayName as StateName, t1.ObjectUID, AT.Id as TypeID, AT.DisplayName as TypeName, e.AssetTypeId, e.AssetStateId " +
+            return "SELECT e.Id, e.DisplayName, e.Description, e.ExternalId, e.ObjectUID, e.ParentId,  t1.DisplayName as StateName, t1.ObjectUID, AT.Id as TypeID, AT.DisplayName as TypeName, e.AssetTypeId, e.AssetStateId, e.CreationTime, ISNULL(e.ModificationTime, e.CreationTime) AS ModificationTime " +
                 "FROM Assets AS e " +
                 "LEFT JOIN ( " +
                 "    SELECT e2.Id, e2.DisplayName, e2.ExternalId, e2.IsDeleted, e2.Name, e2.ObjectUID, e2.Revision, e2.TenantId " +
@@ -1679,17 +1680,10 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         private static string SelectResources(long? ID = null, long? DepID = null)
         {
-            return "SELECT Id, DisplayName, ObjectUID, ResourceTypeId, ResourceStateId, DepartmentId, Latitude, Longitude, Address " +
+            return "SELECT Id, DisplayName, ObjectUID, ResourceTypeId, ResourceStateId, DepartmentId, Latitude, Longitude, Address, CreationTime, ISNULL(ModificationTime, CreationTime) AS ModificationTime " +
                 "FROM Resources WHERE " +
                 $"{(ID != null ? $"Id = {ID} AND" : "")} " +
                 $"{(DepID != null ? $"DepartmentId = {DepID} AND" : "")} " +
-                "(IsDeleted <> 1) AND (TenantId = CAST(1 AS bigint)) order by DisplayName";
-        }
-        private static string SelectResourcesByDepartment(int DepartmentID = -1)
-        {
-            return "SELECT Id, DisplayName, ObjectUID, ResourceTypeId, ResourceStateId, DepartmentId, Latitude, Longitude, Address " +
-                "FROM Resources WHERE " +
-                $"DepartmentId = {DepartmentID} " +
                 "(IsDeleted <> 1) AND (TenantId = CAST(1 AS bigint)) order by DisplayName";
         }
         /// <summary>
@@ -1800,7 +1794,7 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         private static string SelectEngineers(long? ID = null, long? DeptId = null)
         {
-            return "SELECT e.Id, CONCAT(P.Surname,' ',P.GivenName,' ', P.MiddleName) as PersonName, e.ObjectUID, e.PersonId, D.DisplayName as DepartmentName, isnull(U.Name,0) as IsUser , e.DepartmentId, e.PersonId, P.Surname, P.GivenName, P.MiddleName, e.CalendarId, P.PersonPositionId, U.Id AS UserId, U.Name AS Login " +
+            return "SELECT e.Id, CONCAT(P.Surname,' ',P.GivenName,' ', P.MiddleName) as PersonName, e.ObjectUID, e.PersonId, D.DisplayName as DepartmentName, isnull(U.Name,0) as IsUser , e.DepartmentId, e.PersonId, P.Surname, P.GivenName, P.MiddleName, e.CalendarId, P.PersonPositionId, U.Id AS UserId, U.Name AS Login, e.CreationTime, ISNULL(e.ModificationTime, e.CreationTime) AS ModificationTime  " +
                 "FROM Engineers AS e " +
                 "LEFT JOIN Departments AS D ON e.DepartmentId = D.Id AND D.IsDeleted <> 1 " +
                 "LEFT JOIN Persons AS P ON e.PersonId = P.Id AND P.IsDeleted <> 1 " +
@@ -1958,7 +1952,7 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         private static string SelectEngineersList(long? DeptId)
         {
-            return "SELECT e.Id, t1.Surname, t1.GivenName, t1.MiddleName, t1.DisplayName, PP.DisplayName as AppointName " +
+            return "SELECT e.Id, t1.Surname, t1.GivenName, t1.MiddleName, t1.DisplayName, PP.DisplayName as AppointName, e.CreationTime, ISNULL(e.ModificationTime, e.CreationTime) AS ModificationTime  " +
                 "FROM Engineers AS e  " +
                 "LEFT JOIN Persons AS t1 ON e.PersonId = t1.Id  " +
                 "LEFT JOIN PersonPositions as PP on PP.Id = t1.PersonPositionId " +
@@ -2155,7 +2149,17 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         private static string SelectCVR(DateTime From, DateTime To, long DepartmentId, long AssetId)
         {
-            return "SELECT A.Id AS AId, A.DisplayName AS AName, AC.Id AS ACId, AC.DisplayName AS ACName, AP.Id AS APId, AP.DisplayName AS APName, SC.Id AS SCId, SC.StartTime, APV.Value " +
+            return "SELECT A.Id AS AId, " +
+                "A.DisplayName AS AName, " +
+                "AC.Id AS ACId, " +
+                "AC.DisplayName AS ACName, " +
+                "AP.Id AS APId, " +
+                "AP.DisplayName AS APName, " +
+                "SC.Id AS SCId, " +
+                "SC.StartTime, " +
+                "CASE APV.AssetParameterTypeId " + 
+                "WHEN 2 THEN (CASE APV.Value WHEN N'0' THEN N'Норма' WHEN N'1' THEN N'Отклонение' WHEN N'2' THEN N'Сильное отклонение' ELSE N'' END) " +
+                "ELSE APV.Value END AS Value " +
                 "FROM SchedulingContainers AS SC " +
                 "INNER JOIN Departments AS D ON SC.DepartmentId = D.Id " +
                 "INNER JOIN Tasks AS T ON T.SchedulingContainerId = SC.Id " +
@@ -2303,20 +2307,37 @@ namespace O2GEN.Helpers
                 $"WHERE SC.Id = { SCId} " +
                 "AND APV.Value IS NOT NULL " +
                 "AND (" +
-                //Цифровой
-                "(APV.AssetParameterTypeId <> 2 " +
-                "AND (" +
-                "CONVERT(float, REPLACE(APV.Value,',','.')) " +
-                //Cильное отклонение
-                "between CONVERT(float, REPLACE(AP.BottomValue3,',','.')) " +
-                "AND CONVERT(float, REPLACE(AP.TopValue3,',','.'))) " +
-                //Отклонение
-                "OR CONVERT(float, REPLACE(APV.Value,',','.')) " +
-                "between CONVERT(float, REPLACE(AP.BottomValue2,',','.')) " +
-                "AND CONVERT(float, REPLACE(AP.TopValue2,',','.'))" +
-                ") OR " +
-                //Визуальный
-                "(APV.AssetParameterTypeId = 2 AND APV.Value IN (N'1', N'2'))) " +
+                    //Цифровой
+                    "(" +
+                        "APV.AssetParameterTypeId <> 2 " +
+                        "AND " +
+                        "(" +
+                            //Cильное отклонение
+                            "(" +
+                                "TRY_CONVERT(float, REPLACE(APV.Value,',','.')) " +
+                                "between TRY_CONVERT(float, REPLACE(AP.BottomValue3,',','.')) " +
+                                "AND TRY_CONVERT(float, REPLACE(AP.TopValue3,',','.'))" +
+                            ")" +
+                            //Отклонение
+                            "OR " +
+                            "(" +
+                                "TRY_CONVERT(float, REPLACE(APV.Value,',','.')) " +
+                                "between TRY_CONVERT(float, REPLACE(AP.BottomValue2,',','.')) " +
+                                "AND TRY_CONVERT(float, REPLACE(AP.TopValue2,',','.'))" +
+                            ")" +
+                        ") " +
+                        "AND " +
+                        "NOT (" +
+                            "TRY_CONVERT(float, REPLACE(APV.Value,',','.')) " +
+                            "between TRY_CONVERT(float, REPLACE(AP.BottomValue1,',','.')) " +
+                            "AND TRY_CONVERT(float, REPLACE(AP.TopValue1,',','.'))" +
+                        ")" +
+
+                    ") " +
+                    "OR " +
+                    //Визуальный
+                    "(APV.AssetParameterTypeId = 2 AND APV.Value IN (N'1', N'2'))" +
+                ") " +
                 "order by IP.Id, IPI.AssetId ";
         }
         #endregion
@@ -2619,7 +2640,8 @@ namespace O2GEN.Helpers
                                     {
                                         Id = int.Parse(row["Id"].ToString()),
                                         ObjectUID = string.IsNullOrEmpty(row["ObjectUID"].ToString()) ? null : new Guid(row["ObjectUID"].ToString()),
-                                        Name = row["Name"].ToString()
+                                        Name = row["Name"].ToString(),
+                                        IsNFC = bool.Parse(row["NFCReceived"].ToString())
                                     };
                                     output.Add(Tmp);
                                 }
@@ -2628,7 +2650,8 @@ namespace O2GEN.Helpers
                                     Name = row["ItemName"].ToString(),
                                     Date = string.IsNullOrEmpty(row["ItemData"].ToString()) ? null : Convert.ToDateTime(row["ItemData"]),
                                     Value = row["ItemValue"].ToString(),
-                                    Comment = row["Comment"].ToString()
+                                    Comment = row["Comment"].ToString(),
+                                    IsPen = bool.Parse(row["IsPen"].ToString())
                                 });
                             }
                         }
@@ -2920,7 +2943,9 @@ namespace O2GEN.Helpers
                                     ObjectUID = new Guid(row["ObjectUID"].ToString()),
                                     DisplayValueType = row["ValueTypeName"].ToString(),
                                     AssetParameterTypeId = long.Parse(row["AssetParameterTypeId"].ToString()),
-                                    Description = row["Description"].ToString()
+                                    Description = row["Description"].ToString(),
+                                    CreateStamp = Convert.ToDateTime(row["CreationTime"].ToString()),
+                                    ModifyStamp = Convert.ToDateTime(row["ModificationTime"].ToString()),
                                 });
                             }
                         }
@@ -3124,7 +3149,9 @@ namespace O2GEN.Helpers
                                     DisplayName = row["DisplayName"].ToString(),
                                     ObjectUID = new Guid(row["ObjectUID"].ToString()),
                                     DepartmentName = row["DepartmentName"].ToString(),
-                                    DepartmentID = string.IsNullOrEmpty(row["DepartmentID"].ToString()) ? (int?)null : int.Parse(row["DepartmentID"].ToString())
+                                    DepartmentID = string.IsNullOrEmpty(row["DepartmentID"].ToString()) ? 0 : int.Parse(row["DepartmentID"].ToString()),
+                                    CreateStamp = Convert.ToDateTime(row["CreationTime"].ToString()),
+                                    ModifyStamp = Convert.ToDateTime(row["ModificationTime"].ToString())
                                 });
                             }
                         }
@@ -3167,7 +3194,7 @@ namespace O2GEN.Helpers
                                     DisplayName = row["DisplayName"].ToString(),
                                     ObjectUID = new Guid(row["ObjectUID"].ToString()),
                                     DepartmentName = row["DepartmentName"].ToString(),
-                                    DepartmentID = string.IsNullOrEmpty(row["DepartmentID"].ToString()) ? (int?)null : int.Parse(row["DepartmentID"].ToString())
+                                    DepartmentID = string.IsNullOrEmpty(row["DepartmentID"].ToString()) ? 0 : int.Parse(row["DepartmentID"].ToString())
                                 };
                             }
                         }
@@ -3799,7 +3826,9 @@ namespace O2GEN.Helpers
                                     Description = row["Description"].ToString(),
                                     Maximo = row["ExternalId"].ToString(),
                                     Status = row["StateName"].ToString(),
-                                    ParentId = string.IsNullOrEmpty(row["ParentId"].ToString()) ? (int?)null : int.Parse(row["ParentId"].ToString())
+                                    ParentId = string.IsNullOrEmpty(row["ParentId"].ToString()) ? (int?)null : int.Parse(row["ParentId"].ToString()),
+                                    CreateStamp = Convert.ToDateTime(row["CreationTime"].ToString()),
+                                    ModifyStamp = Convert.ToDateTime(row["ModificationTime"].ToString()),
                                 });
                             }
                         }
@@ -4379,7 +4408,9 @@ namespace O2GEN.Helpers
                                 {
                                     Id = int.Parse(row["Id"].ToString()),
                                     DisplayName = row["DisplayName"].ToString(),
-                                    ObjectUID = new Guid(row["ObjectUID"].ToString())
+                                    ObjectUID = new Guid(row["ObjectUID"].ToString()),
+                                    CreateStamp = Convert.ToDateTime(row["CreationTime"].ToString()),
+                                    ModifyStamp = Convert.ToDateTime(row["ModificationTime"].ToString())
                                 });
                             }
                         }
@@ -4426,7 +4457,9 @@ namespace O2GEN.Helpers
                                     ResourceStateId = string.IsNullOrEmpty(row["ResourceStateId"].ToString()) ? (int?)null : int.Parse(row["ResourceStateId"].ToString()),
                                     ResourceTypeId = string.IsNullOrEmpty(row["ResourceTypeId"].ToString()) ? (int?)null : int.Parse(row["ParResourceTypeIdentId"].ToString()),
                                     Latitude = (string.IsNullOrEmpty(row["Latitude"].ToString()) ? 0 : double.Parse(row["Latitude"].ToString())),
-                                    Longitude = (string.IsNullOrEmpty(row["Longitude"].ToString()) ? 0 : double.Parse(row["Longitude"].ToString()))
+                                    Longitude = (string.IsNullOrEmpty(row["Longitude"].ToString()) ? 0 : double.Parse(row["Longitude"].ToString())),
+                                    CreateStamp = Convert.ToDateTime(row["CreationTime"].ToString()),
+                                    ModifyStamp = Convert.ToDateTime(row["ModificationTime"].ToString())
                                 };
                             }
                         }
@@ -4691,7 +4724,9 @@ namespace O2GEN.Helpers
                                     PersonName = row["PersonName"].ToString(),
                                     DepartmentName = row["DepartmentName"].ToString(),
                                     IsUser = row["IsUser"].ToString() != "0",
-                                    ObjectUID = new Guid(row["ObjectUID"].ToString())
+                                    ObjectUID = new Guid(row["ObjectUID"].ToString()),
+                                    CreateStamp = Convert.ToDateTime(row["CreationTime"].ToString()),
+                                    ModifyStamp = Convert.ToDateTime(row["ModificationTime"].ToString())
                                 });
                             }
                         }
@@ -4740,7 +4775,9 @@ namespace O2GEN.Helpers
                                     GivenName = row["GivenName"].ToString(),
                                     MiddleName = row["MiddleName"].ToString(),
                                     DisplayName = row["DisplayName"].ToString(),
-                                    AppointName = row["AppointName"].ToString()
+                                    AppointName = row["AppointName"].ToString(),
+                                    CreateStamp = Convert.ToDateTime(row["CreationTime"].ToString()),
+                                    ModifyStamp = Convert.ToDateTime(row["ModificationTime"].ToString())
                                 });
                             }
                         }
@@ -4793,7 +4830,9 @@ namespace O2GEN.Helpers
                                     MiddleName = row["MiddleName"].ToString(),
                                     Surname = row["Surname"].ToString(),
                                     UserId = string.IsNullOrEmpty(row["UserId"].ToString()) ? (int?)null : int.Parse(row["UserId"].ToString()),
-                                    Login = row["Login"].ToString()
+                                    Login = row["Login"].ToString(),
+                                    CreateStamp = Convert.ToDateTime(row["CreationTime"].ToString()),
+                                    ModifyStamp = Convert.ToDateTime(row["ModificationTime"].ToString())
                                 };
                             }
                         }
