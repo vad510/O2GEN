@@ -31,5 +31,9 @@ namespace O2GEN.Models
         /// </summary>
         public string AppointName { get; set; }
         public string JWToken { get; set; }
+        /// <summary>
+        /// SA - SuperAdmin | A - Admin | U - User
+        /// </summary>
+        public string RoleCode { get; set; }
     }
 }

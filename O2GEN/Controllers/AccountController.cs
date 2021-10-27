@@ -41,11 +41,9 @@ namespace O2GEN.Controllers
                 data.DisplayName = $"{reslt.Surname} {(!string.IsNullOrEmpty(reslt.GivenName) ? $"{reslt.GivenName.Substring(0, 1)}." : "")}{(!string.IsNullOrEmpty(reslt.MiddleName) ? $"{reslt.MiddleName.Substring(0, 1)}." : "")}";
                 data.DeptId = reslt.DeptId;
                 data.Id = reslt.Id;
+                data.RoleCode = reslt.RoleCode;
 
                 reslt.JWToken = JwtTokenExtension.GenerateJwtToken(data);
-                //HttpContext.Response.Headers.Add("Authorization", reslt.JWToken);
-                //return View(data);
-                //return Redirect("/Home/Index");
                 CookieHelper.ClearAllCookies(Request.Cookies.Keys, Response);
                 HttpContext.Session.SetString("token", reslt.JWToken);
                 return new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Home", action = "Index" }));

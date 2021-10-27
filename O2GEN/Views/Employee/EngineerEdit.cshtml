@@ -50,7 +50,7 @@
                             <input asp-for="MiddleName" class="form-control" />
                         </div>
                     </div>
-                    @if (Model.Login == ((Credentials)Context.Items["User"]).UserName || "UFMAdmin" == ((Credentials)Context.Items["User"]).UserName)
+                    @if (Model.Login == ((Credentials)Context.Items["User"]).UserName || "A" == ((Credentials)Context.Items["User"]).RoleCode || "SA" == ((Credentials)Context.Items["User"]).RoleCode)
                     {
                         <div class="form-row">
                             <div class="form-group col-md-12">

@@ -167,3 +167,7 @@ ALTER TABLE AssetParameterValues ALTER COLUMN IsPen BIT NOT NULL
 --Ссылка на словарь деффектов
 ALTER TABLE AssetParameterValues ADD DefectTypeId BIGINT NULL
 
+
+
+--Добавляем дополнительный столбик с кодом роли
+ALTER TABLE PPUsers ADD RoleCode VARCHAR(3) NOT NULL DEFAULT ('U');

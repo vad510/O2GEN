@@ -18,6 +18,7 @@ namespace O2GEN.Models
         /// </summary>
         public string Password { get; set; }
         public string Token { get; set; }
+        public string RoleCode { get; set; }
         public TokenExceprion TokenException { get; set; }
         public string DisplayName { get; set; }
     }

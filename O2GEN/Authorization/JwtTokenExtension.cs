@@ -24,7 +24,8 @@ namespace O2GEN.Authorization
                 new Claim(ClaimsIdentity.DefaultNameClaimType, user.UserName),
                 new Claim("id", user.Id.ToString()),
                 new Claim("did", user.DeptId.ToString()),
-                new Claim("uname", user.DisplayName.ToString())
+                new Claim("uname", user.DisplayName.ToString()),
+                new Claim("role", user.RoleCode.ToString())
             };
 
             // Create the credentials used to generate the token
@@ -59,10 +60,6 @@ namespace O2GEN.Authorization
             {
                 IPrincipal principal = tokenHandler.ValidateToken(token, validateParameters, out securityToken);
                 var sec = tokenHandler.ReadToken(token) as JwtSecurityToken;
-
-                //string nameClaim = sec.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-                //string defaultClaim = sec.Claims.First(c => c.Type == ClaimsIdentity.DefaultNameClaimType).Value;
-                //string guidClaim = sec.Claims.First(c => c.Type == JwtRegisteredClaimNames.Jti).Value;
             }
             catch
             {
@@ -93,12 +90,11 @@ namespace O2GEN.Authorization
                 output.DeptId = tmp;
                 output.UserName = sec.Claims.First(c => c.Type == ClaimTypes.Name).Value;
                 output.DisplayName = sec.Claims.First(c => c.Type == "uname").Value;
+                output.RoleCode  = sec.Claims.First(c => c.Type == "role").Value;
 
                 IPrincipal principal = tokenHandler.ValidateToken(token, validateParameters, out securityToken);
                 output.TokenException = Authorization.TokenExceprion.Ok;
                 return output;
-                //string defaultClaim = sec.Claims.First(c => c.Type == ClaimsIdentity.DefaultNameClaimType).Value;
-                //string guidClaim = sec.Claims.First(c => c.Type == JwtRegisteredClaimNames.Jti).Value;
             }
             catch (SecurityTokenExpiredException e)
             {

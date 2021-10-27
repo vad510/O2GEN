@@ -2236,7 +2236,7 @@ namespace O2GEN.Helpers
 
         public static string SelectUserData(Credentials data)
         {
-            return "SELECT e.Id, e.DepartmentId, PPos.DisplayName AppointName, D.DisplayName DepartmentName, P.GivenName, P.MiddleName, P.Surname, Crend.Name " +
+            return "SELECT e.Id, e.DepartmentId, PPos.DisplayName AppointName, D.DisplayName DepartmentName, P.GivenName, P.MiddleName, P.Surname, Crend.Name, Crend.RoleCode " +
                 "FROM PPUsers Crend " +
                 "LEFT JOIN Persons P ON P.UserId = Crend.Id " +
                 "LEFT JOIN Engineers E ON E.PersonId = P.Id " +
@@ -5263,12 +5263,13 @@ namespace O2GEN.Helpers
                                 output = new UserData()
                                 {
                                     Id = long.Parse(row["Id"].ToString()),
-                                    DeptId = string.IsNullOrEmpty(row["DepartmentId"].ToString())? 0: long.Parse(row["DepartmentId"].ToString()),
+                                    DeptId = string.IsNullOrEmpty(row["DepartmentId"].ToString()) ? 0 : long.Parse(row["DepartmentId"].ToString()),
                                     AppointName = row["AppointName"].ToString(),
                                     DepartmentName = row["DepartmentName"].ToString(),
                                     GivenName = row["GivenName"].ToString(),
                                     MiddleName = row["MiddleName"].ToString(),
-                                    Surname = row["Surname"].ToString()
+                                    Surname = row["Surname"].ToString(),
+                                    RoleCode = row["RoleCode"].ToString()
                                 };
                             }
                         }
