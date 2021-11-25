@@ -49,7 +49,9 @@ namespace O2GEN.Models
         /// Подразделение, указывать не обязательно
         /// </summary>
         [DisplayName("Подразделение")]
+        [Required(ErrorMessage = "Укажите подразделение")]
         public long? DepartmentId { get; set; }
+        public string DepartmentName { get; set; }
 
         [DisplayName("Коментарий")]
         public string Description { get; set; } = "";

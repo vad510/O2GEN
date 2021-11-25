@@ -171,3 +171,9 @@ ALTER TABLE AssetParameterValues ADD DefectTypeId BIGINT NULL
 
 --Добавляем дополнительный столбик с кодом роли
 ALTER TABLE PPUsers ADD RoleCode VARCHAR(3) NOT NULL DEFAULT ('U');
+
+
+--Добавляем столбики (флаги) для отправки данных в систему Максимо в обходы и маршруты
+
+ALTER TABLE AssetParameterSets ADD SendToMaximo BIT NOT NULL DEFAULT (0);
+ALTER TABLE SchedulingContainers ADD SendToMaximo BIT NOT NULL DEFAULT (0);

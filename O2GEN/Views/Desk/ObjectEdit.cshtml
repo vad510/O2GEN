@@ -34,8 +34,12 @@
                                 @Html.Hidden("ObjectUID", Model.ObjectUID)
                                 <div class="form-group">
                                     <div class="form-group">
+                                        <label asp-for="DisplayName"></label>
+                                        <input asp-for="DisplayName" class="form-control" required />
+                                    </div>
+                                    <div class="form-group">
                                         <label asp-for="AssetSortId"></label>
-                                        <select asp-for="AssetSortId" class="form-control" required onchange="AssetSortFade()">
+                                        <select asp-for="AssetSortId" class="form-control" required onchange="AssetSortFade(); GetAssetControls();">
                                             <option value="NULL" selected disabled>Выбрать значение</option>
                                             @foreach (AssetSort item in O2GEN.Helpers.DBHelper.GetAssetSorts())
                                             {
@@ -45,17 +49,13 @@
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="DepartmentId"></label>
-                                        <select asp-for="DepartmentId" class="form-control" required onchange="GetAssetsNodes(this)">
+                                        <select asp-for="DepartmentId" class="form-control" required onchange="GetAssetsNodes(this); GetAssetControls();">
                                             <option value="NULL" selected disabled>Выбрать значение</option>
                                             @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments())
                                             {
                                                 <option value="@item.Id">@item.DisplayName</option>
                                             }
                                         </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label asp-for="DisplayName"></label>
-                                        <input asp-for="DisplayName" class="form-control" required />
                                     </div>
                                     <div class="form-group par-fadable">
                                         <label asp-for="AssetStateId"></label>
@@ -84,25 +84,6 @@
                                             }
                                         </select>
                                     </div>
-                                    @*<div class="form-group chld-fadable">
-                                            <label asp-for="AssetClassId"></label>
-                                            <select asp-for="AssetClassId" class="form-control" required onchange="GetAssetClassParameters(this)">
-                                                @{
-                                                    var classes = O2GEN.Helpers.DBHelper.GetAssetClasses();
-                                                    @for (int i = 0; i < classes.Count; i++)
-                                                    {
-                                                        if (i == 0)
-                                                        {
-                                                            <option value="@classes[i].Id" selected>@classes[i].DisplayName</option>
-                                                        }
-                                                        else
-                                                        {
-                                                            <option value="@classes[i].Id">@classes[i].DisplayName</option>
-                                                        }
-                                                    }
-                                                }
-                                            </select>
-                                        </div>*@
                                     <div class="form-group chld-fadable">
                                         <label asp-for="ParentId"></label>
                                         <select asp-for="ParentId" class="form-control">
@@ -139,45 +120,78 @@
                             </div>
                         </div>
                         <div id="control-tab" class="tab-pane">
-                            <div id="Selected" style="visibility:collapse;">
-                                @for (int i = 0; i < Model.Parameters.Count; i++)
+
+                            @{
+                                if (Model.ParentId != null && Model.Id > 0)
+                                {Html.RenderPartial("ObjectControlsEdit", Model);}
+                                else
                                 {
-                                    <input id="Parameters[@i]" name="Parameters[@i]" type="hidden" value="@Model.Parameters[i]">
+                                    <div class="margin-between-above" style="height:500px; overflow:auto;">
+                                        <table class="table table-bordered table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        <p>Название</p>
+                                                    </th>
+
+                                                    <th>
+                                                        <p>Группа</p>
+                                                    </th>
+
+                                                    <th>
+                                                        <p>Использовать</p>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="3">Нет контролей для выбранного подразделения.</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 }
-                            </div>
-                            <div class="form-row pt-3">
-                                <div class="form-group col-md-5">
-                                    <input class="form-control mb-1" id="myInput1" type="text" placeholder="Поиск">
-                                    <select multiple class="form-control" formtarget="_blank" id="SelectList1" style="height: 400px">
-                                        @foreach (Control item in parameters)
-                                        {
-                                            if (!Model.Parameters.Contains(item.Id))
-                                            {
-                                                <option value="@item.Id">@item.DisplayName @(string.IsNullOrEmpty(item.Description)?"":$" ({item.Description})")</option>
-                                            }
-                                        }
-                                    </select>
-                                </div>
-                                <div class="form-group col-md-2 text-center">
-                                    <button type="button" class="btn btn-light mb-1" id="right"><i class="fa fa-arrow-right"></i></button>
-                                    <br />
-                                    <button type="button" class="btn btn-light" id="left"><i class="fa fa-arrow-left"></i></button>
-                                </div>
-                                <div class="form-group col-md-5">
-                                    <input class="form-control mb-1" id="myInput2" type="text" placeholder="Поиск">
-                                    <select multiple class="form-control" formtarget="_blank" id="SelectList2" style="height:400px">
-                                        @foreach (var item in parameters)
-                                        {
-                                            if (Model.Parameters.Contains(item.Id))
-                                            {
-                                                <option value="@item.Id">@item.DisplayName  @(string.IsNullOrEmpty(item.Description)?"":$" ({item.Description})")</option>
-                                            }
-                                        }
-                                    </select>
-                                </div>
-                            </div>
+                            }
+
+                            @*<div id="Selected" style="visibility:collapse;">
+            @for (int i = 0; i < Model.Parameters.Count; i++)
+            {
+                <input id="Parameters[@i]" name="Parameters[@i]" type="hidden" value="@Model.Parameters[i]">
+            }
+        </div>
+        <div class="form-row pt-3">
+            <div class="form-group col-md-5">
+                <input class="form-control mb-1" id="myInput1" type="text" placeholder="Поиск">
+                <select multiple class="form-control" formtarget="_blank" id="SelectList1" style="height: 400px">
+                    @foreach (Control item in parameters)
+                    {
+                        if (!Model.Parameters.Contains(item.Id))
+                        {
+                            <option value="@item.Id">@item.DisplayName @(string.IsNullOrEmpty(item.Description)?"":$" ({item.Description})")</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="form-group col-md-2 text-center">
+                <button type="button" class="btn btn-light mb-1" id="right"><i class="fa fa-arrow-right"></i></button>
+                <br />
+                <button type="button" class="btn btn-light" id="left"><i class="fa fa-arrow-left"></i></button>
+            </div>
+            <div class="form-group col-md-5">
+                <input class="form-control mb-1" id="myInput2" type="text" placeholder="Поиск">
+                <select multiple class="form-control" formtarget="_blank" id="SelectList2" style="height:400px">
+                    @foreach (var item in parameters)
+                    {
+                        if (Model.Parameters.Contains(item.Id))
+                        {
+                            <option value="@item.Id">@item.DisplayName  @(string.IsNullOrEmpty(item.Description)?"":$" ({item.Description})")</option>
+                        }
+                    }
+                </select>
+            </div>
+        </div>*@
                         </div>
-                    </div>
+                            </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
                         @*<button type="submit" class="btn btn-primary" data-save="modal">Сохранить</button>*@

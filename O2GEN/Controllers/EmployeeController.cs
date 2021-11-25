@@ -110,7 +110,7 @@ namespace O2GEN.Controllers
             }
             else
             {
-                Helpers.DBHelper.UpdateEngineer(Model, ((Credentials)HttpContext.Items["User"]).Id, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
+                Helpers.DBHelper.UpdateEngineer(Model, ((Credentials)HttpContext.Items["User"]).Id, ((Credentials)HttpContext.Items["User"]).UserName, ((Credentials)HttpContext.Items["User"]).RoleCode, _logger);
                 AlertHelper.SaveMessage(HttpContext.Session, AlertType.Success, $"Пользователь {Model.Surname} {Model.GivenName} обновлен.");
             }
             return new JsonResult(0); // RedirectToAction("Engineers");

@@ -168,6 +168,10 @@
                             </li>*@
                     </ul>
                 </li>
+                
+                <li>
+                    <a asp-controller="Home" asp-action="Statistics">Статистика</a>
+                </li>
 
             </ul>
         </nav>
@@ -175,7 +179,7 @@
         <!-- Page Content  -->
         <div id="content">
 
-            <nav class="bg-blue">
+            <nav class="bg-blue " style="position:sticky; top:0px;" id="headBar">
                 <div class="row-container">
 
                     <div class="row-col-70">
@@ -211,7 +215,7 @@
                 </div>
             </nav>
 
-            <div class="margin-between-aside">
+            <div class="">
                 @RenderBody()
             </div>
 

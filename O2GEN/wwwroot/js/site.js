@@ -143,7 +143,19 @@ ready(function () {
 
     placeholder = document.getElementById("placeholder");
     prepareLists();
+    CalcToolBarTop();
 });
+
+function CalcToolBarTop() {
+    if (document.getElementById('pageToolbar') == null) return;
+    var elem = document.getElementById('pageToolbar');
+    elem.style.top = document.getElementById('headBar').clientHeight + 'px';
+    window.addEventListener('resize', asdg);
+
+}
+function asdg () {
+    document.getElementById('pageToolbar').style.top = document.getElementById('headBar').clientHeight + 'px';
+}
 
 /** Attempts to create modal into element with Id == placeholder */
 function btnClick() {
@@ -398,6 +410,22 @@ $(document).on('show.bs.modal', '.modal', function (event) {
         $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
     }, 0);
 });
+
+function SetNextGroup(Grp) {
+    if (Grp.value == '-')
+        Grp.value = '1';
+    else if (Grp.value == '9') {
+        Grp.value = '-';
+    }
+    else if (isDigitCode(Grp.value.charCodeAt(0))) {
+        Grp.value = parseInt(Grp.value) + 1;
+    }
+}
+
+
+function isDigitCode(n) {
+    return (n >= "0".charCodeAt(0) && n <= "9".charCodeAt(0));
+}
 
 //function getParents(el, parentSelector) {
 //    if (parentSelector === undefined) {

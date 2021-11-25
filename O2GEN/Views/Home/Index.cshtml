@@ -1,7 +1,7 @@
 ﻿@model O2GEN.Models.ZRPFilter
 @{ ViewData["Title"] = "Главная"; }
 
-<section class="component-section">
+<section class="">
     @*<div class="row-container-left">
             <ul class="ul-list-left-aligned">
                 <li>
@@ -22,7 +22,7 @@
                 </li>
             </ul>
         </div>*@
-    <div class="row-container-left bg-blue">
+    <div class="row-container-left bg-blue" id="pageToolbar" style="position:sticky">
         <form action="Index" method="post">
 
             <input asp-for="From" style="display:none" />
@@ -198,15 +198,15 @@
                             <td><p>@item.PerformerName</p></td>
                             <td><p>@item.StartTime.ToString()</p></td>
                             <td><p>@item.EndTime.ToString()</p></td>
-                            <td><p> </p></td>
+                            <td><p>@item.DeffectNum</p></td>
                             <td>
                                 <div class="d-flex justify-content-center">
                                     <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPEdit", new { id = item.Id })">
                                         <i class="fa fa-pen"></i>
                                     </button>
                                     @*<button type="button" class="btn btn-danger ml-1" onclick="location.href='@Url.Action("ZRPDelete", new { id = item.Id })'">
-                                        <i class="fa fa-trash"></i>
-                                    </button>*@
+                    <i class="fa fa-trash"></i>
+                </button>*@
                                     <button type="submit" class="btn btn-danger ml-1" onclick="changesModalShow('@Url.Action("ZRPDelete", new { id = item.Id })', 'Удаление', 'Вы действительно хотите удалить запись?');">
                                         <i class="fa fa-trash"></i>
                                     </button>
@@ -248,7 +248,7 @@
                                 <p>Дата окончания (план)</p>
                             </th>
                             <th>
-                                <p>Дефект</p>
+                                <p>Дефекты</p>
                             </th>
                             <th>
                                 <p>Редактирование</p>
@@ -266,7 +266,7 @@
                             <td><p>@item.PerformerName</p></td>
                             <td><p>@item.StartTime.ToString()</p></td>
                             <td><p>@item.EndTime.ToString()</p></td>
-                            <td><p> </p></td>
+                            <td><p>@item.DeffectNum</p></td>
                             <td>
                                 <div class="d-flex justify-content-center">
                                     <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPEdit", new { id = item.Id })">

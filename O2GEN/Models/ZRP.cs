@@ -94,5 +94,6 @@ namespace O2GEN.Models
 
         public List<Attachment> Attachments { get; set; } = new List<Attachment>();
         public List<Deffect> Deffects { get; set; } = new List<Deffect>();
+        public string DeffectNum { get; set; }
     }
 }

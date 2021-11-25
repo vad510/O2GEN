@@ -76,7 +76,7 @@ namespace O2GEN.Controllers
         {
             if (ModelState.IsValid)
             {
-                DBHelper.UpdateEngineer(data, ((Credentials)HttpContext.Items["User"]).Id, ((Credentials)HttpContext.Items["User"]).UserName, _logger);
+                DBHelper.UpdateEngineer(data, ((Credentials)HttpContext.Items["User"]).Id, ((Credentials)HttpContext.Items["User"]).UserName, ((Credentials)HttpContext.Items["User"]).RoleCode, _logger);
                 Credentials usData = (Credentials)HttpContext.Items["User"];
                 usData.DeptId = (long)data.DepartmentId;
                 usData.DisplayName = $"{data.Surname} {(!string.IsNullOrEmpty(data.GivenName) ? $"{data.GivenName.Substring(0, 1)}." : "")}{(!string.IsNullOrEmpty(data.MiddleName) ? $"{data.MiddleName.Substring(0, 1)}." : "")}";

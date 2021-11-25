@@ -5,10 +5,10 @@
 @{
     ViewData["Title"] = "График по данным для контроля";
 }
-<section class="component-section">
+<section class="">
 
     <script src="~/js/canvasjs.min.js"></script>
-    <div class="row-container-left bg-blue">
+    <div class="row-container-left bg-blue"  id="pageToolbar" style="position:sticky">
         <form action="ControlTrends" method="post">
             <input asp-for="From" style="display:none" />
             <input asp-for="To" style="display:none" />

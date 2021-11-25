@@ -28,7 +28,7 @@ namespace O2GEN.Models
         public int? DepartmentId { get; set; }
         [DisplayName("Статус оборудования")]
         public long? AssetStateId { get; set; }
-        public List<int> Parameters { get; set; } = new List<int>();
+        public List<AssetControl> Parameters { get; set; } = new List<AssetControl>();
 
         [DisplayName("Создан")]
         public DateTime CreateStamp { get; set; }

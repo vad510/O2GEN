@@ -62,6 +62,15 @@ namespace O2GEN.Controllers
             return View();
         }
 
+
+        [HttpGet]
+        public IActionResult ObjectControlsEdit(long DeptId, long AssetId)
+        {
+            Asset outpt = new Asset();
+            outpt.Parameters = Helpers.DBHelper.GetAssetParameterForAsset(DeptId, AssetId, _logger);
+            return PartialView("ObjectControlsEdit", outpt);
+        }
+
         [HttpPost]
         public IActionResult ObjectUpdate(Asset Model)
         {

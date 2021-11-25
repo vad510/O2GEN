@@ -1,0 +1,41 @@
+﻿@model O2GEN.Models.Asset
+
+
+    <div class="margin-between-above" style="height:500px; overflow:auto;">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        <p>Название</p>
+                    </th>
+
+                    <th width="50">
+                        <p>Группа</p>
+                    </th>
+                    <th width="60">
+                        <p>Использовать</p>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.Parameters.Count; i++)
+                {
+                <tr>
+                    <td>
+                        <span>@Model.Parameters[i].DisplayName</span>
+                        <input type="hidden" asp-for="@Model.Parameters[i].AssetParameterId" />
+                        <input type="hidden" asp-for="@Model.Parameters[i].PairId" />
+                    </td>
+
+                    <td>
+                        <input type="text" style="text-align:center; width:30px;" asp-for="@Model.Parameters[i].GroupNum" readonly="readonly" onclick="SetNextGroup(this)"/>
+                    </td>
+
+                    <td>
+                        <input type="checkbox" style="text-align:center; width:30px; height:30px;" asp-for="@Model.Parameters[i].IsPair" />
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>

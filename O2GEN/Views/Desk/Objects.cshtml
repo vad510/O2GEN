@@ -153,10 +153,10 @@
     }
 }
 
-<section class="component-section">
+<section class="">
 
     <div id="placeholder"></div>
-    <div class="row-container-left bg-blue">
+    <div class="row-container-left bg-blue" id="pageToolbar" style="position:sticky">
         <form action="Objects" method="post">
             <div class="d-flex flex-wrap m-2">
                 <div class="mb-2 mr-2">
@@ -402,44 +402,49 @@
                 })
             }
         }
-        function GetAssetClassParameters(SelectedObj) {
-            if (SelectedObj != 'undefined') {
+        function GetAssetControls() {
+            if ($('#DepartmentId').val()!= null) {
+                console.log($('#DepartmentId').val());
+                console.log($('#Id').val());
                 $.ajax({
                     method: "GET",
-                    url: "GetAssetClassParametersJson",
-                    dataType: "json",
+                    url: "ObjectControlsEdit",
+                    dataType: "html",
                     data: {
-                        "ObjId": SelectedObj.value
+                        "DeptId": $('#DepartmentId').val(),
+                        "AssetId": $('#Id').val(),
                     },
                     success: function (data) {
-                        if (ParamsData == null) GetControls();
-                        console.log(ParamsData);
-                        var hiddenpart = '';
-                        var total = '';
-                        var selected = '';
-                        var hC = 0;
-                        var rslt = false;
                         console.log(data);
-                        for (var i = 0; i < ParamsData.length; i++) {
-                            rslt = false;
-                            for (var j = 0; j < data.length; j++) {
-                                if (data[j].assetParameterId == ParamsData[i].id) {
-                                    rslt = true;
-                                    break;
-                                }
-                            }
-                            if (rslt) {
-                                hiddenpart += '<input id="Parameters[' + hC + ']" name="Parameters[' + hC+']" type="hidden" value="' + ParamsData[i].id + '">';
-                                selected += '<option value="' + ParamsData[i].id + '">' + ParamsData[i].displayName + '</option>';
-                                hC = hC+1;
-                            }
-                            else {
-                                total += '<option value="' + ParamsData[i].id + '">' + ParamsData[i].displayName+'</option>';
-                            }
-                        }
-                        $("#Selected").html(hiddenpart);
-                        $("#SelectList1").html(total);
-                        $("#SelectList2").html(selected);
+                        $('#control-tab').html(data);
+                        //if (ParamsData == null) GetControls();
+                        //console.log(ParamsData);
+                        //var hiddenpart = '';
+                        //var total = '';
+                        //var selected = '';
+                        //var hC = 0;
+                        //var rslt = false;
+                        //console.log(data);
+                        //for (var i = 0; i < ParamsData.length; i++) {
+                        //    rslt = false;
+                        //    for (var j = 0; j < data.length; j++) {
+                        //        if (data[j].assetParameterId == ParamsData[i].id) {
+                        //            rslt = true;
+                        //            break;
+                        //        }
+                        //    }
+                        //    if (rslt) {
+                        //        hiddenpart += '<input id="Parameters[' + hC + ']" name="Parameters[' + hC+']" type="hidden" value="' + ParamsData[i].id + '">';
+                        //        selected += '<option value="' + ParamsData[i].id + '">' + ParamsData[i].displayName + '</option>';
+                        //        hC = hC+1;
+                        //    }
+                        //    else {
+                        //        total += '<option value="' + ParamsData[i].id + '">' + ParamsData[i].displayName+'</option>';
+                        //    }
+                        //}
+                        //$("#Selected").html(hiddenpart);
+                        //$("#SelectList1").html(total);
+                        //$("#SelectList2").html(selected);
                     }
                 })
             }

@@ -467,6 +467,50 @@ namespace O2GEN.Controllers
             return View(Model);
         }
 
+        [Route("Home/Statistics")]
+        [HttpGet]
+        public IActionResult Statistics()
+        {
+            string FROMData = Request.Cookies["statfrom"];
+            string TOData = Request.Cookies["statto"];
+            string DepartmentIdData = Request.Cookies["statdid"];
+
+            long FromL = 0;
+            long ToL = 0;
+            long Did = 0;
+            if (string.IsNullOrEmpty(FROMData) || !long.TryParse(FROMData, out FromL))
+            {
+                FROMData = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(-2).Ticks).ToString();
+            }
+            if (string.IsNullOrEmpty(TOData) || !long.TryParse(TOData, out ToL))
+            {
+                TOData = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(1).Ticks).ToString();
+            }
+            if (!long.TryParse(DepartmentIdData, out Did)) Did = ((Credentials)HttpContext.Items["User"]).DeptId;
+            DateTime From = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(FROMData)));
+            DateTime To = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(TOData)));
+
+            ViewBag.Data = Helpers.DBHelper.GetStatistics(From, To, (Did == 0 ? null : Did), _logger);
+            Response.Cookies.Append("statfrom", FROMData);
+            Response.Cookies.Append("statto", TOData);
+            Response.Cookies.Append("statdid", string.IsNullOrEmpty(DepartmentIdData) ? "" : DepartmentIdData);
+            return View(new StatisticsFilter() { From = Helpers.DateTimeHelper.TicksFromNETToJS(From.Ticks).ToString(), To = Helpers.DateTimeHelper.TicksFromNETToJS(To.Ticks).ToString(), DepartmentId = (Did == 0 ? null : Did) });
+        }
+        [Route("Home/Statistics")]
+        [HttpPost]
+        public IActionResult Statistics(StatisticsFilter Model)
+        {
+            DateTime From = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.From)));
+            DateTime To = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.To)));
+            ViewBag.Data = Helpers.DBHelper.GetStatistics(From, To, Model.DepartmentId, _logger);
+
+            Response.Cookies.Append("statfrom", Model.From);
+            Response.Cookies.Append("statto", Model.To);
+            Response.Cookies.Append("statdid", (Model.DepartmentId == null ? "" : Model.DepartmentId.ToString()));
+            return View(Model);
+        }
+
+
 
         [HttpGet]
         public IActionResult Start()
