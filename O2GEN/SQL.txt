@@ -177,3 +177,92 @@ ALTER TABLE PPUsers ADD RoleCode VARCHAR(3) NOT NULL DEFAULT ('U');
 
 ALTER TABLE AssetParameterSets ADD SendToMaximo BIT NOT NULL DEFAULT (0);
 ALTER TABLE SchedulingContainers ADD SendToMaximo BIT NOT NULL DEFAULT (0);
+
+
+
+--Таблица настроек Maximo
+
+CREATE TABLE [dbo].[MaximoReporterSettings](
+	[Id] [bigint] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](30) NOT NULL,
+	[Value] [nvarchar](max) NOT NULL,
+ CONSTRAINT [PK_MaximoReporterSettings] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+
+--Данные
+INSERT INTO MaximoReporterSettings
+(Name, Value)
+VALUES
+(N'Delay',N'300'),
+(N'LastSCRevision',N'999999'),
+(N'Auth',N'Z2VvcmdpZXZza3lkZToxWWpkc3FnZmhqa20='),
+(N'Url',N'http://10.202.98.87/meaweb/os/mxsr')
+
+
+
+--Таблица лога выгрузки деффектов в Maximo
+CREATE TABLE [dbo].[MaximoReporterSendLog](
+	[Id] [bigint] IDENTITY(1,1) NOT NULL,
+	[AssetParameterValueId] [bigint] NOT NULL,
+	[SCId] [bigint] NOT NULL,
+	[SendToMaximo] [bit] NOT NULL DEFAULT 0,
+	[AssetCode] [nvarchar](max) NOT NULL DEFAULT N'',
+	[AssetChildCode] [nvarchar](max) NOT NULL DEFAULT N'',
+	[Description] [nvarchar](max) NOT NULL DEFAULT N'',
+	[TICKETID] [nvarchar](max) NOT NULL DEFAULT N'',
+	[TICKETUID] [nvarchar](max) NOT NULL DEFAULT N'',
+	[LastUpdate] [datetime] NOT NULL DEFAULT GETDATE()
+ CONSTRAINT [PK_MaximoReporterSendLog] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+
+
+--Статусы отправки в МАКСИМО
+CREATE TABLE [dbo].[MaximoStatuses](
+	[Id] [bigint] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](30) NOT NULL,
+	[DisplayName] [nvarchar](max) NOT NULL,
+	[IsDeleted] [bit] DEFAULT 0
+ CONSTRAINT [PK_MaximoStatuses] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+
+
+INSERT INTO MaximoStatuses
+(Name,DisplayName)
+values
+(N'CREATED',N'Создан'),
+(N'INQUEUE',N'В очереди на отправку'),
+(N'ERROR',N'Ошибка при отправке'),
+(N'SENDED',N'Отправлено в Maximo')
+
+
+
+
+--UPD для таблицы с логами
+ALTER TABLE MaximoReporterSendLog ADD CreationTime [DateTime] DEFAULT GETDATE() NOT NULL;
+ALTER TABLE MaximoReporterSendLog ADD ModificationTime [DateTime] NULL;
+ALTER TABLE MaximoReporterSendLog ADD ModifiedByUser [BIGINT] NULL;
+ALTER TABLE MaximoReporterSendLog ADD MaximoStatus [BIGINT] DEFAULT 0 NOT NULL;
+ALTER TABLE MaximoReporterSendLog ADD [CustomAssetCode] NVARCHAR(MAX) NULL;
+ALTER TABLE MaximoReporterSendLog ADD [CustomAssetChildCode] NVARCHAR(MAX) NULL;
+ALTER TABLE MaximoReporterSendLog ADD [CustomDescription] NVARCHAR(MAX) NULL;
+ALTER TABLE MaximoReporterSendLog ADD [MaximoError] NVARCHAR(MAX) NULL;
+
+
+UPDATE MaximoReporterSendLog SET CreationTime = LastUpdate, CustomAssetCode = AssetCode, CustomAssetChildCode = AssetChildCode, CustomDescription = [Description];
+UPDATE MaximoReporterSendLog SET MaximoStatus = 0 WHERE SendToMaximo = 0;
+UPDATE MaximoReporterSendLog SET MaximoStatus = 4 WHERE SendToMaximo = 1;

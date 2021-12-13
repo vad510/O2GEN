@@ -1,0 +1,99 @@
+﻿@model O2GEN.Models.MaximoDefect
+
+<div class="modal fade" id="MaximoStatisticsEdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <form action="MaximoStatisticsUpdate" method="post" id="formid">
+                <div class="validation" asp-validation-summary="All"></div>
+                <div class="modal-header">
+                    <h5>Изменить запись №@Model.Id</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    @Html.Hidden("Id", Model.Id)
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label asp-for="DepartmentName"></label>
+                            <input asp-for="DepartmentName" class="form-control" disabled="disabled" />
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label asp-for="TaskName"></label>
+                            <input asp-for="TaskName" class="form-control" disabled="disabled" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label asp-for="CreationTime"></label>
+                            <input asp-for="CreationTime" class="form-control" disabled="disabled" />
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label asp-for="MaximoStatus"></label>
+                            <input asp-for="MaximoStatus" class="form-control" disabled="disabled" />
+                        </div>
+                    </div>
+                    <hr />
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label asp-for="CustomAssetCode"></label>
+                            <input asp-for="CustomAssetCode" class="form-control" />
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label asp-for="CustomAssetChildCode"></label>
+                            <input asp-for="CustomAssetChildCode" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label asp-for="CustomDescription"></label>
+                            @Html.TextAreaFor(m => m.CustomDescription, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label asp-for="TICKETID"></label>
+
+                            @if(Model.LastSend == null)
+                            {
+                            <input value="Нет" class="form-control" disabled="disabled" />
+                            }
+                            else
+                            {
+                            <input value="@Model.TICKETID" class="form-control" disabled="disabled" />
+                            }
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label asp-for="LastSend"></label>
+                            @if(Model.LastSend == null)
+                            {
+                            <input value="Не отправлялось" class="form-control" disabled="disabled" />
+                            }
+                            else
+                            {
+                            <input value="@((DateTime)Model.LastSend)" class="form-control" disabled="disabled" />
+                            }
+                        </div>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.MaximoError))
+                    {
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label asp-for="MaximoError"></label>
+                            @Html.TextAreaFor(m => m.MaximoError, new { @class = "form-control", @readonly = true })
+                            <input asp-for="MaximoError" class="form-control" disabled="disabled" />
+                        </div>
+                    </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary" onclick="$('#SaveChangesModal').modal('show')">Сохранить</button>
+                </div>
+            </form>
+            @Html.Partial("ModalBlock")
+        </div>
+    </div>
+</div>
+
+@Html.Partial("ModalSaveAccept")

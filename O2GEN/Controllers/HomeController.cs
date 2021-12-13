@@ -511,6 +511,77 @@ namespace O2GEN.Controllers
         }
 
 
+        [Route("Home/MaximoStatistics")]
+        [HttpGet]
+        public IActionResult MaximoStatistics()
+        {
+            string FROMData = Request.Cookies["maxstatfrom"];
+            string TOData = Request.Cookies["maxstatto"];
+            string DepartmentIdData = Request.Cookies["maxstatdid"];
+            string StatusIdData = Request.Cookies["maxstatstatusid"];
+
+            long FromL = 0;
+            long ToL = 0;
+            long Did = 0;
+            long Sid = 0;
+            if (string.IsNullOrEmpty(FROMData) || !long.TryParse(FROMData, out FromL))
+            {
+                FROMData = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(-2).Ticks).ToString();
+            }
+            if (string.IsNullOrEmpty(TOData) || !long.TryParse(TOData, out ToL))
+            {
+                TOData = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(1).Ticks).ToString();
+            }
+            long.TryParse(DepartmentIdData, out Did);
+            long.TryParse(StatusIdData, out Sid);
+            DateTime From = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(FROMData)));
+            DateTime To = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(TOData)));
+
+            ViewBag.Data = Helpers.DBHelper.GetMaximoStatistics(From:From, To:To, DeptId:(Did == 0 ? null : Did), StatusId:(Sid == 0 ? null : Sid), logger: _logger);
+            Response.Cookies.Append("maxstatfrom", FROMData);
+            Response.Cookies.Append("maxstatto", TOData);
+            Response.Cookies.Append("maxstatdid", string.IsNullOrEmpty(DepartmentIdData) ? "" : DepartmentIdData);
+            Response.Cookies.Append("maxstatstatusid", string.IsNullOrEmpty(StatusIdData) ? "" : StatusIdData);
+            return View(new MaximoStatisticsFilter() { From = Helpers.DateTimeHelper.TicksFromNETToJS(From.Ticks).ToString(), To = Helpers.DateTimeHelper.TicksFromNETToJS(To.Ticks).ToString(), DepartmentId = (Did == 0 ? null : Did), MaximoStatusId = (Sid == 0 ? null : Sid) });
+        }
+        [Route("Home/MaximoStatistics")]
+        [HttpPost]
+        public IActionResult MaximoStatistics(MaximoStatisticsFilter Model)
+        {
+            DateTime From = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.From)));
+            DateTime To = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.To)));
+            ViewBag.Data = Helpers.DBHelper.GetMaximoStatistics(From: From, To: To, DeptId: Model.DepartmentId, StatusId: Model.MaximoStatusId, logger: _logger);
+
+            Response.Cookies.Append("maxstatfrom", Model.From);
+            Response.Cookies.Append("maxstatto", Model.To);
+            Response.Cookies.Append("maxstatdid", (Model.DepartmentId == null ? "" : Model.DepartmentId.ToString()));
+            Response.Cookies.Append("maxstatstatusid", (Model.MaximoStatusId == null ? "" : Model.MaximoStatusId.ToString()));
+            return View(Model);
+        }
+
+        [HttpGet]
+        public IActionResult MaximoStatisticsEdit(int id)
+        {
+            var res = Helpers.DBHelper.GetMaximoStatistics(Id:id, logger:_logger).FirstOrDefault();
+            if (res != null) return PartialView("MaximoStatisticsEdit", res);
+            return View();
+        }
+        [HttpPost]
+        public IActionResult MaximoStatisticsUpdate(MaximoDefect Model)
+        {
+            Helpers.DBHelper.MaximoStatisticsUpdate(Model, ((Credentials)HttpContext.Items["User"]).Id, _logger);
+            AlertHelper.SaveMessage(HttpContext.Session, AlertType.Success, $"Дефект обновлен.");
+            return new JsonResult(0);
+        }
+        [HttpGet]
+        public IActionResult MaximoStatisticsSend(int Id)
+        {
+            Helpers.DBHelper.MaximoStatisticsSend(Id, ((Credentials)HttpContext.Items["User"]).Id, _logger);
+            AlertHelper.SaveMessage(HttpContext.Session, AlertType.Success, $"Дефект отправлен в очередь.");
+            return RedirectToAction("MaximoStatistics", "Home");
+        }
+
+
 
         [HttpGet]
         public IActionResult Start()

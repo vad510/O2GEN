@@ -47,7 +47,7 @@ namespace O2GEN.Helpers
             }
 
             return "" +
-                $"declare @__start_2 datetime2(7)='{From.ToString("yyyy-MM-dd HH:mm:ss")}', @__finish_1 datetime2(7)='{To.ToString("yyyy-MM-dd HH:mm:ss")}'; " +
+                $"declare @__start_2 datetime2(7)='{From.ToString("yyyyMMdd HH:mm:ss")}', @__finish_1 datetime2(7)='{To.ToString("yyyyMMdd HH:mm:ss")}'; " +
                 "SELECT " +
                 "[e].[Id], " +
                 "[e].[CloseTime], " +
@@ -190,10 +190,10 @@ namespace O2GEN.Helpers
             $"'{Guid.NewGuid().ToString("D")}', " +
             $"{ obj.DepartmentID}, " +
             $"{ obj.ResourceId}, " +
-            $"'{ obj.StartTime.ToString("yyyy-MM-dd HH:mm:ss")}', " +
-            $"'{ obj.StartTime.AddDays(1).ToString("yyyy-MM-dd HH:mm:ss")}', " +
-            $"'{ obj.StartTime.ToString("yyyy-MM-dd HH:mm:ss")}', " +
-            $"'{ obj.StartTime.AddDays(1).ToString("yyyy-MM-dd HH:mm:ss")}'); " +
+            $"'{ obj.StartTime.ToString("yyyyMMdd HH:mm:ss")}', " +
+            $"'{ obj.StartTime.AddDays(1).ToString("yyyyMMdd HH:mm:ss")}', " +
+            $"'{ obj.StartTime.ToString("yyyyMMdd HH:mm:ss")}', " +
+            $"'{ obj.StartTime.AddDays(1).ToString("yyyyMMdd HH:mm:ss")}'); " +
 
             "INSERT INTO SchedulingContainers " +
             "(IsDeleted, " +
@@ -219,8 +219,8 @@ namespace O2GEN.Helpers
             $"{obj.SCTypeId}, " +
             "(SELECT TOP 1 id FROM @SRId), " +
             "1, " +
-            $"'{ obj.StartTime.ToString("yyyy-MM-dd HH:mm:ss")}', " +
-            $"'{ obj.StartTime.AddDays(1).ToString("yyyy-MM-dd HH:mm:ss")}', " +
+            $"'{ obj.StartTime.ToString("yyyyMMdd HH:mm:ss")}', " +
+            $"'{ obj.StartTime.AddDays(1).ToString("yyyyMMdd HH:mm:ss")}', " +
             $"{ obj.DepartmentID}); " +
 
             "INSERT INTO Tasks " +
@@ -270,8 +270,8 @@ namespace O2GEN.Helpers
             $"(SELECT TOP 1 id FROM @SCId), " +
             $"(SELECT TOP 1 id FROM @TId), " +
             $"{obj.ResourceId}, " +
-            $"'{ obj.StartTime.ToString("yyyy-MM-dd HH:mm:ss")}', " +
-            $"'{ obj.StartTime.AddDays(1).ToString("yyyy-MM-dd HH:mm:ss")}', " +
+            $"'{ obj.StartTime.ToString("yyyyMMdd HH:mm:ss")}', " +
+            $"'{ obj.StartTime.AddDays(1).ToString("yyyyMMdd HH:mm:ss")}', " +
             "1); " +
 
             "INSERT INTO InspectionDocuments " +
@@ -379,7 +379,7 @@ namespace O2GEN.Helpers
                             $"0, " +
                             $"(SELECT TOP 1 ValueType FROM AssetParameters WHERE Id = {obj.NewTechPoz[i].Childs[j].Childs[k].Id}), " +
                             $"0, " +
-                            $"'{new DateTime(0).ToString("yyyy-MM-dd HH:mm:ss.fff")}', " +
+                            $"'{new DateTime(0).ToString("yyyyMMdd HH:mm:ss.fff")}', " +
                             $"{IPData[obj.NewTechPoz[i].Id]}, " +
                             $"(SELECT TOP 1 AssetParameterTypeId FROM AssetParameters WHERE Id = {obj.NewTechPoz[i].Childs[j].Childs[k].Id}))";
                     }
@@ -506,10 +506,10 @@ namespace O2GEN.Helpers
             $"ModifiedByUser = {EngId}, " +
             "ModificationTime = getdate(), " +
             "Revision = @SRRev, " +
-            $"EarlyStart = '{obj.StartTime.ToString("yyyy-MM-dd HH:mm:ss")}', " +
-            $"DueDate = '{obj.StartTime.AddDays(1).ToString("yyyy-MM-dd HH:mm:ss")}', " +
-            $"AppointmentStart = '{obj.StartTime.ToString("yyyy-MM-dd HH:mm:ss")}', " +
-            $"AppointmentFinish = '{obj.StartTime.AddDays(1).ToString("yyyy-MM-dd HH:mm:ss")}' " +
+            $"EarlyStart = '{obj.StartTime.ToString("yyyyMMdd HH:mm:ss")}', " +
+            $"DueDate = '{obj.StartTime.AddDays(1).ToString("yyyyMMdd HH:mm:ss")}', " +
+            $"AppointmentStart = '{obj.StartTime.ToString("yyyyMMdd HH:mm:ss")}', " +
+            $"AppointmentFinish = '{obj.StartTime.AddDays(1).ToString("yyyyMMdd HH:mm:ss")}' " +
             $"WHERE ID in (SELECT RequirementId FROM SchedulingContainers WHERE ID = {obj.Id}); " +
 
             "UPDATE SchedulingContainers SET " +
@@ -518,8 +518,8 @@ namespace O2GEN.Helpers
             "Revision = @SCRev, " +
             $"SCStatusId = {obj.SCStatusId}, " +
             $"SCTypeId = {obj.SCTypeId}, " +
-            $"StartTime = '{obj.StartTime.ToString("yyyy-MM-dd HH:mm:ss")}', " +
-            $"CloseTime = '{obj.StartTime.AddDays(1).ToString("yyyy-MM-dd HH:mm:ss")}', " +
+            $"StartTime = '{obj.StartTime.ToString("yyyyMMdd HH:mm:ss")}', " +
+            $"CloseTime = '{obj.StartTime.AddDays(1).ToString("yyyyMMdd HH:mm:ss")}', " +
             $"DepartmentId = {obj.DepartmentID} " +
             $"WHERE ID = {obj.Id}; " +
 
@@ -535,8 +535,8 @@ namespace O2GEN.Helpers
             "ModificationTime = getdate(), " +
             "Revision = @ARev, " +
             $"ResourceId = {obj.ResourceId}, " +
-            $"Start = '{ obj.StartTime.ToString("yyyy-MM-dd HH:mm:ss")}', " +
-            $"Finish = '{ obj.StartTime.AddDays(1).ToString("yyyy-MM-dd HH:mm:ss")}' " +
+            $"Start = '{ obj.StartTime.ToString("yyyyMMdd HH:mm:ss")}', " +
+            $"Finish = '{ obj.StartTime.AddDays(1).ToString("yyyyMMdd HH:mm:ss")}' " +
             $"WHERE SchedulingContainerId = {obj.Id}; " +
 
             "UPDATE InspectionDocuments SET " +
@@ -866,8 +866,8 @@ namespace O2GEN.Helpers
                 $"INNER JOIN AssetParameterSetRecords APSR ON APSR.AssetParameterSetId = {AssetParameterSetId} AND IP.AssetId = APSR.AssetId AND APSR.AssetComponentId = APV.AssetId AND APSR.AssetParameterId = APV.AssetParameterId " +
                 "WHERE SC.SCStatusId = 3 " +
                 "AND SC.IsDeleted <> 1 " +
-                $"AND SC.StartTime <= '{To.ToString("yyyy-MM-dd HH:mm:ss")}' " +
-                $"AND SC.CloseTime >= '{From.ToString("yyyy-MM-dd HH:mm:ss")}' " +
+                $"AND SC.StartTime <= '{To.ToString("yyyyMMdd HH:mm:ss")}' " +
+                $"AND SC.CloseTime >= '{From.ToString("yyyyMMdd HH:mm:ss")}' " +
                 "AND APV.Value IS NOT NULL " +
                 $"AND SC.DepartmentId = {DepartmentId} " +
                 $"AND IP.AssetId = {AssetId} " +
@@ -1367,17 +1367,20 @@ namespace O2GEN.Helpers
         {
             return
                 //Берем все для подразделения, исключая уже работающие в узле.
-                "SELECT Id, " +                 //AssetParameterId
+                "SELECT A.Id, " +                 //AssetParameterId
                 "NULL AS PairId, " +            //AssetParameterPairId
-                "CASE WHEN Description <> '' THEN CONCAT(DisplayName, ' (', Description, ')') ELSE DisplayName END DisplayName, " +
+                "CASE WHEN A.Description <> '' THEN CONCAT(A.DisplayName, ' (', A.Description, ')') ELSE A.DisplayName END DisplayName, " +
                 "0 AS IsPair, " +               //Выбран
-                "NULL AS ObjectUID " +  
-                "FROM AssetParameters " +
-                "WHERE ID IN( " +
+                "NULL AS ObjectUID, " + 
+                "ISNULL(D.DisplayName, N'Нет') DeptName " +
+                "FROM AssetParameters A " +
+                "LEFT JOIN Departments D ON D.Id = A.DepartmentId " +
+                "WHERE A.Id IN( " +
                 "SELECT ID  " +
-                "FROM AssetParameters  " +
+                "FROM AssetParameters " +
                 "WHERE  " +
                 $"DepartmentId = {DeptId} " +
+                $"AND IsDeleted <> 1 " +
                 $"AND ID NOT IN (SELECT AssetParameterId FROM AssetParameterPair WHERE IsDeleted <> 1 AND AssetId = {AssetId})) " +
                 "UNION " +
                 //Берем все что касается текущего узла.
@@ -1386,9 +1389,11 @@ namespace O2GEN.Helpers
                 "APP.Id AS PairId , " +
                 "CASE WHEN AP.Description <> '' THEN CONCAT(AP.DisplayName, ' (', AP.Description, ')') ELSE AP.DisplayName END DisplayName, " +
                 "1 AS IsPair, " +               //Выбран
-                "APP.ObjectUID " +
+                "APP.ObjectUID, " +
+                "ISNULL(D.DisplayName, N'Нет') DeptName " +
                 "FROM AssetParameterPair APP " +
                 "LEFT JOIN AssetParameters AP ON AP.Id = APP.AssetParameterId " +
+                "LEFT JOIN Departments D ON D.Id = AP.DepartmentId " +
                 "WHERE APP.IsDeleted <> 1 " +
                 $"AND APP.AssetId = {AssetId} ORDER BY DisplayName";
         }
@@ -2222,7 +2227,7 @@ namespace O2GEN.Helpers
                 "INNER JOIN Assets AS A ON A.Id = IProt.AssetId " +
                 "INNER JOIN Assets AS AC ON AC.Id = APV.AssetId " +
                 "INNER JOIN AssetParameters AS AP ON AP.Id = APV.AssetParameterId " +
-                $"WHERE SC.StartTime <= '{To.ToString("yyyy-MM-dd HH:mm:ss")}' AND SC.CloseTime >= '{From.ToString("yyyy-MM-dd HH:mm:ss")}' AND D.Id = {DepartmentId} AND A.Id = {AssetId} AND SC.IsDeleted <> 1 " +
+                $"WHERE SC.StartTime <= '{To.ToString("yyyy-MM-dd HH:mm:ss")}' AND SC.CloseTime >= '{From.ToString("yyyyMMdd HH:mm:ss")}' AND D.Id = {DepartmentId} AND A.Id = {AssetId} AND SC.IsDeleted <> 1 " +
                 "ORDER BY SC.StartTime";
         }
         private static string SelectAssetsFromAPS(long APSId)
@@ -2260,7 +2265,7 @@ namespace O2GEN.Helpers
                 "LEFT JOIN Tasks AS T ON T.SchedulingContainerId = SC.Id " +
                 "LEFT JOIN InspectionProtocols AS IProt ON IProt.TaskId = T.Id AND IProt.IsDeleted <> 1 " +
                 "WHERE IProt.ModificationTime IS NOT NULL AND IProt.InspectionProtocolStatusId IS NOT NULL " +
-                $"AND SC.StartTime <= '{To.ToString("yyyy-MM-dd HH:mm:ss")}' AND SC.CloseTime >= '{From.ToString("yyyy-MM-dd HH:mm:ss")}' AND D.IsDeleted <> 1 " +
+                $"AND SC.StartTime <= '{To.ToString("yyyy-MM-dd HH:mm:ss")}' AND SC.CloseTime >= '{From.ToString("yyyyMMdd HH:mm:ss")}' AND D.IsDeleted <> 1 " +
                 "group by D.Id, D.DisplayName ";
         }
 
@@ -2400,11 +2405,71 @@ namespace O2GEN.Helpers
         {
             return "SELECT " +
                 "D.DisplayName AS Name, " +
-                $"(SELECT COUNT(*) FROM SchedulingContainers SC WHERE D.Id = SC.DepartmentId AND SC.StartTime BETWEEN '{FromD.ToString("yyyy-MM-dd HH:mm:ss")}' AND '{ToD.ToString("yyyy-MM-dd HH:mm:ss")}' AND SC.SCStatusId = 3 AND SC.IsDeleted <> 1) AS Value " +
+                $"(SELECT COUNT(*) FROM SchedulingContainers SC WHERE D.Id = SC.DepartmentId AND SC.StartTime BETWEEN '{FromD.ToString("yyyyMMdd HH:mm:ss")}' AND '{ToD.ToString("yyyyMMdd HH:mm:ss")}' AND SC.SCStatusId = 3 AND SC.IsDeleted <> 1) AS Value " +
                 "FROM Departments D " +
                 "WHERE D.IsDeleted <> 1 " +
                 (DeptId != null? $"AND D.Id = {DeptId} ": "") +
                 "ORDER BY D.DisplayName";
+        }
+        #endregion
+
+        #region Дефекты максимо
+        private static string SelectMaximoStatuses()
+        {
+            return "SELECT " +
+                "Id, " +
+                "DisplayName " +
+                "FROM MaximoStatuses " +
+                "WHERE IsDeleted <> 1 " +
+                "ORDER BY Id";
+        }
+        private static string SelectMaximoStatistics(long? Id, DateTime? From, DateTime? To, long? DeptId, long? StatusId)
+        {
+            return "SELECT " +
+                "MR.Id, " +
+                "D.DisplayName DepartmentName, " +
+                "ID.Name TaskName, " +
+                "MR.CreationTime, " +
+                "MR.CustomAssetCode, " +
+                "MR.CustomAssetChildCode, " +
+                "MR.CustomDescription, " +
+                "MR.MaximoStatusId MaximoStatusId, " +
+                "MS.DisplayName MaximoStatus, " +
+                "MR.TICKETID, " +
+                "MR.TICKETUID, " +
+                "MR.LastSend, " +
+                "MR.MaximoError " +
+                "FROM MaximoReporterSendLog MR " +
+                "LEFT JOIN MaximoStatuses MS ON MS.Id = MR.MaximoStatusId " +
+                "LEFT JOIN SchedulingContainers SC ON SC.Id = MR.SCId " +
+                "LEFT JOIN Tasks T ON T.SchedulingContainerId = MR.SCId " +
+                "LEFT JOIN Departments D ON D.Id = SC.DepartmentId " +
+                "LEFT JOIN InspectionDocuments ID ON ID.TaskId = T.Id " +
+                "WHERE 1 = 1 " +
+                (Id == null ? "" : $"AND MR.Id = {Id} ") +
+                (From == null ? "" : $"AND MR.CreationTime >= '{((DateTime)From).ToString("yyyyMMdd HH:mm:ss")}' ") +
+                (To == null ? "" : $"AND MR.CreationTime <= '{((DateTime)To).ToString("yyyyMMdd HH:mm:ss")}' ") +
+                (DeptId == null ? "" : $"AND D.Id = {DeptId} ") +
+                (StatusId == null ? "" : $"AND MS.Id = {StatusId} ") +
+                "ORDER BY MR.Id";
+        }
+        private static string MaximoStatisticsUpdate()
+        {
+            return "Update MaximoReporterSendLog " +
+                "SET CustomAssetCode = @CustomAssetCode," +
+                "CustomAssetChildCode = @CustomAssetChildCode, " +
+                "CustomDescription = @CustomDescription, " +
+                "ModifiedByUser = @User, " +
+                "ModificationTime = getdate() " +
+                "WHERE Id = @Id ";
+        }
+        private static string MaximoStatisticsSend()
+        {
+            return "Update MaximoReporterSendLog " +
+                "SET MaximoStatusId = 2," +
+                $"ModifiedByUser = @User, " +
+                $"ModificationTime = getdate() " +
+                $"WHERE Id = @Id ";
         }
         #endregion
 
@@ -4142,7 +4207,7 @@ namespace O2GEN.Helpers
                                     new AssetControl()
                                     {
                                         AssetParameterId = long.Parse(row["Id"].ToString()),
-                                        DisplayName = row["DisplayName"].ToString(),
+                                        DisplayName = $"{row["DisplayName"].ToString()} {row["DeptName"].ToString()}",
                                         IsPair = row["IsPair"].ToString() == "1",
                                         PairId = string.IsNullOrEmpty(row["PairId"].ToString())? null : long.Parse(row["PairId"].ToString()),
                                         ObjectUID = string.IsNullOrEmpty(row["ObjectUID"].ToString())? null : new Guid(row["ObjectUID"].ToString())
@@ -4374,8 +4439,11 @@ namespace O2GEN.Helpers
                     if (all[i].ParentId != null)
                     {
                         temp = all.Find(x => x.Id == all[i].ParentId);
-                        if (temp.Childs is null) temp.Childs = new List<Department>();
-                        temp.Childs.Add(all[i]);
+                        if (temp != null)
+                        {
+                            if (temp.Childs is null) temp.Childs = new List<Department>();
+                            temp.Childs.Add(all[i]);
+                        }
                     }
                 }
                 foreach (var item in all.FindAll(x => x.ParentId == null))
@@ -5592,16 +5660,127 @@ namespace O2GEN.Helpers
             return output;
         }
         #endregion
+        #region Дефекты максимо
 
-        #endregion
-        #region Служебные
-        private static string ExecuteScalar(string commandString, ILogger logger)
+        public static List<MaximoStatus> GetMaximoStatuses(ILogger logger = null)
         {
             string con = GetConnectionString();
 
             if (string.IsNullOrEmpty(con))
             {
                 logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
+            List<MaximoStatus> output = new List<MaximoStatus>();
+            try
+            {
+                using (var connection = new SqlConnection(con))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectMaximoStatuses(), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output.Add(new MaximoStatus()
+                                {
+                                    Id = int.Parse(row["Id"].ToString()),
+                                    DisplayName = row["DisplayName"].ToString()
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
+        public static List<MaximoDefect> GetMaximoStatistics(long? Id = null, DateTime? From = null, DateTime? To = null, long? DeptId = null, long? StatusId = null, ILogger logger = null)
+        {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger.LogDebug("connection string is null or empty");
+                return null;
+            }
+
+            List<MaximoDefect> output = new List<MaximoDefect>();
+            try
+            {
+                using (var connection = new SqlConnection(con))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(SelectMaximoStatistics(Id, From, To, DeptId, StatusId), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                output.Add(new MaximoDefect()
+                                {
+                                    Id = long.Parse(row["Id"].ToString()),
+                                    DepartmentName = row["DepartmentName"].ToString(),
+                                    TaskName = row["TaskName"].ToString(),
+                                    CreationTime = Convert.ToDateTime(row["CreationTime"].ToString()),
+                                    CustomAssetCode = row["CustomAssetCode"].ToString(),
+                                    CustomAssetChildCode = row["CustomAssetChildCode"].ToString(),
+                                    CustomDescription = row["CustomDescription"].ToString(),
+                                    MaximoStatusId = long.Parse(row["MaximoStatusId"].ToString()),
+                                    MaximoStatus = row["MaximoStatus"].ToString(),
+                                    TICKETID = row["TICKETID"].ToString(),
+                                    TICKETUID = row["TICKETUID"].ToString(),
+                                    LastSend = string.IsNullOrEmpty(row["LastSend"].ToString()) ? null : Convert.ToDateTime(row["LastSend"]),
+                                    MaximoError = row["MaximoError"].ToString()
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
+
+        public static void MaximoStatisticsUpdate(MaximoDefect Data, long User, ILogger logger = null)
+        {
+            List<SqlParameter> sqlParameters = new List<SqlParameter>();
+            sqlParameters.Add(new SqlParameter() { ParameterName = "@Id", SqlDbType = SqlDbType.BigInt, Value = Data.Id });
+            sqlParameters.Add(new SqlParameter() { ParameterName = "@User", SqlDbType = SqlDbType.BigInt, Value = User });
+            sqlParameters.Add(new SqlParameter() { ParameterName = "@CustomAssetCode", SqlDbType = SqlDbType.NVarChar, Value = Data.CustomAssetCode });
+            sqlParameters.Add(new SqlParameter() { ParameterName = "@CustomAssetChildCode", SqlDbType = SqlDbType.NVarChar, Value = Data.CustomAssetChildCode });
+            sqlParameters.Add(new SqlParameter() { ParameterName = "@CustomDescription", SqlDbType = SqlDbType.NVarChar, Value = Data.CustomDescription });
+            ExecuteNonQuery(MaximoStatisticsUpdate(), logger, sqlParameters);
+        }
+        public static void MaximoStatisticsSend(long Id, long User, ILogger logger = null)
+        {
+            List<SqlParameter> sqlParameters = new List<SqlParameter>();
+            sqlParameters.Add(new SqlParameter() { ParameterName = "@Id", SqlDbType = SqlDbType.BigInt, Value = Id });
+            sqlParameters.Add(new SqlParameter() { ParameterName = "@User", SqlDbType = SqlDbType.BigInt, Value = User });
+            ExecuteNonQuery(MaximoStatisticsSend(), logger, sqlParameters);
+        }
+        #endregion
+        #endregion
+        #region Служебные
+        private static string ExecuteScalar(string commandString, ILogger logger = null, List<SqlParameter> sqlParameters = null)
+        {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger?.LogDebug("connection string is null or empty");
                 return null;
             }
 
@@ -5615,24 +5794,31 @@ namespace O2GEN.Helpers
                     {
                         command.CommandType = CommandType.Text;
                         command.Parameters.Clear();
+                        if (sqlParameters != null)
+                        {
+                            foreach (var parameter in sqlParameters)
+                            {
+                                command.Parameters.Add(parameter);
+                            }
+                        }
                         output = command.ExecuteScalar().ToString();
                     }
                 }
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Ошибка на запросе скалярного значения {commandString}");
+                logger?.LogError(ex, $"Ошибка на запросе скалярного значения {commandString}");
                 output = null;
             }
             return output;
         }
-        private static void ExecuteNonQuery(string commandString, ILogger logger)
+        private static void ExecuteNonQuery(string commandString, ILogger logger = null, List<SqlParameter> sqlParameters = null)
         {
             string con = GetConnectionString();
 
             if (string.IsNullOrEmpty(con))
             {
-                logger.LogDebug("connection string is null or empty");
+                logger?.LogDebug("connection string is null or empty");
                 return;
             }
 
@@ -5645,13 +5831,20 @@ namespace O2GEN.Helpers
                     {
                         command.CommandType = CommandType.Text;
                         command.Parameters.Clear();
+                        if (sqlParameters != null)
+                        {
+                            foreach (var parameter in sqlParameters)
+                            {
+                                command.Parameters.Add(parameter);
+                            }
+                        }
                         command.ExecuteNonQuery();
                     }
                 }
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Ошибка на запросе скалярного значения {commandString}");
+                logger?.LogError(ex, $"Ошибка на запросе скалярного значения {commandString}");
             }
         }
 
