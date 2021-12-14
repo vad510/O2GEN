@@ -2316,14 +2316,14 @@ namespace O2GEN.Helpers
                 "AD.CreationTime, " +
                 "AD.ObjectUID AS FileRef, " +
                 "IP.Name AS IPName, " +
-                "A.DisplayName AS IPIName, " +
+                "AC.DisplayName AS IPIName, " +
                 "AP.DisplayName AS APName " +
                 "FROM AttachedData AD " +
-                "LEFT JOIN InspectionProtocols IP ON IP.Id = AD.InspectionProtocolId " +
-                "LEFT JOIN InspectionProtocolItems IPI ON IPI.Id = AD.InspectionProtocolItemId " +
-                "LEFT JOIN Assets A ON A.Id = IPI.AssetId " +
                 "LEFT JOIN AssetParameterValues APV ON APV.Id = AD.AssetParameterValueId " +
                 "LEFT JOIN AssetParameters AP ON AP.Id = APV.AssetParameterId " +
+                "LEFT JOIN InspectionProtocolItems IPI ON IPI.AssetParameterValueId = APV.Id " +
+                "LEFT JOIN InspectionProtocols IP ON IPI.InspectionProtocolId = IP.Id " +
+                "LEFT JOIN Assets AC ON AC.Id = IPI.AssetId " +
                 $"WHERE AD.SchedulingContainerId = {SCId};";
         }
         private static string GetAttachment(Guid guid)
