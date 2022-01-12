@@ -10,7 +10,7 @@ namespace O2GEN.Models
     /// </summary>
     public class Engineer
     {
-        public int Id { get; set; } = -1;
+        public long Id { get; set; } = -1;
         [DisplayName("Фамилия")]
         public string Surname { get; set; }
         [DisplayName("Имя")]
@@ -25,13 +25,13 @@ namespace O2GEN.Models
         public Guid ObjectUID { get; set; } = Guid.NewGuid();
         [DisplayName("Подразделение")]
         [Required(ErrorMessage = "Укажите подразделение")]
-        public int? DepartmentId { get; set; }
+        public long? DepartmentId { get; set; }
         [DisplayName("График")]
-        public int? CalendarId { get; set; } = null;
-        public int? PersonId { get; set; }
+        public long? CalendarId { get; set; } = null;
+        public long? PersonId { get; set; }
         [DisplayName("Должность")]
-        public int? PersonPositionId { get; set; }
-        public int? UserId { get; set; }
+        public long? PersonPositionId { get; set; }
+        public long? UserId { get; set; }
 
         [DisplayName("Логин")]
         [LoginExists(ErrorMessage ="Пользователь с таким логином уже существует.")]

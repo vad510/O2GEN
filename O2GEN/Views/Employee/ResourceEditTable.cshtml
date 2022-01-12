@@ -1,0 +1,42 @@
+﻿@model O2GEN.Models.Resource
+
+<div class="margin-between-above" style="height:500px; overflow:auto;">
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>
+                    <p>Имя</p>
+                </th>
+                <th width="60">
+                    <p>Назначить</p>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Engineers.Count > 0)
+            {
+                for (int i = 0; i < Model.Engineers.Count; i++)
+                {
+                <tr>
+                    <td>
+                        <span>@Model.Engineers[i].TargetObject.DisplayName</span>
+                        <input type="hidden" asp-for="@Model.Engineers[i].TargetObject.Id" />
+                        <input type="hidden" asp-for="@Model.Engineers[i].MatchId" />
+                        <input type="hidden" asp-for="@Model.Engineers[i].BaseSelected" />
+                    </td>
+
+                    <td>
+                        <input type="checkbox" style="text-align:center; width:30px; height:30px;" asp-for="@Model.Engineers[i].Selected" />
+                    </td>
+                </tr>
+                }
+            }
+            else 
+            {
+                <tr>
+                    <td colspan="2">Нет данных.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

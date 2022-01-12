@@ -32,7 +32,7 @@
                         <label asp-for="ParentId"></label>
                         <select asp-for="ParentId" class="form-control">
                             <option value="null" selected disabled>Выбрать</option>
-                            @foreach (var item in O2GEN.Helpers.DBHelper.GetDepartments(true, Model.Id))
+                            @foreach (var item in O2GEN.Helpers.DBHelper.GetDepartments(RootDepartId:-1, ClearList: true, ForDept: Model.Id))
                             {
                                 if (item.Id != Model.Id)
                                 {

@@ -30,7 +30,7 @@ namespace O2GEN.Controllers
                 var d = Helpers.DBHelper.GetChildDepartments();
                 if (d.Count > 0) Dept = d[0].Id;
             }
-            ViewBag.Objects = Helpers.DBHelper.GetAssets(logger: _logger, DeptID: Dept, DisplayName: DisplayName) ;
+            ViewBag.Objects = Helpers.DBHelper.GetAssets(logger: _logger, DeptID: Dept, DisplayName: DisplayName, UserDept: ((Credentials)HttpContext.Items["User"]).DeptId) ;
             Response.Cookies.Append("odid", Dept.ToString());
             Response.Cookies.Append("on", (string.IsNullOrEmpty(DisplayName) ? "" : DisplayName));
             AlertHelper.DisplayMessage(HttpContext.Session, ViewBag);
@@ -40,7 +40,7 @@ namespace O2GEN.Controllers
         [HttpPost]
         public IActionResult Objects(Filter Model)
         {
-            ViewBag.Objects = Helpers.DBHelper.GetAssets(logger: _logger, DeptID: Model.DepartmentId, DisplayName: Model.DisplayName);
+            ViewBag.Objects = Helpers.DBHelper.GetAssets(logger: _logger, DeptID: Model.DepartmentId, DisplayName: Model.DisplayName, UserDept: ((Credentials)HttpContext.Items["User"]).DeptId);
             Response.Cookies.Append("odid", (Model.DepartmentId == null ? "" : Model.DepartmentId.ToString()));
             Response.Cookies.Append("on", (string.IsNullOrEmpty(Model.DisplayName) ? "" : Model.DisplayName));
             return View(Model);
@@ -252,7 +252,7 @@ namespace O2GEN.Controllers
                 var d = Helpers.DBHelper.GetChildDepartments();
                 if (d.Count > 0) Dept = d[0].Id;
             }
-            ViewBag.Routes = Helpers.DBHelper.GetAssetParameterSets(_logger, Dept);
+            ViewBag.Routes = Helpers.DBHelper.GetAssetParameterSets(UserDept: ((Credentials)HttpContext.Items["User"]).DeptId, logger:_logger, DeptID: Dept);
             Response.Cookies.Append("rdid", Dept.ToString());
             AlertHelper.DisplayMessage(HttpContext.Session, ViewBag);
             return View(new Filter() { DepartmentId = Dept });
@@ -261,7 +261,7 @@ namespace O2GEN.Controllers
         [HttpPost]
         public IActionResult Route(Filter Model)
         {
-            ViewBag.Routes = Helpers.DBHelper.GetAssetParameterSets(_logger, Model.DepartmentId);
+            ViewBag.Routes = Helpers.DBHelper.GetAssetParameterSets(UserDept: ((Credentials)HttpContext.Items["User"]).DeptId, _logger, Model.DepartmentId);
             Response.Cookies.Append("rdid", (Model.DepartmentId == null ? "" : Model.DepartmentId.ToString()));
             return View(Model);
         }
@@ -404,7 +404,7 @@ namespace O2GEN.Controllers
 
         public IActionResult Departments()
         {
-            ViewBag.Departments = Helpers.DBHelper.GetDepartments(logger: _logger);
+            ViewBag.Departments = Helpers.DBHelper.GetDepartments(-1, logger: _logger);
             AlertHelper.DisplayMessage(HttpContext.Session, ViewBag);
             return View();
         }

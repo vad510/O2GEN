@@ -10,7 +10,7 @@
         <div class="margin-between-above">
             <label>Подразделения</label>
             <select class="form-control">
-                @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments())
+                @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments((long)((Credentials)Context.Items["User"]).DeptId))
                 {
                     <option value="@item.Id">@item.DisplayName</option>
                 }

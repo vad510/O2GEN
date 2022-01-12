@@ -51,7 +51,7 @@
                                         <label asp-for="DepartmentId"></label>
                                         <select asp-for="DepartmentId" class="form-control" required onchange="GetAssetsNodes(this); GetAssetControls();">
                                             <option value="NULL" selected disabled>Выбрать значение</option>
-                                            @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments())
+                                            @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments((long)((Credentials)Context.Items["User"]).DeptId))
                                             {
                                                 <option value="@item.Id">@item.DisplayName</option>
                                             }

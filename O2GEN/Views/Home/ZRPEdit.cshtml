@@ -78,7 +78,7 @@
                                             <label asp-for="DepartmentID"></label>
                                             <select asp-for="DepartmentID" class="form-control" required>
                                                 <option selected disabled>Выбрать</option>
-                                                @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments())
+                                                @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments((long)((Credentials)Context.Items["User"]).DeptId))
                                                 {
                                                     <option value="@item.Id">@item.DisplayName</option>
                                                 }
@@ -126,7 +126,7 @@
                                             <label asp-for="DepartmentID"></label>
                                             <select asp-for="DepartmentID" class="form-control" onchange="GetResources(this); GetRoutes(this);" required>
                                                 <option selected disabled>Выбрать</option>
-                                                @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments())
+                                                @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments((long)((Credentials)Context.Items["User"]).DeptId))
                                                 {
                                                     <option value="@item.Id">@item.DisplayName</option>
                                                 }
@@ -233,14 +233,6 @@
                                                         <input type="hidden" name="InsProt[@i].Id" value="@Model.InsProt[i].Id" />
                                                         <input type="hidden" name="InsProt[@i].Name" value="@Model.InsProt[i].Name" />
                                                     </td>
-
-                                                    @*<td>
-                                                        <div class="d-flex justify-content-center">
-                                                            <button type="submit" class="btn btn-danger ml-1" onclick="RemoveNode(this); sortInputsForUpdate();">
-                                                                <i class="fa fa-trash"></i>
-                                                            </button>
-                                                        </div>
-                                                    </td>*@
                                                 </tr>
                                                 if (Model.InsProt[i].Items.Count > 0)
                                                 {

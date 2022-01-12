@@ -24,7 +24,7 @@
                         {
                             <option value="NULL">Выбрать значение</option>
                         }
-                        @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments())
+                        @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments((long)((Credentials)Context.Items["User"]).DeptId))
                         {
                             @if (Model.DepartmentId == item.Id)
                             {
@@ -107,31 +107,21 @@
         </table>
     </div>
     <script type="text/javascript">
-
-        function GetEngineersByDept(SelectedObj, elem) {
-            if (SelectedObj != 'undefined') {
+        function GetResourceEngeneersMatch(SelectedDeptId) {
+            if (SelectedDeptId != null) {
                 $.ajax({
                     method: "GET",
-                    url: "GetEngineersByDept",
-                    dataType: "json",
+                    url: "ResourceEditTable",
+                    dataType: "html",
                     data: {
-                        "DeptId": SelectedObj.value
+                        "DepartmentId": $('#DepartmentId').val(),
+                        "Id": $('#Id').val(),
                     },
                     success: function (data) {
-                        var s = '';
-                        for (var i = 0; i < data.length; i++) {
-                            s += '<option value="' + data[i].id + '">' + data[i].displayName + '</option>';
-                        }
-                        $(elem).html(s);
+                        $('#match-table').html(data);
                     }
                 })
             }
-        }
-        function DeptChanged(SelectedObj) {
-            $("#Selected").html('');
-            $("#SelectList1").html('');
-            $("#SelectList2").html('');
-            GetEngineersByDept(SelectedObj,'#SelectList1');
         }
     </script>
 </section>

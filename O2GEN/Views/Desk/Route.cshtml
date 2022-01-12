@@ -23,7 +23,7 @@
                         {
                             <option value="NULL">Выбрать значение</option>
                         }
-                        @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments())
+                        @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments((long)((Credentials)Context.Items["User"]).DeptId))
                         {
                             @if (Model.DepartmentId == item.Id)
                             {

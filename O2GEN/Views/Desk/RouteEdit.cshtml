@@ -39,7 +39,7 @@
                                 <label asp-for="DepartmentID"></label>
                                 <select asp-for="DepartmentID" class="form-control" onchange="GetAssets(this); AddAssetByDept(this);">
                                     <option selected disabled>Выбрать</option>
-                                    @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments())
+                                    @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments((long)((Credentials)Context.Items["User"]).DeptId))
                                     {
                                     <option value="@item.Id">@item.DisplayName</option>
                                     }
@@ -97,7 +97,6 @@
                                                         <td>
                                                             <span>@Model.Childs[i].DisplayName</span>
                                                             <input type="text" style="display: none;" name="Childs[@i].Id" value="@Model.Childs[i].Id" />
-                                                            @*<input type="text" style="display: none;" name="Childs[@i].DisplayName" value="@Model.Childs[i].DisplayName" />*@
                                                         </td>
                                                         <td>
                                                             <div class="d-flex justify-content-center">
@@ -114,7 +113,6 @@
                                                         <td>
                                                             <span class="caret"><span class="badge badge-info mr-1">@Model.Childs[i].Childs.Count</span>@Model.Childs[i].DisplayName</span>
                                                             <input type="text" style="display: none;" name="Childs[@i].Id" value="@Model.Childs[i].Id" />
-                                                            @*<input type="text" style="display: none;" name="Childs[@i].DisplayName" value="@Model.Childs[i].DisplayName" />*@
                                                         </td>
                                                         <td>
                                                             <div class="d-flex justify-content-center">
@@ -132,7 +130,6 @@
                                                                 <td>
                                                                     <span class="ml-3">@Model.Childs[i].Childs[j].DisplayName</span>
                                                                     <input type="text" style="display: none;" name="Childs[@i].Childs[j].Id" value="@Model.Childs[i].Childs[j].Id" />
-                                                                    @*<input type="text" style="display: none;" name="Childs[@i].Childs[j].DisplayName" value="@Model.Childs[i].Childs[j].DisplayName" />*@
                                                                 </td>
                                                                 <td>
                                                                     <div class="d-flex justify-content-center">
@@ -149,7 +146,6 @@
                                                                 <td>
                                                                     <span class="ml-3 caret"><span class="badge badge-info mr-1">@Model.Childs[i].Childs[j].Childs.Count</span>@Model.Childs[i].Childs[j].DisplayName</span>
                                                                     <input type="text" style="display: none;" name="Childs[@i].Childs[@j].Id" value="@Model.Childs[i].Childs[j].Id" />
-                                                                    @*<input type="text" style="display: none;" name="Childs[@i].Childs[@j].DisplayName" value="@Model.Childs[i].Childs[j].DisplayName" />*@
                                                                 </td>
                                                                 <td>
                                                                     <div class="d-flex justify-content-center">
@@ -165,7 +161,6 @@
                                                                     <td>
                                                                         <span class="ml-5">@Model.Childs[i].Childs[j].Childs[k].DisplayName</span>
                                                                         <input type="text" style="display: none;" name="Childs[@i].Childs[@j].Childs[@k].Id" value="@Model.Childs[i].Childs[j].Childs[k].Id" />
-                                                                        @*<input type="text" style="display: none;" name="Childs[@i].Childs[@j].Childs[@k].DisplayName" value="@Model.Childs[i].Childs[j].Childs[k].DisplayName" />*@
                                                                     </td>
                                                                     <td>
                                                                         <div class="d-flex justify-content-center">

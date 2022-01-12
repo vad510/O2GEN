@@ -51,8 +51,8 @@ namespace O2GEN.Controllers
             DateTime To = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(TOData)));
 
             //ViewBag.ZRPCreated = Helpers.DBHelper.GetZRP(From, To, _logger, (int)Helpers.ZRPStatus.Created, (Did == 0 ? null : Did));
-            ViewBag.ZRPInWork = Helpers.DBHelper.GetZRP(From, To, _logger, new int[] { (int)Helpers.ZRPStatus.Started, (int)Helpers.ZRPStatus.Created }, DisplayName, (Did == 0 ? null : Did));
-            ViewBag.ZRPDone = Helpers.DBHelper.GetZRP(From, To, _logger, new int[] { (int)Helpers.ZRPStatus.Ended, (int)Helpers.ZRPStatus.Stoped }, DisplayName, (Did == 0 ? null : Did));
+            ViewBag.ZRPInWork = Helpers.DBHelper.GetZRP(From, To, _logger, new int[] { (int)Helpers.ZRPStatus.Started, (int)Helpers.ZRPStatus.Created }, DisplayName, (Did == 0 ? null : Did), ((Credentials)HttpContext.Items["User"]).DeptId);
+            ViewBag.ZRPDone = Helpers.DBHelper.GetZRP(From, To, _logger, new int[] { (int)Helpers.ZRPStatus.Ended, (int)Helpers.ZRPStatus.Stoped }, DisplayName, (Did == 0 ? null : Did), ((Credentials)HttpContext.Items["User"]).DeptId);
             Response.Cookies.Append("zrpfrom", FROMData);
             Response.Cookies.Append("zrpto", TOData);
             Response.Cookies.Append("zrpdid", string.IsNullOrEmpty(DepartmentIdData)?"" : DepartmentIdData);
@@ -66,9 +66,8 @@ namespace O2GEN.Controllers
         {
             DateTime From = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.From)));
             DateTime To = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.To)));
-            //ViewBag.ZRPCreated = Helpers.DBHelper.GetZRP(From, To, _logger, (int)Helpers.ZRPStatus.Created, Model.DepartmentId);
-            ViewBag.ZRPInWork = Helpers.DBHelper.GetZRP(From, To, _logger, new int[] { (int)Helpers.ZRPStatus.Started, (int)Helpers.ZRPStatus.Created }, Model.DisplayName, Model.DepartmentId);
-            ViewBag.ZRPDone = Helpers.DBHelper.GetZRP(From, To, _logger, new int[] { (int)Helpers.ZRPStatus.Ended, (int)Helpers.ZRPStatus.Stoped }, Model.DisplayName, Model.DepartmentId);
+            ViewBag.ZRPInWork = Helpers.DBHelper.GetZRP(From, To, _logger, new int[] { (int)Helpers.ZRPStatus.Started, (int)Helpers.ZRPStatus.Created }, Model.DisplayName, Model.DepartmentId, ((Credentials)HttpContext.Items["User"]).DeptId);
+            ViewBag.ZRPDone = Helpers.DBHelper.GetZRP(From, To, _logger, new int[] { (int)Helpers.ZRPStatus.Ended, (int)Helpers.ZRPStatus.Stoped }, Model.DisplayName, Model.DepartmentId, ((Credentials)HttpContext.Items["User"]).DeptId);
 
             Response.Cookies.Append("zrpfrom", Model.From);
             Response.Cookies.Append("zrpto", Model.To);
@@ -258,7 +257,7 @@ namespace O2GEN.Controllers
             DateTime From2 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.From2)));
             DateTime To2 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.To2)));
 
-            ViewBag.Data = new AssetsReportMerge(Helpers.DBHelper.GetDepartments(ClearList: true, logger: _logger), Helpers.DBHelper.GetVA(From1, To1, _logger), Helpers.DBHelper.GetVA(From2, To2, _logger));
+            ViewBag.Data = new AssetsReportMerge(Helpers.DBHelper.GetDepartments(((Credentials)HttpContext.Items["User"]).DeptId, logger: _logger), Helpers.DBHelper.GetVA(From1, To1, _logger), Helpers.DBHelper.GetVA(From2, To2, _logger));
 
             Response.Cookies.Append("RepVAFrom1", Model.From1);
             Response.Cookies.Append("RepVATo1", Model.To1);
@@ -323,7 +322,7 @@ namespace O2GEN.Controllers
             DateTime From2 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.From2)));
             DateTime To2 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.To2)));
 
-            ViewBag.Data = new AssetsReportMerge(Helpers.DBHelper.GetDepartments(ClearList: true, logger: _logger), Helpers.DBHelper.GetNA(From1, To1, _logger), Helpers.DBHelper.GetNA(From2, To2, _logger));
+            ViewBag.Data = new AssetsReportMerge(Helpers.DBHelper.GetDepartments(((Credentials)HttpContext.Items["User"]).DeptId, logger: _logger), Helpers.DBHelper.GetNA(From1, To1, _logger), Helpers.DBHelper.GetNA(From2, To2, _logger));
 
             Response.Cookies.Append("RepNAFrom1", Model.From1);
             Response.Cookies.Append("RepNATo1", Model.To1);
@@ -612,7 +611,7 @@ namespace O2GEN.Controllers
         {
             int id = 0;
             if (int.TryParse(ObjId, out id))
-                return new JsonResult(Helpers.DBHelper.GetAssetParameterSets(_logger,DeptID:id));
+                return new JsonResult(Helpers.DBHelper.GetAssetParameterSets(UserDept: ((Credentials)HttpContext.Items["User"]).DeptId, _logger,DeptID:id));
             else
                 return new JsonResult(new List<AssetParameterSet>());
         }
@@ -630,7 +629,7 @@ namespace O2GEN.Controllers
         {
             int id = 0;
             if (int.TryParse(ObjId, out id))
-                return new JsonResult(Helpers.DBHelper.GetAssetParameterSets( _logger, id));
+                return new JsonResult(Helpers.DBHelper.GetAssetParameterSets(UserDept: ((Credentials)HttpContext.Items["User"]).DeptId, _logger, id));
             else
                 return new JsonResult(new List<AssetParameterSet>());
         }

@@ -32,7 +32,7 @@ namespace O2GEN.Helpers
         #region Тексты запросов
 
         #region Обходы
-        private static string GetZRP(DateTime From, DateTime To, int[] statuses, string DisplayName, long? DeptId)
+        private static string GetZRP(DateTime From, DateTime To, int[] statuses, string DisplayName, long? DeptId, long UserDept)
         {
             string statusSQL = "";
             if(statuses!= null)
@@ -63,7 +63,8 @@ namespace O2GEN.Helpers
                 "[t7].[AppointmentStart], " +
                 "[t8].[Name] as [RouteName], " +
                 "[t10].[DisplayName] as [ResName], " +
-                "Eng.DisplayName AS PerformerName " +
+                "Eng.DisplayName AS PerformerName, " +
+                "[e].DefectCount " +
                 "FROM [SchedulingContainers] AS [e] " +
                 "LEFT JOIN( " +
                 "    SELECT[e0].* " +
@@ -106,6 +107,7 @@ namespace O2GEN.Helpers
                 "   FROM[Resources] AS[e10] " +
                 "    WHERE([e10].[IsDeleted] <> 1) AND([e10].[TenantId] = CAST(1 AS bigint)) " +
                 ") AS[t10] ON[t9].[ResourceId] = [t10].[Id] " +
+                $"INNER JOIN TBFN_GET_DEPARTMENTS({UserDept}) dps ON dps.Id = e.DepartmentId " +
                 $"WHERE {(string.IsNullOrEmpty(DisplayName) ? "" : $"[t8].[Name] like N'%{DisplayName}%' AND ")} {(statuses!= null && statuses.Length > 0 ? $"[e].[SCStatusId] in ({statusSQL}) AND " : "")}  (([e].[IsDeleted] <> 1) AND([e].[TenantId] = CAST(1 AS bigint))) AND(([t7].[DepartmentId] IS NOT NULL {(DeptId != null ? $"AND[t7].[DepartmentId] = {DeptId}" : "")} ) AND(CASE " +
                 "WHEN EXISTS( " +
                 "   SELECT 1 " +
@@ -882,7 +884,7 @@ namespace O2GEN.Helpers
         /// Маршруты
         /// </summary>
         /// <returns></returns>
-        private static string SelectAssetParameterSets(int ID = -1, int? DeptId = null)
+        private static string SelectAssetParameterSets(int ID = -1, int? DeptId = null, long UserDept = -1)
         {
             return "SELECT e.Id, e.DisplayName, e.ObjectUID, t.id as DepartmentID, t.DisplayName as DepartmentName, e.CreationTime, ISNULL(e.ModificationTime, e.CreationTime) AS ModificationTime " +
                 "FROM AssetParameterSets AS e " +
@@ -891,6 +893,7 @@ namespace O2GEN.Helpers
                 "    FROM Departments AS e0 " +
                 "    WHERE (e0.IsDeleted<> 1) AND(e0.TenantId = CAST(1 AS bigint)) " +
                 ") AS t ON e.DepartmentId = t.Id " +
+                $"INNER JOIN TBFN_GET_DEPARTMENTS({UserDept}) dps ON dps.Id = e.DepartmentId " +
                 "WHERE e.IsDeleted <> 1 " +
                 $"{(ID == -1 ? "" : "AND e.Id = " + ID)} " +
                 $"{(DeptId == null ? "" : $"AND e.DepartmentId = {DeptId} ")}" +
@@ -1328,7 +1331,7 @@ namespace O2GEN.Helpers
         /// Объекты
         /// </summary>
         /// <returns></returns>
-        private static string SelectAssets(int? DeptID = -1, bool NotesOnly = false)
+        private static string SelectAssets(int? DeptID = -1, bool NotesOnly = false, long UserDept = -1 )
         {
             return "SELECT e.Id, e.DisplayName, e.Description, e.ExternalId, e.ObjectUID, e.ParentId,  t1.DisplayName as StateName, t1.ObjectUID, AT.Id as TypeID, AT.DisplayName as TypeName, e.AssetTypeId, e.AssetStateId, e.CreationTime, ISNULL(e.ModificationTime, e.CreationTime) AS ModificationTime " +
                 "FROM Assets AS e " +
@@ -1338,6 +1341,7 @@ namespace O2GEN.Helpers
                 "    WHERE (e2.IsDeleted <> 1) AND (e2.TenantId = CAST(1 AS bigint)) " +
                 ") AS t1 ON e.AssetStateId = t1.Id " +
                 "LEFT JOIN AssetTypes AT on AT.Id = e.AssetTypeId " +
+                $"INNER JOIN TBFN_GET_DEPARTMENTS({UserDept}) dps ON dps.Id = e.DepartmentId " +
                 "WHERE ((e.IsDeleted <> 1) AND (e.TenantId = CAST(1 AS bigint))) " +
                 (DeptID != null && DeptID != -1 ? $"AND (e.DepartmentId =  {DeptID} OR e.DepartmentId IS NULL)" : "") +
                 (NotesOnly ? $"AND e.AssetSortId = 1 " : "") +
@@ -1569,7 +1573,8 @@ namespace O2GEN.Helpers
         /// Участки
         /// </summary>
         /// <returns></returns>
-        private static string SelectDepartments(int ID = -1, bool IsChildOnly = false)
+        [Obsolete]
+        private static string _OLDSelectDepartments(int ID = -1, bool IsChildOnly = false)
         {
             return "SELECT D.*, P.DisplayName as ParentDisplayName " +
                 "FROM Departments as D " +
@@ -1578,6 +1583,18 @@ namespace O2GEN.Helpers
                 $"{(ID > 0 ? $"D.id = {ID} AND" : "")} " +
                 $"{(IsChildOnly ? $"D.ParentId IS NOT NULL AND" : "")} " +
                 "(D.IsDeleted <> 1) AND(D.TenantId = CAST(1 AS bigint)) order by D.DisplayName";
+        }
+        /// <summary>
+        /// Получаем список 
+        /// </summary>
+        /// <returns></returns>
+        private static string SelectDepartments()
+        {
+            return "SELECT * FROM TBFN_GET_DEPARTMENTS(@RootDeptId) order by DisplayName";
+        }
+        private static string SelectDepartment()
+        {
+            return "SELECT * FROM Departments WHERE Id = @DeptId";
         }
         /// <summary>
         /// Создание подразделения
@@ -1682,9 +1699,20 @@ namespace O2GEN.Helpers
         /// </summary>
         /// <param name="ID"></param>
         /// <returns></returns>
-        private static string SelectResourceAllocations(int ID)
+        private static string _SelectResourceEngineers(long DepartmentId, long ResourceId)
         {
-            return $"SELECT Id, ObjectUID, EngineerId, ResourceId FROM ResourceAllocations where ResourceId = {ID} AND IsDeleted <> 1 ";
+            return $"SELECT " +
+                $"E.Id, " +
+                $"E.DisplayName, " +
+                $"RA.Id AS ResEngId, " +
+                $"CASE WHEN RA.Id IS NULL THEN 0 ELSE 1 END AS Selected " +
+                $"FROM Engineers E " +
+                $"LEFT JOIN ResourceAllocations RA ON RA.EngineerId = E.Id AND ({(ResourceId > 0 ? $" RA.ResourceId = {ResourceId} OR " : "")} RA.ResourceId IS NULL)" +
+                $"WHERE E.IsDeleted = 0 " +
+                $"AND (RA.IsDeleted = 0 OR RA.IsDeleted IS NULL) " +
+                $"AND E.DepartmentId = {DepartmentId} " +
+                $"ORDER BY E.DisplayName";
+            
         }
         /// <summary>
         /// Привязка работника к  бригаде
@@ -1720,7 +1748,7 @@ namespace O2GEN.Helpers
         /// <param name="ID"></param>
         /// <param name="UserName"></param>
         /// <returns></returns>
-        private static string DeleteResourceAllocation(int ID, long EngId)
+        private static string DeleteResourceAllocation(long ID, long EngId)
         {
             return "DECLARE @revision bigint; " +
                 "set @revision = (isnull((SELECT max(revision) id FROM ResourceAllocations ),0)+1); " +
@@ -1736,13 +1764,15 @@ namespace O2GEN.Helpers
         /// Бригады
         /// </summary>
         /// <returns></returns>
-        private static string SelectResources(long? ID = null, long? DepID = null)
+        private static string SelectResources(long? ID = null, long? DepID = null, long UserDept = -1)
         {
-            return "SELECT Id, DisplayName, ObjectUID, ResourceTypeId, ResourceStateId, DepartmentId, Latitude, Longitude, Address, CreationTime, ISNULL(ModificationTime, CreationTime) AS ModificationTime " +
-                "FROM Resources WHERE " +
-                $"{(ID != null ? $"Id = {ID} AND" : "")} " +
-                $"{(DepID != null ? $"DepartmentId = {DepID} AND" : "")} " +
-                "(IsDeleted <> 1) AND (TenantId = CAST(1 AS bigint)) order by DisplayName";
+            return "SELECT r.Id, r.DisplayName, r.ObjectUID, r.ResourceTypeId, r.ResourceStateId, r.DepartmentId, r.Latitude, r.Longitude, r.Address, r.CreationTime, ISNULL(r.ModificationTime, r.CreationTime) AS ModificationTime " +
+                "FROM Resources r " +
+                $"INNER JOIN TBFN_GET_DEPARTMENTS({UserDept}) dps ON dps.Id = r.DepartmentId " +
+                $"WHERE " +
+                $"{(ID != null ? $"r.Id = {ID} AND" : "")} " +
+                $"{(DepID != null ? $"r.DepartmentId = {DepID} AND" : "")} " +
+                "(r.IsDeleted <> 1) AND (r.TenantId = CAST(1 AS bigint)) order by r.DisplayName";
         }
         /// <summary>
         /// Создание бригады
@@ -1771,10 +1801,10 @@ namespace O2GEN.Helpers
                 "output inserted.Id into @InsertedPId " +
                 "values" +
                 $"(N'{obj.DisplayName}'," +
-                $"{(obj.Latitude == null?"NULL": obj.Latitude)}, " +
-                $"{(obj.Longitude == null ? "NULL" : obj.Longitude)}, " +
-                $"{(obj.Address == null ? "NULL" : $"N'{obj.Address}'")}, " +
-                $"{(obj.ResourceStateId == null ? "NULL" : obj.ResourceStateId)}, " +
+                $"NULL, " +
+                $"NULL, " +
+                $"NULL, " +
+                $"NULL, " +
                 $"{EngId}, " +
                 $"getdate(), " +
                 $"'{obj.ObjectUID.ToString("D")}', " +
@@ -1800,10 +1830,6 @@ namespace O2GEN.Helpers
                 "Revision = @revision, " +
                 $"DisplayName = N'{obj.DisplayName}', " +
                 $"DepartmentId = {obj.DepartmentId}, " +
-                $"Latitude = {(obj.Latitude == null ? "NULL" : obj.Latitude)}, " +
-                $"Longitude = {(obj.Longitude == null ? "NULL" : obj.Longitude)}, " +
-                $"Address = N'{obj.Address}', " +
-                $"ResourceStateId = {(obj.ResourceStateId == null ? "NULL" : obj.ResourceStateId)}, " +
                 $"ModifiedByUser = {EngId}, " +
                 "ModificationTime = getdate() " +
                 $"WHERE ID = {obj.Id}; " +
@@ -1850,13 +1876,14 @@ namespace O2GEN.Helpers
         /// Работники
         /// </summary>
         /// <returns></returns>
-        private static string SelectEngineers(long? ID = null, long? DeptId = null)
+        private static string SelectEngineers(long? ID = null, long? DeptId = null, long UserDept = -1)
         {
             return "SELECT e.Id, CONCAT(P.Surname,' ',P.GivenName,' ', P.MiddleName) as PersonName, e.ObjectUID, e.PersonId, D.DisplayName as DepartmentName, isnull(U.Name,0) as IsUser , e.DepartmentId, e.PersonId, P.Surname, P.GivenName, P.MiddleName, e.CalendarId, P.PersonPositionId, U.Id AS UserId, U.Name AS Login, e.CreationTime, ISNULL(e.ModificationTime, e.CreationTime) AS ModificationTime  " +
                 "FROM Engineers AS e " +
                 "LEFT JOIN Departments AS D ON e.DepartmentId = D.Id AND D.IsDeleted <> 1 " +
                 "LEFT JOIN Persons AS P ON e.PersonId = P.Id AND P.IsDeleted <> 1 " +
                 "LEFT JOIN PPUsers AS U ON P.UserId = U.Id AND U.IsDeleted <> 1 " +
+                $"INNER JOIN TBFN_GET_DEPARTMENTS({UserDept}) dps ON dps.Id = e.DepartmentId " +
                 "WHERE ((e.IsDeleted <> 1) " +
                 $"{(ID == null ? "" : "AND e.Id = " + ID)} " +
                 $"{(DeptId == null ? "" : "AND e.DepartmentId = " + DeptId)} " +
@@ -2475,7 +2502,7 @@ namespace O2GEN.Helpers
 
         #region Процедуры получения данных
         #region ЗРП
-        public static List<ZRP> GetZRP(DateTime From, DateTime To, ILogger logger, int[] statuses = null, string DisplayName = "", long? DeptId = null)
+        public static List<ZRP> GetZRP(DateTime From, DateTime To, ILogger logger, int[] statuses = null, string DisplayName = "", long? DeptId = null, long UserDept = -1)
         {
             string con = GetConnectionString();
 
@@ -2492,7 +2519,7 @@ namespace O2GEN.Helpers
                 using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
-                    using (var command = new SqlCommand(GetZRP(From, To, statuses, DisplayName, DeptId), connection))
+                    using (var command = new SqlCommand(GetZRP(From, To, statuses, DisplayName, DeptId, UserDept), connection))
                     {
                         command.CommandType = CommandType.Text;
                         command.Parameters.Clear();
@@ -2513,18 +2540,19 @@ namespace O2GEN.Helpers
                                     SCStatusName = row["StatusName"].ToString(),
                                     RouteName = row["RouteName"].ToString(),
                                     ResName = row["ResName"].ToString(),
-                                    PerformerName = row["PerformerName"].ToString()
+                                    PerformerName = row["PerformerName"].ToString(),
+                                    DeffectNum = row["DefectCount"].ToString()
                                 });
                             }
                         }
                     }
                 }
-                List<Deffect> deffects = null;
-                foreach (var zrp in output)
-                {
-                    deffects = GetDeffects(zrp.Id, logger);
-                    zrp.DeffectNum = (deffects.Count == 0 ? "Нет" : deffects.Count.ToString());
-                }
+                //List<Deffect> deffects = null;
+                //foreach (var zrp in output)
+                //{
+                //    deffects = GetDeffects(zrp.Id, logger);
+                //    zrp.DeffectNum = (deffects.Count == 0 ? "Нет" : deffects.Count.ToString());
+                //}
             }
             catch (Exception ex)
             {
@@ -3257,7 +3285,7 @@ namespace O2GEN.Helpers
         /// </summary>
         /// <param name="logger"></param>
         /// <returns></returns>
-        public static List<AssetParameterSet> GetAssetParameterSets(ILogger logger = null, int? DeptID = -1)
+        public static List<AssetParameterSet> GetAssetParameterSets(long UserDept = -1, ILogger logger = null, int? DeptID = -1)
         {
             string con = GetConnectionString();
 
@@ -3274,7 +3302,7 @@ namespace O2GEN.Helpers
                 using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
-                    using (var command = new SqlCommand(SelectAssetParameterSets(DeptId: DeptID), connection))
+                    using (var command = new SqlCommand(SelectAssetParameterSets(DeptId: DeptID, UserDept: UserDept), connection))
                     {
                         command.CommandType = CommandType.Text;
                         command.Parameters.Clear();
@@ -3931,7 +3959,7 @@ namespace O2GEN.Helpers
         /// </summary>
         /// <param name="logger"></param>
         /// <returns></returns>
-        public static List<Asset> GetAssets(ILogger logger = null, int? DeptID = -1, string DisplayName = null, bool NotesOnly = false)
+        public static List<Asset> GetAssets(ILogger logger = null, int? DeptID = -1, string DisplayName = null, bool NotesOnly = false, long UserDept = -1)
         {
             string con = GetConnectionString();
 
@@ -3949,7 +3977,7 @@ namespace O2GEN.Helpers
                 using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
-                    using (var command = new SqlCommand(SelectAssets(DeptID, NotesOnly), connection))
+                    using (var command = new SqlCommand(SelectAssets(DeptID, NotesOnly, UserDept), connection))
                     {
                         command.CommandType = CommandType.Text;
                         command.Parameters.Clear();
@@ -4378,11 +4406,14 @@ namespace O2GEN.Helpers
 
         #region Участки
         /// <summary>
-        /// Участки
+        /// Подразделения
         /// </summary>
+        /// <param name="RootDepartId">Базовое подразделение</param>
+        /// <param name="ClearList">Без вложенности</param>
+        /// <param name="ForDept">Удаляет дочерние подразделения указанного</param>
         /// <param name="logger"></param>
         /// <returns></returns>
-        public static List<Department> GetDepartments(bool ClearList = false, int ForDept = -1, ILogger logger = null)
+        public static List<Department> GetDepartments(long? RootDepartId = null, bool ClearList = false, int ForDept = -1, ILogger logger = null)
         {
             string con = GetConnectionString();
 
@@ -4404,6 +4435,7 @@ namespace O2GEN.Helpers
                     {
                         command.CommandType = CommandType.Text;
                         command.Parameters.Clear();
+                        command.Parameters.Add(new SqlParameter() { ParameterName = "@RootDeptId", SqlDbType = SqlDbType.BigInt, Value = RootDepartId });
                         using (var dataReader = command.ExecuteReader())
                         {
                             foreach (var row in dataReader.Select(row => row))
@@ -4412,7 +4444,6 @@ namespace O2GEN.Helpers
                                 {
                                     Id = int.Parse(row["Id"].ToString()),
                                     DisplayName = row["DisplayName"].ToString(),
-                                    ObjectUID = new Guid(row["ObjectUID"].ToString()),
                                     ParentId = (string.IsNullOrEmpty(row["ParentId"].ToString()) ? null : int.Parse(row["ParentId"].ToString()))
                                 });
                             }
@@ -4463,7 +4494,7 @@ namespace O2GEN.Helpers
             return list;
         }
 
-        public static List<Department> GetChildDepartments(ILogger logger = null)
+        public static List<Department> GetChildDepartments(long? RootDepartId = null, ILogger logger = null)
         {
             string con = GetConnectionString();
 
@@ -4479,10 +4510,12 @@ namespace O2GEN.Helpers
                 using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
-                    using (var command = new SqlCommand(SelectDepartments(IsChildOnly: true), connection))
+                    using (var command = new SqlCommand(SelectDepartments(), connection))
                     {
                         command.CommandType = CommandType.Text;
                         command.Parameters.Clear();
+                        command.Parameters.Add(new SqlParameter() { ParameterName = "@RootDeptId", SqlDbType = SqlDbType.BigInt, Value = RootDepartId });
+
                         using (var dataReader = command.ExecuteReader())
                         {
                             foreach (var row in dataReader.Select(row => row))
@@ -4491,7 +4524,6 @@ namespace O2GEN.Helpers
                                 {
                                     Id = int.Parse(row["Id"].ToString()),
                                     DisplayName = row["DisplayName"].ToString(),
-                                    ObjectUID = new Guid(row["ObjectUID"].ToString()),
                                     ParentId = (string.IsNullOrEmpty(row["ParentId"].ToString()) ? null : int.Parse(row["ParentId"].ToString()))
                                 });
                             }
@@ -4506,7 +4538,7 @@ namespace O2GEN.Helpers
             return output;
         }
 
-        public static Department GetDepartment(int id, ILogger logger)
+        public static Department GetDepartment(int DeptId, ILogger logger)
         {
             string con = GetConnectionString();
 
@@ -4522,10 +4554,11 @@ namespace O2GEN.Helpers
                 using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
-                    using (var command = new SqlCommand(SelectDepartments(id), connection))
+                    using (var command = new SqlCommand(SelectDepartment(), connection))
                     {
                         command.CommandType = CommandType.Text;
                         command.Parameters.Clear();
+                        command.Parameters.Add(new SqlParameter() { ParameterName = "@DeptId", SqlDbType = SqlDbType.BigInt, Value = DeptId });
                         using (var dataReader = command.ExecuteReader())
                         {
                             foreach (var row in dataReader.Select(row => row))
@@ -4536,13 +4569,8 @@ namespace O2GEN.Helpers
                                     DisplayName = row["DisplayName"].ToString(),
                                     ObjectUID = new Guid(row["ObjectUID"].ToString()),
                                     ParentId = (string.IsNullOrEmpty(row["ParentId"].ToString()) ? null : int.Parse(row["ParentId"].ToString())),
-                                    Latitude = (string.IsNullOrEmpty(row["Latitude"].ToString()) ? 0 : double.Parse(row["Latitude"].ToString())),
-                                    Longitude = (string.IsNullOrEmpty(row["Longitude"].ToString()) ? 0 : double.Parse(row["Longitude"].ToString())),
                                     Name = row["Name"].ToString(),
-                                    Organization = row["Organization"].ToString(),
-                                    ShortCode = row["ShortCode"].ToString(),
-                                    TimeZone = row["TimeZone"].ToString(),
-                                    ParentName = row["ParentDisplayName"].ToString()
+                                    ShortCode = row["ShortCode"].ToString()
                                 };
                             }
                         }
@@ -4576,7 +4604,7 @@ namespace O2GEN.Helpers
         /// </summary>
         /// <param name="logger"></param>
         /// <returns></returns>
-        public static List<Resource> GetResources(long? Id = null, long? DeptId = null, ILogger logger = null)
+        public static List<Resource> GetResources(long? Id = null, long? DeptId = null, ILogger logger = null, long UserDept = -1)
         {
             string con = GetConnectionString();
 
@@ -4592,7 +4620,7 @@ namespace O2GEN.Helpers
                 using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
-                    using (var command = new SqlCommand(SelectResources(Id, DeptId), connection))
+                    using (var command = new SqlCommand(SelectResources(Id, DeptId, UserDept), connection))
                     {
                         command.CommandType = CommandType.Text;
                         command.Parameters.Clear();
@@ -4648,22 +4676,13 @@ namespace O2GEN.Helpers
                                     Id = int.Parse(row["Id"].ToString()),
                                     DisplayName = row["DisplayName"].ToString(),
                                     ObjectUID = new Guid(row["ObjectUID"].ToString()),
-                                    Address = row["Address"].ToString(),
                                     DepartmentId = string.IsNullOrEmpty(row["DepartmentId"].ToString()) ? (int?)null : int.Parse(row["DepartmentId"].ToString()),
-                                    ResourceStateId = string.IsNullOrEmpty(row["ResourceStateId"].ToString()) ? (int?)null : int.Parse(row["ResourceStateId"].ToString()),
-                                    ResourceTypeId = string.IsNullOrEmpty(row["ResourceTypeId"].ToString()) ? (int?)null : int.Parse(row["ParResourceTypeIdentId"].ToString()),
-                                    Latitude = (string.IsNullOrEmpty(row["Latitude"].ToString()) ? 0 : double.Parse(row["Latitude"].ToString())),
-                                    Longitude = (string.IsNullOrEmpty(row["Longitude"].ToString()) ? 0 : double.Parse(row["Longitude"].ToString())),
                                     CreateStamp = Convert.ToDateTime(row["CreationTime"].ToString()),
                                     ModifyStamp = Convert.ToDateTime(row["ModificationTime"].ToString())
                                 };
                             }
                         }
                     }
-                }
-                foreach (var item in GetResourceAllocations(output.Id, logger))
-                {
-                    output.Parameters.Add(item.EngineerID);
                 }
             }
             catch (Exception ex)
@@ -4675,24 +4694,22 @@ namespace O2GEN.Helpers
         public static void CreateResource(Resource obj, long EngId, ILogger logger)
         {
             var idnew = ExecuteScalar(CreateResource(obj, EngId), logger);
-            foreach (var item in obj.Parameters)
+            foreach (var SelectedItem in obj.Engineers.FindAll(x=>x.Selected))
             {
-                CreateResourceAllocation(new ResourceAllocations() { ResourceID = int.Parse(idnew), EngineerID = item }, EngId, logger);
+                CreateResourceAllocation(new ResourceAllocations() { ResourceID = int.Parse(idnew), EngineerID = SelectedItem.TargetObject.Id }, EngId, logger);
             }
         }
-        public static void UpdateResource(Resource obj, long EngId, ILogger logger)
+        public static void UpdateResource(Resource obj, long UserId, ILogger logger)
         {
-            ExecuteNonQuery(UpdateResource(obj, EngId), logger);
-            var currPar = GetResourceAllocations(obj.Id);
-            foreach (var item in obj.Parameters)
+            ExecuteNonQuery(UpdateResource(obj, UserId), logger);
+
+            foreach (var SelectedItem in obj.Engineers.FindAll(x=>!x.BaseSelected && x.Selected))
             {
-                if (currPar.Find(x => x.EngineerID == item) == null)
-                    CreateResourceAllocation(new ResourceAllocations() { ResourceID = obj.Id, EngineerID = item }, EngId, logger);
+                CreateResourceAllocation(new ResourceAllocations() { ResourceID = obj.Id, EngineerID = SelectedItem.TargetObject.Id }, UserId, logger);
             }
-            foreach (var item in currPar)
+            foreach (var UnselectedItem in obj.Engineers.FindAll(x => x.BaseSelected && !x.Selected))
             {
-                if (!obj.Parameters.Contains(item.EngineerID))
-                    DeleteResourceAllocation(item.Id, EngId, logger);
+                DeleteResourceAllocation((long)UnselectedItem.MatchId, UserId, logger);
             }
         }
         public static void DeleteResource(int ID, long EngId, ILogger logger)
@@ -4740,7 +4757,7 @@ namespace O2GEN.Helpers
             }
             return output;
         }
-        public static List<ResourceAllocations> GetResourceAllocations(int ResourceId, ILogger logger = null)
+        public static List<Selectable<Engineer>> GetResourceEngineers(long DepartmentId, long ResourceId, ILogger logger = null)
         {
             string con = GetConnectionString();
 
@@ -4750,13 +4767,13 @@ namespace O2GEN.Helpers
                 return null;
             }
 
-            List<ResourceAllocations> output = new List<ResourceAllocations>();
+            List<Selectable<Engineer>> output = new List<Selectable<Engineer>>();
             try
             {
                 using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
-                    using (var command = new SqlCommand(SelectResourceAllocations(ResourceId), connection))
+                    using (var command = new SqlCommand(_SelectResourceEngineers(DepartmentId, ResourceId), connection))
                     {
                         command.CommandType = CommandType.Text;
                         command.Parameters.Clear();
@@ -4764,13 +4781,16 @@ namespace O2GEN.Helpers
                         {
                             foreach (var row in dataReader.Select(row => row))
                             {
-                                output.Add(new ResourceAllocations()
+                                output.Add(new Selectable<Engineer>()
                                 {
-                                    //Id, ObjectUID, EngineerId, ResourceId
-                                    Id = int.Parse(row["Id"].ToString()),
-                                    EngineerID = int.Parse(row["EngineerId"].ToString()),
-                                    ResourceID = int.Parse(row["ResourceId"].ToString()),
-                                    ObjectUID = new Guid(row["ObjectUID"].ToString())
+                                    TargetObject = new Engineer() 
+                                    {
+                                        Id = long.Parse(row["Id"].ToString()),
+                                        DisplayName = row["DisplayName"].ToString()
+                                    },
+                                    MatchId = string.IsNullOrEmpty(row["ResEngId"].ToString())? null: long.Parse(row["ResEngId"].ToString()),
+                                    BaseSelected = row["Selected"].ToString() == "1",
+                                    Selected = row["Selected"].ToString() == "1"
                                 });
                             }
                         }
@@ -4787,7 +4807,7 @@ namespace O2GEN.Helpers
         {
             ExecuteNonQuery(CreateResourceAllocation(obj, EngId), logger);
         }
-        public static void DeleteResourceAllocation(int ID, long EngId, ILogger logger)
+        public static void DeleteResourceAllocation(long ID, long EngId, ILogger logger)
         {
             ExecuteNonQuery(DeleteResourceAllocation(ID, EngId), logger);
         }
@@ -4890,7 +4910,7 @@ namespace O2GEN.Helpers
         /// </summary>
         /// <param name="logger"></param>
         /// <returns></returns>
-        public static List<Engineer> GetEngineers(long? DeptId = null, ILogger logger = null)
+        public static List<Engineer> GetEngineers(long? DeptId = null, ILogger logger = null, long UserDept = -1)
         {
             string con = GetConnectionString();
 
@@ -4906,7 +4926,7 @@ namespace O2GEN.Helpers
                 using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
-                    using (var command = new SqlCommand(SelectEngineers(DeptId: DeptId), connection))
+                    using (var command = new SqlCommand(SelectEngineers(DeptId: DeptId, UserDept: UserDept), connection))
                     {
                         command.CommandType = CommandType.Text;
                         command.Parameters.Clear();

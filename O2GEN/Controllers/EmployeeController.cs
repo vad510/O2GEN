@@ -67,7 +67,7 @@ namespace O2GEN.Controllers
                 var d = Helpers.DBHelper.GetChildDepartments();
                 if (d.Count > 0) Dept = d[0].Id;
             }
-            ViewBag.Engineers = Helpers.DBHelper.GetEngineers(DeptId: Dept, logger: _logger);
+            ViewBag.Engineers = Helpers.DBHelper.GetEngineers(DeptId: Dept, logger: _logger, UserDept: ((Credentials)HttpContext.Items["User"]).DeptId);
             Response.Cookies.Append("engdid", Dept.ToString());
             AlertHelper.DisplayMessage(HttpContext.Session, ViewBag);
             return View(new Filter() { DepartmentId = Dept });
@@ -76,7 +76,7 @@ namespace O2GEN.Controllers
         [HttpPost]
         public IActionResult Engineers(Filter Model)
         {
-            ViewBag.Engineers = Helpers.DBHelper.GetEngineers(DeptId: Model.DepartmentId, logger: _logger);
+            ViewBag.Engineers = Helpers.DBHelper.GetEngineers(DeptId: Model.DepartmentId, logger: _logger, UserDept: ((Credentials)HttpContext.Items["User"]).DeptId);
             Response.Cookies.Append("engdid", (Model.DepartmentId == null ? "" : Model.DepartmentId.ToString()));
             return View(Model);
         }
@@ -145,7 +145,7 @@ namespace O2GEN.Controllers
                 var d = Helpers.DBHelper.GetChildDepartments();
                 if (d.Count > 0) Dept = d[0].Id;
             }
-            ViewBag.Resources = Helpers.DBHelper.GetResources(DeptId: Dept, logger: _logger);
+            ViewBag.Resources = Helpers.DBHelper.GetResources(DeptId: Dept, logger: _logger, UserDept: ((Credentials)HttpContext.Items["User"]).DeptId);
             Response.Cookies.Append("resdid", Dept.ToString());
             AlertHelper.DisplayMessage(HttpContext.Session, ViewBag);
             return View(new Filter() { DepartmentId = Dept });
@@ -154,7 +154,7 @@ namespace O2GEN.Controllers
         [HttpPost]
         public IActionResult Resources(Filter Model)
         {
-            ViewBag.Resources = Helpers.DBHelper.GetResources(DeptId: Model.DepartmentId, logger: _logger);
+            ViewBag.Resources = Helpers.DBHelper.GetResources(DeptId: Model.DepartmentId, logger: _logger, UserDept: ((Credentials)HttpContext.Items["User"]).DeptId);
             Response.Cookies.Append("resdid", (Model.DepartmentId == null ? "" : Model.DepartmentId.ToString()));
             return View(Model);
         }
@@ -169,9 +169,21 @@ namespace O2GEN.Controllers
         public IActionResult ResourceEdit(int id)
         {
             var res = Helpers.DBHelper.GetResource(id, _logger);
+            res.Engineers = Helpers.DBHelper.GetResourceEngineers((long)res.DepartmentId, res.Id, _logger);
             if (res != null) return PartialView("ResourceEdit", res);
             return View();
         }
+        [HttpGet]
+        public IActionResult ResourceEditTable(long Id, long? DepartmentId)
+        {
+            Resource outpt = new Resource();
+            if(DepartmentId is not null)
+            {
+                outpt.Engineers = Helpers.DBHelper.GetResourceEngineers((long)DepartmentId, Id, _logger);
+            }
+            return PartialView("ResourceEditTable", outpt);
+        }
+
 
         [HttpPost]
         public IActionResult ResourceUpdate(Resource Model)

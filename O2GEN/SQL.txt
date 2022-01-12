@@ -266,3 +266,13 @@ ALTER TABLE MaximoReporterSendLog ADD [MaximoError] NVARCHAR(MAX) NULL;
 UPDATE MaximoReporterSendLog SET CreationTime = LastUpdate, CustomAssetCode = AssetCode, CustomAssetChildCode = AssetChildCode, CustomDescription = [Description];
 UPDATE MaximoReporterSendLog SET MaximoStatus = 0 WHERE SendToMaximo = 0;
 UPDATE MaximoReporterSendLog SET MaximoStatus = 4 WHERE SendToMaximo = 1;
+
+
+
+
+--Добавляем вычисляемый в сервисе столбец количества дефектов
+
+ALTER TABLE SchedulingContainers ADD DefectCount int not null default 0
+
+UPDATE MaximoReporterSettings SET NAME = N'LastSCRevisionMaximo' WHERE ID = 2
+INSERT INTO MaximoReporterSettings (NAME, Value) Values (N'LastSCRevisionDefect', N'99999')

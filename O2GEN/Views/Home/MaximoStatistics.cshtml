@@ -37,7 +37,7 @@
                 <div class="mb-2 mr-2">
                     <select asp-for="DepartmentId" class="form-control" required>
                         <option value="NULL" selected>Выбрать подразделение</option>
-                        @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments())
+                        @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments((long)((Credentials)Context.Items["User"]).DeptId))
                         {
                             <option value="@item.Id">@item.DisplayName</option>
                         }
