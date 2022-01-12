@@ -64,7 +64,7 @@ namespace O2GEN.Helpers
                 "[t8].[Name] as [RouteName], " +
                 "[t10].[DisplayName] as [ResName], " +
                 "Eng.DisplayName AS PerformerName, " +
-                "[e].DefectCount " +
+                "CASE WHEN [e].DefectCount = 0 THEN N'Нет' ELSE CAST([e].DefectCount AS nvarchar(5))  END DefectCount " +
                 "FROM [SchedulingContainers] AS [e] " +
                 "LEFT JOIN( " +
                 "    SELECT[e0].* " +
