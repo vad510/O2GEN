@@ -2450,7 +2450,7 @@ namespace O2GEN.Helpers
                 "WHERE IsDeleted <> 1 " +
                 "ORDER BY Id";
         }
-        private static string SelectMaximoStatistics(long? Id, DateTime? From, DateTime? To, long? DeptId, long? StatusId)
+        private static string SelectMaximoStatistics(long? Id, DateTime? From, DateTime? To, long? DeptId, long? StatusId, long UserDept = -1)
         {
             return "SELECT " +
                 "MR.Id, " +
@@ -2472,6 +2472,7 @@ namespace O2GEN.Helpers
                 "LEFT JOIN Tasks T ON T.SchedulingContainerId = MR.SCId " +
                 "LEFT JOIN Departments D ON D.Id = SC.DepartmentId " +
                 "LEFT JOIN InspectionDocuments ID ON ID.TaskId = T.Id " +
+                $"INNER JOIN TBFN_GET_DEPARTMENTS({UserDept}) dps ON dps.Id = SC.DepartmentId " +
                 "WHERE 1 = 1 " +
                 (Id == null ? "" : $"AND MR.Id = {Id} ") +
                 (From == null ? "" : $"AND MR.CreationTime >= '{((DateTime)From).ToString("yyyyMMdd HH:mm:ss")}' ") +
@@ -5722,7 +5723,7 @@ namespace O2GEN.Helpers
             }
             return output;
         }
-        public static List<MaximoDefect> GetMaximoStatistics(long? Id = null, DateTime? From = null, DateTime? To = null, long? DeptId = null, long? StatusId = null, ILogger logger = null)
+        public static List<MaximoDefect> GetMaximoStatistics(long? Id = null, DateTime? From = null, DateTime? To = null, long? DeptId = null, long? StatusId = null, long UserDept = -1, ILogger logger = null)
         {
             string con = GetConnectionString();
 
@@ -5738,7 +5739,7 @@ namespace O2GEN.Helpers
                 using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
-                    using (var command = new SqlCommand(SelectMaximoStatistics(Id, From, To, DeptId, StatusId), connection))
+                    using (var command = new SqlCommand(SelectMaximoStatistics(Id, From, To, DeptId, StatusId, UserDept), connection))
                     {
                         command.CommandType = CommandType.Text;
                         command.Parameters.Clear();

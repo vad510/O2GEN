@@ -536,7 +536,7 @@ namespace O2GEN.Controllers
             DateTime From = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(FROMData)));
             DateTime To = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(TOData)));
 
-            ViewBag.Data = Helpers.DBHelper.GetMaximoStatistics(From:From, To:To, DeptId:(Did == 0 ? null : Did), StatusId:(Sid == 0 ? null : Sid), logger: _logger);
+            ViewBag.Data = Helpers.DBHelper.GetMaximoStatistics(From:From, To:To, DeptId:(Did == 0 ? null : Did), StatusId:(Sid == 0 ? null : Sid), UserDept: ((Credentials)HttpContext.Items["User"]).DeptId, logger: _logger);
             Response.Cookies.Append("maxstatfrom", FROMData);
             Response.Cookies.Append("maxstatto", TOData);
             Response.Cookies.Append("maxstatdid", string.IsNullOrEmpty(DepartmentIdData) ? "" : DepartmentIdData);
@@ -549,7 +549,7 @@ namespace O2GEN.Controllers
         {
             DateTime From = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.From)));
             DateTime To = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.To)));
-            ViewBag.Data = Helpers.DBHelper.GetMaximoStatistics(From: From, To: To, DeptId: Model.DepartmentId, StatusId: Model.MaximoStatusId, logger: _logger);
+            ViewBag.Data = Helpers.DBHelper.GetMaximoStatistics(From: From, To: To, DeptId: Model.DepartmentId, StatusId: Model.MaximoStatusId, UserDept: ((Credentials)HttpContext.Items["User"]).DeptId, logger: _logger);
 
             Response.Cookies.Append("maxstatfrom", Model.From);
             Response.Cookies.Append("maxstatto", Model.To);
