@@ -159,6 +159,9 @@
                     <thead class="color-black">
                         <tr>
                             <th>
+                                <p>Номер</p>
+                            </th>
+                            <th>
                                 <p>Подразделение</p>
                             </th>
                             <th>
@@ -191,6 +194,7 @@
                         @foreach (ZRP item in ViewBag.ZRPInWork)
                         {
                         <tr>
+                            <td><p>@item.Id</p></td>
                             <td><p>@item.ObjName</p></td>
                             <td><p>@item.SCTypeName</p></td>
                             <td><p>@item.RouteName</p></td>
@@ -227,6 +231,9 @@
                     <thead class="color-black">
                         <tr>
                             <th>
+                                <p>Номер</p>
+                            </th>
+                            <th>
                                 <p>Подразделение</p>
                             </th>
                             <th>
@@ -259,6 +266,7 @@
                         @foreach (var item in ViewBag.ZRPDone)
                         {
                         <tr>
+                            <td><p>@item.Id</p></td>
                             <td><p>@item.ObjName</p></td>
                             <td><p>@item.SCTypeName</p></td>
                             <td><p>@item.RouteName</p></td>
@@ -273,8 +281,8 @@
                                         <i class="fa fa-pen"></i>
                                     </button>
                                     @*<button type="button" class="btn btn-danger ml-1" onclick="location.href='@Url.Action("ZRPDelete", new { id = item.Id })'">
-                                        <i class="fa fa-trash"></i>
-                                    </button>*@
+                    <i class="fa fa-trash"></i>
+                </button>*@
                                     <button type="submit" class="btn btn-danger ml-1" onclick="changesModalShow('@Url.Action("ZRPDelete", new { id = item.Id })', 'Удаление', 'Вы действительно хотите удалить запись?');">
                                         <i class="fa fa-trash"></i>
                                     </button>

@@ -108,7 +108,7 @@ namespace O2GEN.Helpers
                 "    WHERE([e10].[IsDeleted] <> 1) AND([e10].[TenantId] = CAST(1 AS bigint)) " +
                 ") AS[t10] ON[t9].[ResourceId] = [t10].[Id] " +
                 $"INNER JOIN TBFN_GET_DEPARTMENTS({UserDept}) dps ON dps.Id = e.DepartmentId " +
-                $"WHERE {(string.IsNullOrEmpty(DisplayName) ? "" : $"[t8].[Name] like N'%{DisplayName}%' AND ")} {(statuses!= null && statuses.Length > 0 ? $"[e].[SCStatusId] in ({statusSQL}) AND " : "")}  (([e].[IsDeleted] <> 1) AND([e].[TenantId] = CAST(1 AS bigint))) AND(([t7].[DepartmentId] IS NOT NULL {(DeptId != null ? $"AND[t7].[DepartmentId] = {DeptId}" : "")} ) AND(CASE " +
+                $"WHERE {(string.IsNullOrEmpty(DisplayName) ? "" : $"([e].[Id] LIKE N'%{DisplayName}%' OR Eng.DisplayName LIKE N'%{DisplayName}%') AND ")} {(statuses!= null && statuses.Length > 0 ? $"[e].[SCStatusId] in ({statusSQL}) AND " : "")}  (([e].[IsDeleted] <> 1) AND([e].[TenantId] = CAST(1 AS bigint))) AND(([t7].[DepartmentId] IS NOT NULL {(DeptId != null ? $"AND[t7].[DepartmentId] = {DeptId}" : "")} ) AND(CASE " +
                 "WHEN EXISTS( " +
                 "   SELECT 1 " +
                 "   FROM[Assignments] AS[e9] " +
@@ -124,7 +124,7 @@ namespace O2GEN.Helpers
                 "        THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) " +
                 "    END " +
                 "END = 1)) " +
-                "ORDER BY[e].[Id]";
+                "ORDER BY[t7].[AppointmentStart] DESC";
         }
 
         private static string GetZRP(int ID)
