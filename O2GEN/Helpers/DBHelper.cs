@@ -2428,15 +2428,9 @@ namespace O2GEN.Helpers
         #endregion
 
         #region Статистика
-        private static string GetStatistics(DateTime FromD, DateTime ToD, long? DeptId)
+        private static string GetStatistics()
         {
-            return "SELECT " +
-                "D.DisplayName AS Name, " +
-                $"(SELECT COUNT(*) FROM SchedulingContainers SC WHERE D.Id = SC.DepartmentId AND SC.StartTime BETWEEN '{FromD.ToString("yyyyMMdd HH:mm:ss")}' AND '{ToD.ToString("yyyyMMdd HH:mm:ss")}' AND SC.SCStatusId = 3 AND SC.IsDeleted <> 1) AS Value " +
-                "FROM Departments D " +
-                "WHERE D.IsDeleted <> 1 " +
-                (DeptId != null? $"AND D.Id = {DeptId} ": "") +
-                "ORDER BY D.DisplayName";
+            return "SELECT Name, Value FROM TBFN_GET_STATISTICS(@DeptId, @FromD, @ToD) ORDER BY Name";
         }
         #endregion
 
@@ -5656,10 +5650,13 @@ namespace O2GEN.Helpers
                 {
                     output.Add(new Statistics() { MetricName = "Количество пройденых обходов. " });
                     connection.Open();
-                    using (var command = new SqlCommand(GetStatistics(Fromd, Tod, DeptId), connection))
+                    using (var command = new SqlCommand(GetStatistics(), connection))
                     {
                         command.CommandType = CommandType.Text;
                         command.Parameters.Clear();
+                        command.Parameters.Add(new SqlParameter() { ParameterName = "@DeptId", SqlDbType = SqlDbType.BigInt, Value = DeptId == null? 0: DeptId });
+                        command.Parameters.Add(new SqlParameter() { ParameterName = "@FromD", SqlDbType = SqlDbType.DateTime, Value = Fromd });
+                        command.Parameters.Add(new SqlParameter() { ParameterName = "@ToD", SqlDbType = SqlDbType.DateTime, Value = Tod });
                         using (var dataReader = command.ExecuteReader())
                         {
                             foreach (var row in dataReader.Select(row => row))
