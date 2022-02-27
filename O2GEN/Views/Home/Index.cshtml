@@ -2,31 +2,8 @@
 @{ ViewData["Title"] = "Главная"; }
 
 <section class="">
-    @*<div class="row-container-left">
-            <ul class="ul-list-left-aligned">
-                <li>
-                    <i class="fa fa-globe"></i>
-                </li>
-                <li>
-                    <i class="fa fa-redo"></i>
-                </li>
-
-                <li class="li-text-white">
-                    <p>
-                        Сегодня
-                    </p>
-                </li>
-                <li class="li-text-white">
-                    <i class="fa fa-calendar"></i>
-                    <p>@DateTime.Now.ToString("dd'.'MM'.'yyyy")</p>
-                </li>
-            </ul>
-        </div>*@
     <div class="row-container-left bg-blue" id="pageToolbar" style="position:sticky">
         <form action="Index" method="post">
-
-            <input asp-for="From" style="display:none" />
-            <input asp-for="To" style="display:none" />
             <div class="d-flex flex-wrap m-2">
                 <div class="mb-2 mr-2">
                     <button type="button" class="btn btn-light" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPCreate")">
@@ -34,28 +11,18 @@
                     </button>
                 </div>
                 <div class="mb-2 mr-2">
-                    <button class="btn btn-light" type="button" id="SetToday">
+                    <button class="btn btn-light" type="button" onclick="SetTodayForTDTs($('#From'), $('#To'))">
                         <i class="fa fa-calendar-day"></i>
                         Сегодня
                     </button>
                 </div>
-                <span class="li-text-white mr-0 mb-2">От:</span>
-                <div class="mb-2 mr-2">
-                    <div class="input-group date col-auto" id="datetimepickerFROM" data-target-input="nearest">
-                        <input type="text" class="form-control datetimepicker-input" data-target="#datetimepickerFROM" id="DTPFROM" style="width:150px;" />
-                        <div class="input-group-append" data-target="#datetimepickerFROM" data-toggle="datetimepicker">
-                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                        </div>
-                    </div>
+                <span class="li-text-white mr-0">От:</span>
+                <div class="mb-2">
+                    <input id="From" type="datetime-local" value="@Model.From" name="From" class="datetime-css">
                 </div>
-                <span class="li-text-white mr-0 mb-2">До:</span>
-                <div class="mb-2 mr-2">
-                    <div class="input-group date col-auto" id="datetimepickerTO" data-target-input="nearest">
-                        <input type="text" class="form-control datetimepicker-input" data-target="#datetimepickerTO" id="DTPTO" style="width:150px;" />
-                        <div class="input-group-append" data-target="#datetimepickerTO" data-toggle="datetimepicker">
-                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                        </div>
-                    </div>
+                <span class="li-text-white mr-0">До:</span>
+                <div class="mb-2">
+                    <input id="To" type="datetime-local" value="@Model.To" name="To" class="datetime-css">
                 </div>
 
                 <div class="mb-2 mr-2">
@@ -63,7 +30,7 @@
                         <option value="NULL" selected>Выбрать подразделение</option>
                         @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments((long)((Credentials)Context.Items["User"]).DeptId))
                         {
-                        <option value="@item.Id">@item.DisplayName</option>
+                            <option value="@item.Id">@item.DisplayName</option>
                         }
                     </select>
                 </div>
@@ -76,71 +43,12 @@
                     </button>
                 </div>
             </div>
-                @*<ul class="ul-list-left-aligned">
-                    <li class="li-text-white">
-                        <button type="button" class="btn btn-light" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPCreate")">
-                            <i class="fa fa-plus"></i> Создать
-                        </button>
-                    </li>
-
-                    <li class="li-text-white">
-                        <button class="btn btn-light" type="button" id="SetToday">
-                            <i class="fa fa-calendar-day"></i>
-                            Сегодня
-                        </button>
-                    </li>
-
-                    <li class="li-text-white mr-0">
-                        От:
-                    </li>
-                    <li class="li-text-white ml-0">
-                        <div class="input-group date col-auto" id="datetimepickerFROM" data-target-input="nearest">
-                            <input type="text" class="form-control datetimepicker-input" data-target="#datetimepickerFROM" id="DTPFROM" style="width:150px;" />
-                            <div class="input-group-append" data-target="#datetimepickerFROM" data-toggle="datetimepicker">
-                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="li-text-white mr-0">
-                        До:
-                    </li>
-                    <li class="li-text-white ml-0">
-                        <div class="input-group date col-auto" id="datetimepickerTO" data-target-input="nearest">
-                            <input type="text" class="form-control datetimepicker-input" data-target="#datetimepickerTO" id="DTPTO" style="width:150px;" />
-                            <div class="input-group-append" data-target="#datetimepickerTO" data-toggle="datetimepicker">
-                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                            </div>
-                        </div>
-                    </li>
-
-                    <li class="li-text-white">
-                        <select asp-for="DepartmentId" class="form-control" required>
-                            <option value="NULL" selected>Выбрать подразделение</option>
-                            @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments())
-                        {
-                            <option value="@item.Id">@item.DisplayName</option>
- }
-                        </select>
-                    </li>
-                    <li>
-                        <input asp-for="DisplayName" class="form-control" placeholder="Название" />
-                    </li>
-                    <li class="li-text-white">
-                        <button class="btn btn-light" type="submit">
-                            <i class="fa fa-search"></i> Поиск
-                        </button>
-                    </li>
-                </ul>*@
-</form>
+        </form>
     </div>
 
-    @* strange stuff *@
     <div id="placeholder"></div>
 
     <ul class="nav nav-tabs top-margin">
-        @*<li class="nav-item active">
-            <a class="nav-link text-black-50 active" href="#first-tab" data-toggle="tab">ЗПР выданные</a>
-        </li>*@
         <li class="nav-item active">
             <a class="nav-link text-black-50 active" href="#first-tab" data-toggle="tab">Обходы в работе</a>
         </li>
@@ -208,9 +116,6 @@
                                     <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPEdit", new { id = item.Id })">
                                         <i class="fa fa-pen"></i>
                                     </button>
-                                    @*<button type="button" class="btn btn-danger ml-1" onclick="location.href='@Url.Action("ZRPDelete", new { id = item.Id })'">
-                    <i class="fa fa-trash"></i>
-                </button>*@
                                     <button type="submit" class="btn btn-danger ml-1" onclick="changesModalShow('@Url.Action("ZRPDelete", new { id = item.Id })', 'Удаление', 'Вы действительно хотите удалить запись?');">
                                         <i class="fa fa-trash"></i>
                                     </button>
@@ -280,9 +185,6 @@
                                     <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPEdit", new { id = item.Id })">
                                         <i class="fa fa-pen"></i>
                                     </button>
-                                    @*<button type="button" class="btn btn-danger ml-1" onclick="location.href='@Url.Action("ZRPDelete", new { id = item.Id })'">
-                    <i class="fa fa-trash"></i>
-                </button>*@
                                     <button type="submit" class="btn btn-danger ml-1" onclick="changesModalShow('@Url.Action("ZRPDelete", new { id = item.Id })', 'Удаление', 'Вы действительно хотите удалить запись?');">
                                         <i class="fa fa-trash"></i>
                                     </button>
@@ -294,150 +196,9 @@
                 </table>
             </section>
         </div>
-
-        @*<div id="third-tab" class="tab-pane fade">
-            <section>
-                <table class="table table-bordered table-hover">
-                    <thead class="color-black">
-                        <tr>
-                            <th>
-                                <p>Тип оборудований</p>
-                            </th>
-                            <th>
-                                <p>Статус обхода</p>
-                            </th>
-                            <th>
-                                <p>Тип обхода</p>
-                            </th>
-                            <th>
-                                <p>Обход</p>
-                            </th>
-                            <th>
-                                <p>Обходчик</p>
-                            </th>
-                            <th>
-                                <p>Дата начала (план)</p>
-                            </th>
-                            <th>
-                                <p>Дата окончания (план)</p>
-                            </th>
-                            <th>
-                                <p>Дефект</p>
-                            </th>
-                            <th>
-                                <p>Редактирование</p>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in ViewBag.ZRPEnded)
-                        {
-            <tr>
-                <td><p>@item.ObjName</p></td>
-                <td><p>@item.SCStatusName</p></td>
-                <td><p>@item.SCTypeName</p></td>
-                <td><p>@item.RouteName</p></td>
-                <td><p>@item.ResName</p></td>
-                <td><p>@item.StartTime.ToString()</p></td>
-                <td><p>@item.EndTime.ToString()</p></td>
-                <td><p> </p></td>
-                <td>
-                    <div class="d-flex justify-content-center">
-                        <button type="button" class="btn btn-info mr-1" data-toggle="modal-toggler" data-target="#ZRPEdit" data-url="@Url.Action("ZRPEdit", new { id = item.Id })">
-                            <i class="fa fa-pen"></i>
-                        </button>
-                        <button type="button" class="btn btn-danger ml-1" onclick="location.href='@Url.Action("ZRPDelete", new { id = item.Id })'">
-                            <i class="fa fa-trash"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-}
-                    </tbody>
-                </table>
-            </section>
-        </div>*@
     </div>
 
     <script type="text/javascript">
-
-
-        $(document).ready(function () {
-            InitializeDatePicker();
-            //$.noConflict();
-            $('#SetToday').click('click', SetTodayForTDTs);
-        });
-        function InitializeDatePicker() {
-
-            @if (string.IsNullOrEmpty(Model.From))
-            {
-            <text>
-                var d = new Date(moment().subtract(2, 'days'));
-                var now = new Date(moment());
-            </text>
-            }
-            else
-            {
-                <text>
-                    var d = new Date(@Model.From);
-                    var now = new Date(@Model.To);
-                </text>
-            }
-            $('#datetimepickerFROM').datetimepicker({
-                locale: 'ru',
-                icons: {
-                    time: "fa fa-clock",
-                    date: "fa fa-calendar-alt",
-                    up: "fa fa-arrow-up",
-                    down: "fa fa-arrow-down"
-                }
-            });
-
-            $('#datetimepickerFROM').on("change.datetimepicker", ({ date }) => { $('#From').val(date._d.getTime()); });
-            $('#datetimepickerFROM').datetimepicker('date', new Date(d.getFullYear(), d.getMonth(), d.getDate()));
-
-            $('#datetimepickerTO').datetimepicker({
-                locale: 'ru',
-                icons: {
-                    time: "fa fa-clock",
-                    date: "fa fa-calendar-alt",
-                    up: "fa fa-arrow-up",
-                    down: "fa fa-arrow-down"
-                }
-                });
-            $("#datetimepickerTO").on("change.datetimepicker", ({ date }) => { $('#To').val(date._d.getTime()); });
-            $('#datetimepickerTO').datetimepicker('date', now);
-        }
-
-        function SetTodayForTDTs() {
-
-            var from = document.getElementById('DTPFROM');
-            var date = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
-            date.setDate(date.getDate() - 2);
-            from.value = formatDate(date);
-
-            var to = document.getElementById('DTPTO');
-            var toDate = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
-            toDate.setDate(toDate.getDate() + 1);
-            to.value = formatDate(toDate);
-
-            $('#From').val(date.getTime());
-            $('#To').val(toDate.getTime());
-        }
-
-        function dateFromChanged({ date }) {
-            $('#From').val(date._d.getTime());
-        }
-
-        function formatDate(date) {
-            var month = date.getMonth()+1;
-            var day = date.getDate();
-            var year = date.getFullYear();
-            var hours = date.getHours();
-            var minutes = date.getMinutes();
-
-            return ((day > 9 ? '' : '0') + day + '.' + (month > 9 ? '' : '0') + month + '.' + year + ' ' + hours + ':' + (minutes > 9 ? '' : '0') + minutes);
-        }
 
         function GetResources(SelectedObj) {
             if (SelectedObj != 'undefined') {

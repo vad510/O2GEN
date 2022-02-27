@@ -3,13 +3,11 @@ using Microsoft.Extensions.Logging;
 using O2GEN.Authorization;
 using O2GEN.Helpers;
 using O2GEN.Models;
-using O2GEN.Models.HomeModels;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace O2GEN.Controllers
 {
@@ -18,11 +16,9 @@ namespace O2GEN.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
-
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
-          
         }
 
         #region Index
@@ -30,27 +26,25 @@ namespace O2GEN.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            string FROMData = Request.Cookies["zrpfrom"];
-            string TOData = Request.Cookies["zrpto"];
-            string DepartmentIdData = Request.Cookies["zrpdid"];
-            string DisplayName = Request.Cookies["zrpn"];
+            string 
+            FROMData = Request.Cookies["zrpfrom"],
+            TOData = Request.Cookies["zrpto"],
+            DepartmentIdData = Request.Cookies["zrpdid"],
+            DisplayName = Request.Cookies["zrpn"];
 
-            long FromL = 0;
-            long ToL = 0;
             long Did = 0;
-            if (string.IsNullOrEmpty(FROMData) || !long.TryParse(FROMData, out FromL)) 
+            DateTime From, To;
+            if (!DateTime.TryParse(FROMData, out From))
             {
-                FROMData = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(-2).Ticks).ToString();
+                From = DateTime.Now.Date.AddDays(-2);
             }
-            if (string.IsNullOrEmpty(TOData) || !long.TryParse(TOData, out ToL))
+            if (!DateTime.TryParse(TOData, out To))
             {
-                TOData = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(1).Ticks).ToString();
+                To = DateTime.Now;
             }
-            if(!long.TryParse(DepartmentIdData, out Did)) Did = ((Credentials)HttpContext.Items["User"]).DeptId;
-            DateTime From = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(FROMData)));
-            DateTime To = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(TOData)));
+            FROMData = From.ToString("yyyy-MM-ddTHH:mm");
+            TOData = To.ToString("yyyy-MM-ddTHH:mm");
 
-            //ViewBag.ZRPCreated = Helpers.DBHelper.GetZRP(From, To, _logger, (int)Helpers.ZRPStatus.Created, (Did == 0 ? null : Did));
             ViewBag.ZRPInWork = Helpers.DBHelper.GetZRP(From, To, _logger, new int[] { (int)Helpers.ZRPStatus.Started, (int)Helpers.ZRPStatus.Created }, DisplayName, (Did == 0 ? null : Did), ((Credentials)HttpContext.Items["User"]).DeptId);
             ViewBag.ZRPDone = Helpers.DBHelper.GetZRP(From, To, _logger, new int[] { (int)Helpers.ZRPStatus.Ended, (int)Helpers.ZRPStatus.Stoped }, DisplayName, (Did == 0 ? null : Did), ((Credentials)HttpContext.Items["User"]).DeptId);
             Response.Cookies.Append("zrpfrom", FROMData);
@@ -58,14 +52,19 @@ namespace O2GEN.Controllers
             Response.Cookies.Append("zrpdid", string.IsNullOrEmpty(DepartmentIdData)?"" : DepartmentIdData);
             Response.Cookies.Append("zrpn", (string.IsNullOrEmpty(DisplayName) ? "" : DisplayName));
             AlertHelper.DisplayMessage(HttpContext.Session, ViewBag);
-            return View(new ZRPFilter() { From = Helpers.DateTimeHelper.TicksFromNETToJS(From.Ticks).ToString(), To = Helpers.DateTimeHelper.TicksFromNETToJS(To.Ticks).ToString(), DepartmentId = (Did == 0 ? null : Did), DisplayName = DisplayName });
+            return View(new ZRPFilter()
+            {
+                From = FROMData,
+                To = TOData,
+                DepartmentId = (Did == 0 ? null : Did), DisplayName = DisplayName 
+            });
         }
         [Route("Home/Index")]
         [HttpPost]
         public IActionResult Index(ZRPFilter Model)
         {
-            DateTime From = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.From)));
-            DateTime To = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.To)));
+            DateTime From = DateTime.Parse(Model.From);
+            DateTime To = DateTime.Parse(Model.To);
             ViewBag.ZRPInWork = Helpers.DBHelper.GetZRP(From, To, _logger, new int[] { (int)Helpers.ZRPStatus.Started, (int)Helpers.ZRPStatus.Created }, Model.DisplayName, Model.DepartmentId, ((Credentials)HttpContext.Items["User"]).DeptId);
             ViewBag.ZRPDone = Helpers.DBHelper.GetZRP(From, To, _logger, new int[] { (int)Helpers.ZRPStatus.Ended, (int)Helpers.ZRPStatus.Stoped }, Model.DisplayName, Model.DepartmentId, ((Credentials)HttpContext.Items["User"]).DeptId);
 
@@ -123,31 +122,31 @@ namespace O2GEN.Controllers
         [HttpGet]
         public IActionResult ControlValueReports()
         {
-            string FROMData = Request.Cookies["RepCVFrom"];
-            string TOData = Request.Cookies["RepCVTo"];
-            string DIdData = Request.Cookies["RepCVDId"];
-            string APSIdData = Request.Cookies["RepCVAPSId"];
-            string APIdData = Request.Cookies["RepCVAPId"];
+            string FROMData = Request.Cookies["RepCVFrom"],
+            TOData = Request.Cookies["RepCVTo"],
+            DIdData = Request.Cookies["RepCVDId"],
+            APSIdData = Request.Cookies["RepCVAPSId"],
+            APIdData = Request.Cookies["RepCVAPId"];
 
-            long FROMParsed = 0;
-            long TOParsed = 0;
-            int DIdParsed = 0;
-            int APSIdParsed = 0;
-            int APIdParsed = 0;
-            if (string.IsNullOrEmpty(FROMData) || !long.TryParse(FROMData, out FROMParsed))
+            long 
+            DIdParsed = 0,
+            APSIdParsed = 0,
+            APIdParsed = 0;
+            DateTime From, To;
+            if (!DateTime.TryParse(FROMData, out From))
             {
-                FROMData = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(-2).Ticks).ToString();
+                From = DateTime.Now.Date.AddDays(-2);
             }
-            if (string.IsNullOrEmpty(TOData) || !long.TryParse(TOData, out TOParsed))
+            if (!DateTime.TryParse(TOData, out To))
             {
-                TOData = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Ticks).ToString();
+                To = DateTime.Now;
             }
-            if (!int.TryParse(DIdData, out DIdParsed)) DIdParsed = (int)((Credentials)HttpContext.Items["User"]).DeptId;
-            int.TryParse(APSIdData, out APSIdParsed);
-            int.TryParse(APIdData, out APIdParsed);
-            DateTime From = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(FROMData)));
-            DateTime To = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(TOData)));
+            FROMData = From.ToString("yyyy-MM-ddTHH:mm");
+            TOData = To.ToString("yyyy-MM-ddTHH:mm");
 
+            if (!long.TryParse(DIdData, out DIdParsed)) DIdParsed = (int)((Credentials)HttpContext.Items["User"]).DeptId;
+            long.TryParse(APSIdData, out APSIdParsed);
+            long.TryParse(APIdData, out APIdParsed);
             ViewBag.Data = null;
             Response.Cookies.Append("RepCVFrom", FROMData);
             Response.Cookies.Append("RepCVTo", TOData);
@@ -156,8 +155,8 @@ namespace O2GEN.Controllers
             Response.Cookies.Append("RepCVAPId", string.IsNullOrEmpty(APIdData) ? "" : APIdData);
             return View(new ControlValueReportFilter()
             {
-                From = Helpers.DateTimeHelper.TicksFromNETToJS(From.Ticks).ToString(),
-                To = Helpers.DateTimeHelper.TicksFromNETToJS(To.Ticks).ToString(),
+                From = FROMData,
+                To = TOData,
                 DepartmentId = (DIdParsed == 0 ? null : DIdParsed),
                 AssetParameterSetId = (APSIdParsed == 0 ? null : APSIdParsed),
                 AssetId = (APIdParsed == 0 ? null : APIdParsed)
@@ -189,8 +188,8 @@ namespace O2GEN.Controllers
                 AlertHelper.DisplayMessage(ViewBag, AlertType.Warning, message);
                 return View(Model);
             }
-            DateTime From = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.From)));
-            DateTime To = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.To)));
+            DateTime From = DateTime.Parse(Model.From);
+            DateTime To = DateTime.Parse(Model.To);
             ViewBag.Data = Helpers.DBHelper.GetCVR(From, To, (long)Model.DepartmentId, (long)Model.AssetId, logger: _logger);
 
             Response.Cookies.Append("RepCVFrom", Model.From);
@@ -205,57 +204,55 @@ namespace O2GEN.Controllers
         [HttpGet]
         public IActionResult ReportsOnViewedTechPositions()
         {
-            string FROM1Data = Request.Cookies["RepVAFrom1"];
-            string TO1Data = Request.Cookies["RepVATo1"];
-            string FROM2Data = Request.Cookies["RepVAFrom2"];
-            string TO2Data = Request.Cookies["RepVATo2"];
+            string
+            FROMData1 = Request.Cookies["RepVAFrom1"],
+            TOData1 = Request.Cookies["RepVATo1"],
+            FROMData2 = Request.Cookies["RepVAFrom2"],
+            TOData2 = Request.Cookies["RepVATo2"];
 
-            long FROM1Parsed = 0;
-            long TO1Parsed = 0;
-            long FROM2Parsed = 0;
-            long TO2Parsed = 0;
-            if (string.IsNullOrEmpty(FROM1Data) || !long.TryParse(FROM1Data, out FROM1Parsed))
+            DateTime From1, To1, From2, To2;
+            if (!DateTime.TryParse(FROMData1, out From1))
             {
-                FROM1Data = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(-2).Ticks).ToString();
+                From1 = DateTime.Now.Date.AddDays(-2);
             }
-            if (string.IsNullOrEmpty(TO1Data) || !long.TryParse(TO1Data, out TO1Parsed))
+            if (!DateTime.TryParse(TOData1, out To1))
             {
-                TO1Data = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Ticks).ToString();
+                To1 = DateTime.Now;
             }
-            if (string.IsNullOrEmpty(FROM2Data) || !long.TryParse(FROM2Data, out FROM2Parsed))
+            if (!DateTime.TryParse(FROMData2, out From2))
             {
-                FROM2Data = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(-2).Ticks).ToString();
+                From2 = DateTime.Now.Date.AddDays(-2);
             }
-            if (string.IsNullOrEmpty(TO2Data) || !long.TryParse(TO2Data, out TO2Parsed))
+            if (!DateTime.TryParse(TOData2, out To2))
             {
-                TO2Data = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Ticks).ToString();
+                To2 = DateTime.Now;
             }
-            DateTime From1 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(FROM1Data)));
-            DateTime To1 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(TO1Data)));
-            DateTime From2 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(FROM2Data)));
-            DateTime To2 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(TO2Data)));
+            FROMData1 = From1.ToString("yyyy-MM-ddTHH:mm");
+            TOData1 = To1.ToString("yyyy-MM-ddTHH:mm");
+            FROMData2 = From2.ToString("yyyy-MM-ddTHH:mm");
+            TOData2 = To2.ToString("yyyy-MM-ddTHH:mm");
 
             ViewBag.Data = null;
-            Response.Cookies.Append("RepVAFrom1", FROM1Data);
-            Response.Cookies.Append("RepVATo1", TO1Data);
-            Response.Cookies.Append("RepVAFrom2", FROM2Data);
-            Response.Cookies.Append("RepVATo2", TO2Data);
+            Response.Cookies.Append("RepVAFrom1", FROMData1);
+            Response.Cookies.Append("RepVATo1", TOData1);
+            Response.Cookies.Append("RepVAFrom2", FROMData2);
+            Response.Cookies.Append("RepVATo2", TOData2);
             return View(new AssetsReportFilter()
             {
-                From1 = Helpers.DateTimeHelper.TicksFromNETToJS(From1.Ticks).ToString(),
-                To1 = Helpers.DateTimeHelper.TicksFromNETToJS(To1.Ticks).ToString(),
-                From2 = Helpers.DateTimeHelper.TicksFromNETToJS(From2.Ticks).ToString(),
-                To2 = Helpers.DateTimeHelper.TicksFromNETToJS(To2.Ticks).ToString()
+                From1 = FROMData1,
+                To1 = TOData1,
+                From2 = FROMData2,
+                To2 = TOData2
             });
         }
         [Route("Home/ReportsOnViewedTechPositions")]
         [HttpPost]
         public IActionResult ReportsOnViewedTechPositions(AssetsReportFilter Model)
         {
-            DateTime From1 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.From1)));
-            DateTime To1 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.To1)));
-            DateTime From2 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.From2)));
-            DateTime To2 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.To2)));
+            DateTime From1 = DateTime.Parse(Model.From1);
+            DateTime To1 = DateTime.Parse(Model.To1);
+            DateTime From2 = DateTime.Parse(Model.From2);
+            DateTime To2 = DateTime.Parse(Model.To2);
 
             ViewBag.Data = new AssetsReportMerge(Helpers.DBHelper.GetDepartments(((Credentials)HttpContext.Items["User"]).DeptId, logger: _logger), Helpers.DBHelper.GetVA(From1, To1, _logger), Helpers.DBHelper.GetVA(From2, To2, _logger));
 
@@ -270,57 +267,54 @@ namespace O2GEN.Controllers
         [HttpGet]
         public IActionResult NumberOfTechPosReports()
         {
-            string FROM1Data = Request.Cookies["RepNAFrom1"];
-            string TO1Data = Request.Cookies["RepNATo1"];
-            string FROM2Data = Request.Cookies["RepNAFrom2"];
-            string TO2Data = Request.Cookies["RepNATo2"];
+            string FROMData1 = Request.Cookies["RepNAFrom1"];
+            string TOData1 = Request.Cookies["RepNATo1"];
+            string FROMData2 = Request.Cookies["RepNAFrom2"];
+            string TOData2 = Request.Cookies["RepNATo2"];
 
-            long FROM1Parsed = 0;
-            long TO1Parsed = 0;
-            long FROM2Parsed = 0;
-            long TO2Parsed = 0;
-            if (string.IsNullOrEmpty(FROM1Data) || !long.TryParse(FROM1Data, out FROM1Parsed))
+            DateTime From1, To1, From2, To2;
+            if (!DateTime.TryParse(FROMData1, out From1))
             {
-                FROM1Data = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(-2).Ticks).ToString();
+                From1 = DateTime.Now.Date.AddDays(-2);
             }
-            if (string.IsNullOrEmpty(TO1Data) || !long.TryParse(TO1Data, out TO1Parsed))
+            if (!DateTime.TryParse(TOData1, out To1))
             {
-                TO1Data = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Ticks).ToString();
+                To1 = DateTime.Now;
             }
-            if (string.IsNullOrEmpty(FROM2Data) || !long.TryParse(FROM2Data, out FROM2Parsed))
+            if (!DateTime.TryParse(FROMData2, out From2))
             {
-                FROM2Data = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(-2).Ticks).ToString();
+                From2 = DateTime.Now.Date.AddDays(-2);
             }
-            if (string.IsNullOrEmpty(TO2Data) || !long.TryParse(TO2Data, out TO2Parsed))
+            if (!DateTime.TryParse(TOData2, out To2))
             {
-                TO2Data = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Ticks).ToString();
+                To2 = DateTime.Now;
             }
-            DateTime From1 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(FROM1Data)));
-            DateTime To1 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(TO1Data)));
-            DateTime From2 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(FROM2Data)));
-            DateTime To2 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(TO2Data)));
+            FROMData1 = From1.ToString("yyyy-MM-ddTHH:mm");
+            TOData1 = To1.ToString("yyyy-MM-ddTHH:mm");
+            FROMData2 = From2.ToString("yyyy-MM-ddTHH:mm");
+            TOData2 = To2.ToString("yyyy-MM-ddTHH:mm");
 
             ViewBag.Data = null;
-            Response.Cookies.Append("RepNAFrom1", FROM1Data);
-            Response.Cookies.Append("RepNATo1", TO1Data);
-            Response.Cookies.Append("RepNAFrom2", FROM2Data);
-            Response.Cookies.Append("RepNATo2", TO2Data);
+            Response.Cookies.Append("RepNAFrom1", FROMData1);
+            Response.Cookies.Append("RepNATo1", TOData1);
+            Response.Cookies.Append("RepNAFrom2", FROMData2);
+            Response.Cookies.Append("RepNATo2", TOData2);
             return View(new AssetsReportFilter()
             {
-                From1 = Helpers.DateTimeHelper.TicksFromNETToJS(From1.Ticks).ToString(),
-                To1 = Helpers.DateTimeHelper.TicksFromNETToJS(To1.Ticks).ToString(),
-                From2 = Helpers.DateTimeHelper.TicksFromNETToJS(From2.Ticks).ToString(),
-                To2 = Helpers.DateTimeHelper.TicksFromNETToJS(To2.Ticks).ToString()
+                From1 = FROMData1,
+                To1 = TOData1,
+                From2 = FROMData2,
+                To2 = TOData2
             });
         }
         [Route("Home/NumberOfTechPosReports")]
         [HttpPost]
         public IActionResult NumberOfTechPosReports(AssetsReportFilter Model)
         {
-            DateTime From1 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.From1)));
-            DateTime To1 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.To1)));
-            DateTime From2 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.From2)));
-            DateTime To2 = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.To2)));
+            DateTime From1 = DateTime.Parse(Model.From1);
+            DateTime To1 = DateTime.Parse(Model.To1);
+            DateTime From2 = DateTime.Parse(Model.From2);
+            DateTime To2 = DateTime.Parse(Model.To2);
 
             ViewBag.Data = new AssetsReportMerge(Helpers.DBHelper.GetDepartments(((Credentials)HttpContext.Items["User"]).DeptId, logger: _logger), Helpers.DBHelper.GetNA(From1, To1, _logger), Helpers.DBHelper.GetNA(From2, To2, _logger));
 
@@ -359,23 +353,24 @@ namespace O2GEN.Controllers
             ACIdData = Request.Cookies["ctacid"],
             APIdData = Request.Cookies["ctapid"];
 
-            long FromL = 0,
-            ToL = 0,
+            long 
             DId = 0,
             APSId = 0,
             AId = 0,
             ACId = 0,
             APId = 0;
-            if (string.IsNullOrEmpty(FROMData) || !long.TryParse(FROMData, out FromL))
+            DateTime From, To;
+            if (!DateTime.TryParse(FROMData, out From))
             {
-                FROMData = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(-2).Ticks).ToString();
+                From = DateTime.Now.Date.AddDays(-2);
             }
-            if (string.IsNullOrEmpty(TOData) || !long.TryParse(TOData, out ToL))
+            if (!DateTime.TryParse(TOData, out To))
             {
-                TOData = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Ticks).ToString();
+                To = DateTime.Now;
             }
-            DateTime From = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(FROMData)));
-            DateTime To = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(TOData)));
+            FROMData = From.ToString("yyyy-MM-ddTHH:mm");
+            TOData = To.ToString("yyyy-MM-ddTHH:mm");
+
             if(!long.TryParse(DIdData, out DId)) DId = (int)((Credentials)HttpContext.Items["User"]).DeptId;
             long.TryParse(APSIdData, out APSId);
             long.TryParse(AIdData, out AId);
@@ -392,8 +387,8 @@ namespace O2GEN.Controllers
             return View(
                 new ControlTrendsFilter() 
                 { 
-                    From = Helpers.DateTimeHelper.TicksFromNETToJS(From.Ticks).ToString(), 
-                    To = Helpers.DateTimeHelper.TicksFromNETToJS(To.Ticks).ToString(), 
+                    From = FROMData, 
+                    To = TOData, 
                     DepartmentId = (DId == 0? null:DId),
                     AssetParameterSetId = (APSId == 0 ? null : APSId),
                     AssetId = (AId == 0 ? null : AId),
@@ -405,9 +400,9 @@ namespace O2GEN.Controllers
         [HttpPost]
         public IActionResult ControlTrends(ControlTrendsFilter Model)
         {
-            DateTime From = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.From)));
-            DateTime To = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.To)));
-            if(Model.DepartmentId is null ||
+            if(string.IsNullOrEmpty(Model.From) ||
+                string.IsNullOrEmpty(Model.To) ||
+                Model.DepartmentId is null ||
                 Model.AssetParameterSetId is null ||
                 Model.AssetId is null ||
                 Model.AssetChildId is null ||
@@ -417,7 +412,10 @@ namespace O2GEN.Controllers
             }
             else
             {
+                DateTime From = DateTime.Parse(Model.From);
+                DateTime To = DateTime.Parse(Model.To);
                 List<ControlStatistic> data = Helpers.DBHelper.GetControlStatistic(Model.DepartmentId, Model.AssetParameterSetId, Model.AssetId, Model.AssetChildId, Model.AssetParameterId, From, To, _logger);
+
                 ViewBag.Data = data;
                 Control control = Helpers.DBHelper.GetControl((long)Model.AssetParameterId, _logger);
                 ViewBag.Control = control;
@@ -474,33 +472,37 @@ namespace O2GEN.Controllers
             string TOData = Request.Cookies["statto"];
             string DepartmentIdData = Request.Cookies["statdid"];
 
-            long FromL = 0;
-            long ToL = 0;
             long Did = 0;
-            if (string.IsNullOrEmpty(FROMData) || !long.TryParse(FROMData, out FromL))
+
+            DateTime From, To;
+            if (!DateTime.TryParse(FROMData, out From))
             {
-                FROMData = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(-2).Ticks).ToString();
+                From = DateTime.Now.Date.AddDays(-2);
             }
-            if (string.IsNullOrEmpty(TOData) || !long.TryParse(TOData, out ToL))
+            if (!DateTime.TryParse(TOData, out To))
             {
-                TOData = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(1).Ticks).ToString();
+                To = DateTime.Now;
             }
-            if (!long.TryParse(DepartmentIdData, out Did)) Did = ((Credentials)HttpContext.Items["User"]).DeptId;
-            DateTime From = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(FROMData)));
-            DateTime To = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(TOData)));
+            FROMData = From.ToString("yyyy-MM-ddTHH:mm");
+            TOData = To.ToString("yyyy-MM-ddTHH:mm");
 
             ViewBag.Data = Helpers.DBHelper.GetStatistics(From, To, (Did == 0 ? null : Did), _logger);
             Response.Cookies.Append("statfrom", FROMData);
             Response.Cookies.Append("statto", TOData);
             Response.Cookies.Append("statdid", string.IsNullOrEmpty(DepartmentIdData) ? "" : DepartmentIdData);
-            return View(new StatisticsFilter() { From = Helpers.DateTimeHelper.TicksFromNETToJS(From.Ticks).ToString(), To = Helpers.DateTimeHelper.TicksFromNETToJS(To.Ticks).ToString(), DepartmentId = (Did == 0 ? null : Did) });
+            return View(new StatisticsFilter() 
+            { 
+                From = FROMData, 
+                To = TOData, 
+                DepartmentId = (Did == 0 ? null : Did) 
+            });
         }
         [Route("Home/Statistics")]
         [HttpPost]
         public IActionResult Statistics(StatisticsFilter Model)
         {
-            DateTime From = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.From)));
-            DateTime To = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.To)));
+            DateTime From = DateTime.Parse(Model.From);
+            DateTime To = DateTime.Parse(Model.To);
             ViewBag.Data = Helpers.DBHelper.GetStatistics(From, To, Model.DepartmentId, _logger);
 
             Response.Cookies.Append("statfrom", Model.From);
@@ -519,36 +521,40 @@ namespace O2GEN.Controllers
             string DepartmentIdData = Request.Cookies["maxstatdid"];
             string StatusIdData = Request.Cookies["maxstatstatusid"];
 
-            long FromL = 0;
-            long ToL = 0;
             long Did = 0;
             long Sid = 0;
-            if (string.IsNullOrEmpty(FROMData) || !long.TryParse(FROMData, out FromL))
+            DateTime From, To;
+            if (!DateTime.TryParse(FROMData, out From))
             {
-                FROMData = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(-2).Ticks).ToString();
+                From = DateTime.Now.Date.AddDays(-2);
             }
-            if (string.IsNullOrEmpty(TOData) || !long.TryParse(TOData, out ToL))
+            if (!DateTime.TryParse(TOData, out To))
             {
-                TOData = Helpers.DateTimeHelper.TicksFromNETToJS(DateTime.Now.Date.AddDays(1).Ticks).ToString();
+                To = DateTime.Now;
             }
+            FROMData = From.ToString("yyyy-MM-ddTHH:mm");
+            TOData = To.ToString("yyyy-MM-ddTHH:mm");
             long.TryParse(DepartmentIdData, out Did);
             long.TryParse(StatusIdData, out Sid);
-            DateTime From = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(FROMData)));
-            DateTime To = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(TOData)));
 
             ViewBag.Data = Helpers.DBHelper.GetMaximoStatistics(From:From, To:To, DeptId:(Did == 0 ? null : Did), StatusId:(Sid == 0 ? null : Sid), UserDept: ((Credentials)HttpContext.Items["User"]).DeptId, logger: _logger);
             Response.Cookies.Append("maxstatfrom", FROMData);
             Response.Cookies.Append("maxstatto", TOData);
             Response.Cookies.Append("maxstatdid", string.IsNullOrEmpty(DepartmentIdData) ? "" : DepartmentIdData);
             Response.Cookies.Append("maxstatstatusid", string.IsNullOrEmpty(StatusIdData) ? "" : StatusIdData);
-            return View(new MaximoStatisticsFilter() { From = Helpers.DateTimeHelper.TicksFromNETToJS(From.Ticks).ToString(), To = Helpers.DateTimeHelper.TicksFromNETToJS(To.Ticks).ToString(), DepartmentId = (Did == 0 ? null : Did), MaximoStatusId = (Sid == 0 ? null : Sid) });
+            return View(new MaximoStatisticsFilter() 
+            { 
+                From = FROMData, 
+                To = TOData,
+                DepartmentId = (Did == 0 ? null : Did), 
+                MaximoStatusId = (Sid == 0 ? null : Sid) });
         }
         [Route("Home/MaximoStatistics")]
         [HttpPost]
         public IActionResult MaximoStatistics(MaximoStatisticsFilter Model)
         {
-            DateTime From = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.From)));
-            DateTime To = new DateTime().AddTicks(Helpers.DateTimeHelper.TicksFromJSToNET(long.Parse(Model.To)));
+            DateTime From = DateTime.Parse(Model.From);
+            DateTime To = DateTime.Parse(Model.To);
             ViewBag.Data = Helpers.DBHelper.GetMaximoStatistics(From: From, To: To, DeptId: Model.DepartmentId, StatusId: Model.MaximoStatusId, UserDept: ((Credentials)HttpContext.Items["User"]).DeptId, logger: _logger);
 
             Response.Cookies.Append("maxstatfrom", Model.From);

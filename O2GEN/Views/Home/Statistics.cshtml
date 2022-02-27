@@ -10,28 +10,18 @@
             <input asp-for="To" style="display:none" />
             <div class="d-flex flex-wrap m-2">
                 <div class="mb-2 mr-2">
-                    <button class="btn btn-light" type="button" id="SetToday">
+                    <button class="btn btn-light" type="button" onclick="SetTodayForTDTs($('#From'), $('#To'))">
                         <i class="fa fa-calendar-day"></i>
                         Сегодня
                     </button>
                 </div>
-                <span class="li-text-white mr-0 mb-2">От:</span>
-                <div class="mb-2 mr-2">
-                    <div class="input-group date col-auto" id="datetimepickerFROM" data-target-input="nearest">
-                        <input type="text" class="form-control datetimepicker-input" data-target="#datetimepickerFROM" id="DTPFROM" style="width:150px;" />
-                        <div class="input-group-append" data-target="#datetimepickerFROM" data-toggle="datetimepicker">
-                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                        </div>
-                    </div>
+                <span class="li-text-white mr-0">От:</span>
+                <div class="mb-2">
+                    <input id="From" type="datetime-local" name="From" value="@Model.From" class="datetime-css">
                 </div>
-                <span class="li-text-white mr-0 mb-2">До:</span>
-                <div class="mb-2 mr-2">
-                    <div class="input-group date col-auto" id="datetimepickerTO" data-target-input="nearest">
-                        <input type="text" class="form-control datetimepicker-input" data-target="#datetimepickerTO" id="DTPTO" style="width:150px;" />
-                        <div class="input-group-append" data-target="#datetimepickerTO" data-toggle="datetimepicker">
-                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                        </div>
-                    </div>
+                <span class="li-text-white mr-0">До:</span>
+                <div class="mb-2">
+                    <input id="To" type="datetime-local" name="To" value="@Model.To" class="datetime-css">
                 </div>
 
                 <div class="mb-2 mr-2">
@@ -39,7 +29,8 @@
                         <option value="NULL" selected>Выбрать подразделение</option>
                         @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments((long)((Credentials)Context.Items["User"]).DeptId))
                         {
-            <option value="@item.Id">@item.DisplayName</option>}
+            <option value="@item.Id">@item.DisplayName</option>
+}
                     </select>
                 </div>
                 <div class="mb-2 mr-2">

@@ -1,7 +1,4 @@
-﻿@using System.Globalization
-@using O2GEN.Helpers
-@using System
-@model O2GEN.Models.ControlTrendsFilter
+﻿@model O2GEN.Models.ControlTrendsFilter
 @{
     ViewData["Title"] = "График по данным для контроля";
 }
@@ -10,108 +7,95 @@
     <script src="~/js/canvasjs.min.js"></script>
     <div class="row-container-left bg-blue"  id="pageToolbar" style="position:sticky">
         <form action="ControlTrends" method="post">
-            <input asp-for="From" style="display:none" />
-            <input asp-for="To" style="display:none" />
+            <div class="d-flex flex-wrap m-2">
+                <span class="li-text-white mr-0">От:</span>
+                <div class="mb-2">
+                    <input id="From" type="datetime-local" value="@Model.From" name="From" class="datetime-css">
+                </div>
+                <span class="li-text-white mr-0">До:</span>
+                <div class="mb-2">
+                    <input id="To" type="datetime-local" value="@Model.To" name="To" class="datetime-css">
+                </div>
+                <div class="mb-2 mr-2">
+                    <select asp-for="DepartmentId" class="form-control" onchange="GetRoutes(this);" required>
+                        <option value="" disabled selected>Выбрать подразделение</option>
+                        @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments((long)((Credentials)Context.Items["User"]).DeptId))
+                        {
+                            <option value="@item.Id">@item.DisplayName</option>
+                        }
+                    </select>
+                </div>
+                <div class="mb-2 mr-2" style="width:200px;">
+                    <select asp-for="AssetParameterSetId" class="form-control" onchange="GetAssets(this);" required>
+                        @if (Model.DepartmentId != null)
+                        {
+                            <option value="" disabled selected>Выбрать маршрут</option>
+                            foreach (AssetParameterSet item in O2GEN.Helpers.DBHelper.GetAssetParameterSets(DeptID: (int?)Model.DepartmentId))
+                            {
+                                <option value="@item.Id">@item.DisplayName</option>
+                            }
+                        }
+                        else
+                        {
+                            <option value="NULL" disabled selected>Выберите подразделение</option>
+                        }
 
-        <div class="d-flex flex-wrap m-2">
-            <span class="li-text-white mr-0">От:</span>
-            <div class="mb-2">
-                <div class="input-group date col-auto" id="datetimepickerFROM" data-target-input="nearest">
-                    <input type="text" class="form-control datetimepicker-input" data-target="#datetimepickerFROM" id="DTPFROM" style="width:150px;" />
-                    <div class="input-group-append" data-target="#datetimepickerFROM" data-toggle="datetimepicker">
-                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                    </div>
+                    </select>
+                </div>
+                <div class="mb-2 mr-2" style="width:200px;">
+                    <select asp-for="AssetId" class="form-control" onchange="GetAssetChilds(this);" required>
+                        @if (Model.AssetParameterSetId != null)
+                        {
+                            <option value="" disabled selected>Выбрать тех. позицию</option>
+                            foreach (Asset item in O2GEN.Helpers.DBHelper.GetAssetsFromAPS((long)Model.AssetParameterSetId))
+                            {
+                                <option value="@item.Id">@item.DisplayName</option>
+                            }
+                        }
+                        else
+                        {
+                            <option value="NULL" disabled selected>Выберите маршрут</option>
+                        }
+                    </select>
+                </div>
+                <div class="mb-2 mr-2" style="width:200px;">
+                    <select asp-for="AssetChildId" class="form-control" onchange="GetControls(this);" required>
+                        @if (Model.AssetId != null)
+                        {
+                            <option value="" disabled selected>Выбрать узел</option>
+                            foreach (Hierarchy item in O2GEN.Helpers.DBHelper.GetAssetChildsFromAsset((long)Model.AssetId))
+                            {
+                                <option value="@item.Id">@item.DisplayName</option>
+                            }
+                        }
+                        else
+                        {
+                            <option value="NULL" disabled selected>Выберите тех. позицию</option>
+                        }
+                    </select>
+                </div>
+                <div class="mb-2 mr-2" style="width:200px;">
+                    <select asp-for="AssetParameterId" class="form-control" required>
+                        @if (Model.AssetChildId != null)
+                        {
+                            <option value="" disabled selected>Выбрать контроль</option>
+                            foreach (Hierarchy item in O2GEN.Helpers.DBHelper.GetControlsFromAssetChilds((long)Model.AssetChildId))
+                            {
+                                <option value="@item.Id">@item.DisplayName</option>
+                            }
+                        }
+                        else
+                        {
+                            <option value="NULL" disabled selected>Выберите тех. узел</option>
+                        }
+                    </select>
+                </div>
+                <div class="mb-2 mr-2">
+                    <button class="btn btn-light" type="submit">
+                        <i class="fa fa-search"></i> Поиск
+                    </button>
                 </div>
             </div>
-            <span class="li-text-white mr-0">До:</span>
-            <div class="mb-2">
-                <div class="input-group date col-auto" id="datetimepickerTO" data-target-input="nearest">
-                    <input type="text" class="form-control datetimepicker-input" data-target="#datetimepickerTO" id="DTPTO" style="width:150px;" />
-                    <div class="input-group-append" data-target="#datetimepickerTO" data-toggle="datetimepicker">
-                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                    </div>
-                </div>
-            </div>
-            <div class="mb-2 mr-2">
-                <select asp-for="DepartmentId" class="form-control" onchange="GetRoutes(this);" required>
-                    <option value="" disabled selected>Выбрать подразделение</option>
-                    @foreach (Department item in O2GEN.Helpers.DBHelper.GetChildDepartments((long)((Credentials)Context.Items["User"]).DeptId))
-                    {
-                        <option value="@item.Id">@item.DisplayName</option>
-                    }
-                </select>
-            </div>
-            <div class="mb-2 mr-2" style="width:200px;">
-                <select asp-for="AssetParameterSetId" class="form-control" onchange="GetAssets(this);" required>
-                    @if (Model.DepartmentId != null)
-                    {
-                        <option value="" disabled selected>Выбрать маршрут</option>
-                        foreach (AssetParameterSet item in O2GEN.Helpers.DBHelper.GetAssetParameterSets(DeptID:(int?)Model.DepartmentId))
-                        {
-                            <option value="@item.Id">@item.DisplayName</option>
-                        }
-                    }
-                    else
-                    {
-                        <option value="NULL" disabled selected>Выберите подразделение</option>
-                    }
-
-                </select>
-            </div>
-            <div class="mb-2 mr-2" style="width:200px;">
-                <select asp-for="AssetId" class="form-control" onchange="GetAssetChilds(this);" required>
-                    @if (Model.AssetParameterSetId != null)
-                    {
-                        <option value="" disabled selected>Выбрать тех. позицию</option>
-                        foreach (Asset item in O2GEN.Helpers.DBHelper.GetAssetsFromAPS((long)Model.AssetParameterSetId))
-                        {
-                            <option value="@item.Id">@item.DisplayName</option>
-                        }
-                    }
-                    else
-                    {
-                    <option value="NULL" disabled selected>Выберите маршрут</option>
-                    }
-                </select>
-            </div>
-            <div class="mb-2 mr-2" style="width:200px;">
-                <select asp-for="AssetChildId" class="form-control" onchange="GetControls(this);" required>
-                    @if (Model.AssetId != null)
-                    {
-                        <option value="" disabled selected>Выбрать узел</option>
-                        foreach (Hierarchy item in O2GEN.Helpers.DBHelper.GetAssetChildsFromAsset((long)Model.AssetId))
-                        {
-                            <option value="@item.Id">@item.DisplayName</option>
-                        }
-                    }
-                    else
-                    {
-                        <option value="NULL" disabled selected>Выберите тех. позицию</option>
-                    }
-                </select>
-            </div>
-            <div class="mb-2 mr-2" style="width:200px;">
-                <select asp-for="AssetParameterId" class="form-control" required>
-                    @if (Model.AssetChildId != null)
-                    {
-                        <option value="" disabled selected>Выбрать контроль</option>
-                        foreach (Hierarchy item in O2GEN.Helpers.DBHelper.GetControlsFromAssetChilds((long)Model.AssetChildId))
-                        {
-                            <option value="@item.Id">@item.DisplayName</option>
-                        }
-                    }
-                    else
-                    {
-                        <option value="NULL" disabled selected>Выберите тех. узел</option>
-                    }
-                </select>
-            </div>
-            <div class="mb-2 mr-2">
-                <button class="btn btn-light" type="submit">
-                    <i class="fa fa-search"></i> Поиск
-                </button>
-            </div>
-        </div>
             
         </form>
     </div>
@@ -133,7 +117,7 @@
 
     <script type="text/javascript">
 
-        $(document).ready(function () {
+        @*$(document).ready(function () {
             InitializeDatePicker();
             //$.noConflict();
             //$('#SetToday').click('click', SetTodayForTDTs);
@@ -142,10 +126,10 @@
 
             @if (string.IsNullOrEmpty(Model.From))
             {
-            <text>
-                var d = new Date(moment().subtract(2, 'days'));
-                var now = new Date(moment());
-            </text>
+                <text>
+                    var d = new Date(moment().subtract(2, 'days'));
+                    var now = new Date(moment());
+                </text>
             }
             else
             {
@@ -258,7 +242,7 @@
                     chart.render();
         }
             </text>
-        }
+        }*@
 
 
 

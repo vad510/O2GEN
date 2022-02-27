@@ -6,29 +6,15 @@
     <div class="row-container-left bg-blue" id="pageToolbar" style="position:sticky">
 
         <form action="ReportsOnViewedTechPositions" method="post">
-            <input asp-for="From1" style="display:none" />
-            <input asp-for="To1" style="display:none" />
-            <input asp-for="From2" style="display:none" />
-            <input asp-for="To2" style="display:none" />
             <div class="d-flex flex-wrap m-2">
                 <span class="li-text-white mr-2 mb-2">Интервал 1</span>
                 <span class="li-text-white mr-0 mb-2">От:</span>
                 <div class="mb-2 mr-2">
-                    <div class="input-group date col-auto" id="datetimepickerFROM1" data-target-input="nearest">
-                        <input type="text" class="form-control datetimepicker-input" data-target="#datetimepickerFROM1" id="DTPFROM1" style="width:150px;" />
-                        <div class="input-group-append" data-target="#datetimepickerFROM1" data-toggle="datetimepicker">
-                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                        </div>
-                    </div>
+                    <input id="From" type="datetime-local" value="@Model.From1" name="From1" class="datetime-css">
                 </div>
                 <span class="li-text-white mr-0 mb-2">До:</span>
                 <div class="mb-2 mr-2">
-                    <div class="input-group date col-auto" id="datetimepickerTO1" data-target-input="nearest">
-                        <input type="text" class="form-control datetimepicker-input" data-target="#datetimepickerTO1" id="DTPTO1" style="width:150px;" />
-                        <div class="input-group-append" data-target="#datetimepickerTO1" data-toggle="datetimepicker">
-                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                        </div>
-                    </div>
+                    <input id="To" type="datetime-local" value="@Model.To1" name="To1" class="datetime-css">
                 </div>
             </div>
 
@@ -37,21 +23,11 @@
                 <span class="li-text-white mr-2 mb-2">Интервал 2</span>
                 <span class="li-text-white mr-0 mb-2">От:</span>
                 <div class="mb-2 mr-2">
-                    <div class="input-group date col-auto" id="datetimepickerFROM2" data-target-input="nearest">
-                        <input type="text" class="form-control datetimepicker-input" data-target="#datetimepickerFROM2" id="DTPFROM2" style="width:150px;" />
-                        <div class="input-group-append" data-target="#datetimepickerFROM2" data-toggle="datetimepicker">
-                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                        </div>
-                    </div>
+                    <input id="From" type="datetime-local" value="@Model.From2" name="From2" class="datetime-css">
                 </div>
                 <span class="li-text-white mr-0 mb-2">До:</span>
                 <div class="mb-2 mr-2">
-                    <div class="input-group date col-auto" id="datetimepickerTO2" data-target-input="nearest">
-                        <input type="text" class="form-control datetimepicker-input" data-target="#datetimepickerTO2" id="DTPTO2" style="width:150px;" />
-                        <div class="input-group-append" data-target="#datetimepickerTO2" data-toggle="datetimepicker">
-                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                        </div>
-                    </div>
+                    <input id="To" type="datetime-local" value="@Model.To2" name="To2" class="datetime-css">
                 </div>
             </div>
 

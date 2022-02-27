@@ -427,6 +427,31 @@ function isDigitCode(n) {
     return (n >= "0".charCodeAt(0) && n <= "9".charCodeAt(0));
 }
 
+
+function GetDateFormat(date) {
+    var year = date.getFullYear().toString();
+    var month = (date.getMonth() + 1).toString();
+    var day = date.getDate().toString();
+    var hour = date.getHours().toString();
+    var minute = date.getMinutes().toString();
+
+    return (year + '-'
+        + (month.length < 2 ? '0' + month : month) + '-'
+        + (day.length < 2 ? '0' + day : day) + 'T'
+        + (hour.length < 2 ? '0' + hour : hour) + ':'
+        + (minute.length < 2 ? '0' + minute : minute));
+}
+function SetTodayForTDTs(fromObj, toObj) {
+
+    var date = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+    date.setDate(date.getDate() - 2);
+
+    console.log(GetDateFormat(date));
+    fromObj.val(GetDateFormat(date));
+    toObj.val(GetDateFormat(new Date()));
+}
+
+
 //function getParents(el, parentSelector) {
 //    if (parentSelector === undefined) {
 //        parentSelector = document;

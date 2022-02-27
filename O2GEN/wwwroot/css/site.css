@@ -173,3 +173,11 @@ body {
 #SelectList2 option:nth-child(2n) {
     background-color: rgba(0,0,0,.05);
 }
+
+.datetime-css {
+    border-radius: 5px;
+    padding: 6px 6px;
+    border: solid 1px #ddd;
+    margin: 0px 15px;
+    color:#495057
+}

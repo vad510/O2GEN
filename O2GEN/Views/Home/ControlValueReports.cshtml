@@ -5,32 +5,20 @@
 <section class="">
     <div class="row-container-left bg-blue"  id="pageToolbar" style="position:sticky">
         <form action="ControlValueReports" method="post">
-            <input asp-for="From" style="display:none" />
-            <input asp-for="To" style="display:none" />
             <div class="d-flex flex-wrap m-2">
                 <div class="mb-2 mr-2">
-                    <button class="btn btn-light" type="button" id="SetToday">
+                    <button class="btn btn-light" type="button" onclick="SetTodayForTDTs($('#From'), $('#To'))">
                         <i class="fa fa-calendar-day"></i>
                         Сегодня
                     </button>
                 </div>
-                <span class="li-text-white mr-0 mb-2">От:</span>
-                <div class="mb-2 mr-2">
-                    <div class="input-group date col-auto" id="datetimepickerFROM" data-target-input="nearest">
-                        <input type="text" class="form-control datetimepicker-input" data-target="#datetimepickerFROM" id="DTPFROM" style="width:150px;" />
-                        <div class="input-group-append" data-target="#datetimepickerFROM" data-toggle="datetimepicker">
-                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                        </div>
-                    </div>
+                <span class="li-text-white mr-0">От:</span>
+                <div class="mb-2">
+                    <input id="From" type="datetime-local" name="From" value="@Model.From" class="datetime-css">
                 </div>
-                <span class="li-text-white mr-0 mb-2">До:</span>
-                <div class="mb-2 mr-2">
-                    <div class="input-group date col-auto" id="datetimepickerTO" data-target-input="nearest">
-                        <input type="text" class="form-control datetimepicker-input" data-target="#datetimepickerTO" id="DTPTO" style="width:150px;" />
-                        <div class="input-group-append" data-target="#datetimepickerTO" data-toggle="datetimepicker">
-                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                        </div>
-                    </div>
+                <span class="li-text-white mr-0">До:</span>
+                <div class="mb-2">
+                    <input id="To" type="datetime-local" name="To" value="@Model.To" class="datetime-css">
                 </div>
                 <div class="mb-2 mr-2">
                     <select asp-for="DepartmentId" class="form-control" required onchange="GetAssetParameterSets(this);">
@@ -241,7 +229,7 @@
             }
         }
 
-        $(document).ready(function () {
+        @*$(document).ready(function () {
             InitializeDatePicker();
             //$.noConflict();
             $('#SetToday').click('click', SetTodayForTDTs);
@@ -286,35 +274,29 @@
                 });
             $("#datetimepickerTO").on("change.datetimepicker", ({ date }) => { $('#To').val(date._d.getTime()); });
             $('#datetimepickerTO').datetimepicker('date', now);
-        }
+        }*@
 
-        function SetTodayForTDTs() {
+        //function SetTodayForTDTs(fromObj, toObj) {
 
-            var from = document.getElementById('DTPFROM');
-            var date = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
-            date.setDate(date.getDate() - 2);
-            from.value = formatDate(date);
+        //    var date = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+        //    date.setDate(date.getDate() - 2);
 
-            var to = document.getElementById('DTPTO');
-            var toDate = new Date();
-            to.value = formatDate(toDate);
+        //    fromObj.val(date.getTime());
+        //    toObj.val((new Date()).toJSON());
+        //}
 
-            $('#From').val(date.getTime());
-            $('#To').val(toDate.getTime());
-        }
+        //function dateFromChanged({ date }) {
+        //    $('#From').val(date._d.getTime());
+        //}
 
-        function dateFromChanged({ date }) {
-            $('#From').val(date._d.getTime());
-        }
+        //function formatDate(date) {
+        //    var month = date.getMonth()+1;
+        //    var day = date.getDate();
+        //    var year = date.getFullYear();
+        //    var hours = date.getHours();
+        //    var minutes = date.getMinutes();
 
-        function formatDate(date) {
-            var month = date.getMonth()+1;
-            var day = date.getDate();
-            var year = date.getFullYear();
-            var hours = date.getHours();
-            var minutes = date.getMinutes();
-
-            return ((day > 9 ? '' : '0') + day + '.' + (month > 9 ? '' : '0') + month + '.' + year + ' ' + hours + ':' + (minutes > 9 ? '' : '0') + minutes);
-        }
+        //    return ((day > 9 ? '' : '0') + day + '.' + (month > 9 ? '' : '0') + month + '.' + year + ' ' + hours + ':' + (minutes > 9 ? '' : '0') + minutes);
+        //}
     </script>
 </section>
