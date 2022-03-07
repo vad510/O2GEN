@@ -1,4 +1,5 @@
-﻿using System;
+﻿using O2GEN.Enums;
+using System;
 using System.ComponentModel;
 
 namespace O2GEN.Models
@@ -15,5 +16,6 @@ namespace O2GEN.Models
         [DisplayName("Комментарий")]
         public string Comment { get; set; }
         public bool IsPen { get; set; }
+        public TextColor TextColor { get; set; } = 0;
     }
 }

@@ -1,5 +1,5 @@
-﻿@model O2GEN.Models.ZRP
-
+﻿@using O2GEN.Enums
+@model O2GEN.Models.ZRP
 <div class="modal fade" id="ZRPEdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -94,9 +94,9 @@
                                         </div>
 
                                         @*<div class="form-group col-md-6">
-                                            <label asp-for="EndTime"></label>
-                                            <input asp-for="EndTime" class="form-control" />
-                                        </div>*@
+                                                <label asp-for="EndTime"></label>
+                                                <input asp-for="EndTime" class="form-control" />
+                                            </div>*@
                                     </div>
 
 
@@ -153,7 +153,7 @@
                                                 @if (Model.DepartmentID != null)
                                                 {
                                                     <option selected disabled>Выбрать</option>
-                                                    @foreach (AssetParameterSet item in O2GEN.Helpers.DBHelper.GetAssetParameterSets(DeptID:Model.DepartmentID))
+                                                    @foreach (AssetParameterSet item in O2GEN.Helpers.DBHelper.GetAssetParameterSets(DeptID: Model.DepartmentID))
                                                     {
                                                         <option value="@item.Id">@item.DisplayName</option>
                                                     }
@@ -174,9 +174,9 @@
                                         </div>
 
                                         @*<div class="form-group col-md-6">
-                                            <label>Обход закончить</label>
-                                            <input asp-for="EndTime" class="form-control" required />
-                                        </div>*@
+                                                <label>Обход закончить</label>
+                                                <input asp-for="EndTime" class="form-control" required />
+                                            </div>*@
                                     </div>
                                     <div class="form-row">
                                         <div class="form-group col-md-6">
@@ -212,12 +212,6 @@
                                                     Тех.позиция
                                                 </p>
                                             </th>
-
-                                            @*<th width="100px">
-                                                <p>
-                                                    Удалить
-                                                </p>
-                                            </th>*@
                                         </tr>
                                     </thead>
                                     <tbody id="tp_table_cont">
@@ -273,8 +267,35 @@
                                                                             <td>
                                                                                 <span>@(item.Date!= null? ((DateTime)item.Date).ToString("yyyy-MM-dd HH:mm:ss"):"")</span>
                                                                             </td>
-                                                                            <td>
-                                                                                <span>@item.Value</span>
+                                                                            <td class="@{
+                                                                                @switch (item.TextColor)
+                                                                                {
+                                                                                    case TextColor.Green:
+                                                                                        <text>bg-success</text>;
+                                                                                        break;
+                                                                                    case TextColor.Yellow:
+                                                                                        <text>bg-warning</text>;
+                                                                                        break;
+                                                                                    case TextColor.Red:
+                                                                                        <text>bg-danger</text>;
+                                                                                        break;
+                                                                                }
+                                                                             }">
+                                                                                
+                                                                                <span class="@{
+                                                                                switch (item.TextColor)
+                                                                                {
+                                                                                    case TextColor.Green:
+                                                                                    case TextColor.Red:
+                                                                                        <text>text-white</text>
+                                                                                        break;
+                                                                                    case TextColor.Yellow:
+                                                                                    case TextColor.Default:
+                                                                                    default:
+                                                                                        <text>text-dark</text>
+                                                                                        break;
+                                                                                }
+                                                                                 }">@item.Value</span>
                                                                                 @if (item.IsPen)
                                                                                 {<i class="fa fa-pen" title="Виброручка" style="float:right"></i>}
                                                                             </td>
@@ -303,7 +324,7 @@
                                                 {
                                                     for (int a = 0; a < data.Count; a++)
                                                     {
-                                                        if(data[a].Childs.Count == 0)
+                                                        if (data[a].Childs.Count == 0)
                                                         {
                                                             <tr class="parent" data-level="0">
                                                                 <td>
@@ -321,28 +342,28 @@
                                                             </tr>
                                                         }
                                                         else
-                                                        {
-                                                            <tr class="parent" data-level="0"> 
-                                                                <td> 
-                                                                    <span class="caret"><span class="badge badge-info mr-1">@data[a].Childs.Count</span>@data[a].DisplayName</span> 
-                                                                    <input type="text" style="display: none;" name="NewTechPoz[@a].Id" value="@data[a].Id" /> 
-                                                                    <input type="text" style="display: none;" name="NewTechPoz[@a].DisplayName" value="@data[a].DisplayName" /> 
-                                                                </td> 
-                                                                <td> 
-                                                                    <div class="d-flex justify-content-center"> 
-                                                                        <button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this); sortInputsForCreate();"> 
-                                                                            <i class="fa fa-trash"></i> 
-                                                                        </button> 
-                                                                    </div> 
-                                                                </td> 
+                                                                                {
+                                                            <tr class="parent" data-level="0">
+                                                                <td>
+                                                                    <span class="caret"><span class="badge badge-info mr-1">@data[a].Childs.Count</span>@data[a].DisplayName</span>
+                                                                    <input type="text" style="display: none;" name="NewTechPoz[@a].Id" value="@data[a].Id" />
+                                                                    <input type="text" style="display: none;" name="NewTechPoz[@a].DisplayName" value="@data[a].DisplayName" />
+                                                                </td>
+                                                                <td>
+                                                                    <div class="d-flex justify-content-center">
+                                                                        <button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this); sortInputsForCreate();">
+                                                                            <i class="fa fa-trash"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                </td>
                                                             </tr>
                                                         }
                                                         for (int ac = 0; ac < data[a].Childs.Count; ac++)
                                                         {
                                                             if (data[a].Childs.Count == 0)
                                                             {
-                                                                <tr class="nested" data-level="1"> 
-                                                                    <td> 
+                                                                <tr class="nested" data-level="1">
+                                                                    <td>
                                                                         <span class="ml-3">@data[a].Childs[ac].DisplayName</span>
                                                                         <input type="text" style="display: none;" name="NewTechPoz[@a].Childs[@ac].Id" value="@data[a].Childs[ac].Id" />
                                                                         <input type="text" style="display: none;" name="NewTechPoz[@a].Childs[@ac].DisplayName" value="@data[a].Childs[ac].DisplayName" />
@@ -350,44 +371,44 @@
                                                                     <td>
                                                                         <div class="d-flex justify-content-center">
                                                                             <button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this); sortInputsForCreate();">
-                                                                                <i class="fa fa-trash"></i> 
-                                                                            </button> 
-                                                                        </div> 
-                                                                    </td> 
+                                                                                <i class="fa fa-trash"></i>
+                                                                            </button>
+                                                                        </div>
+                                                                    </td>
                                                                 </tr>
                                                             }
                                                             else
-                                                            {
-                                                                <tr class="parent nested" data-level="1"> 
-                                                                    <td> 
-                                                                        <span class="caret ml-3"><span class="badge badge-info mr-1">@data[a].Childs[ac].Childs.Count</span>@data[a].Childs[ac].DisplayName</span> 
-                                                                        <input type="text" style="display: none;" name="NewTechPoz[@a].Childs[@ac].Id" value="@data[a].Childs[ac].Id" /> 
-                                                                        <input type="text" style="display: none;" name="NewTechPoz[@a].Childs[@ac].DisplayName" value="@data[a].Childs[ac].DisplayName" /> 
-                                                                    </td> 
-                                                                    <td> 
-                                                                        <div class="d-flex justify-content-center"> 
-                                                                            <button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this); sortInputsForCreate();"> 
-                                                                                <i class="fa fa-trash"></i> 
-                                                                            </button> 
-                                                                        </div> 
-                                                                    </td> 
+                                                                                {
+                                                                <tr class="parent nested" data-level="1">
+                                                                    <td>
+                                                                        <span class="caret ml-3"><span class="badge badge-info mr-1">@data[a].Childs[ac].Childs.Count</span>@data[a].Childs[ac].DisplayName</span>
+                                                                        <input type="text" style="display: none;" name="NewTechPoz[@a].Childs[@ac].Id" value="@data[a].Childs[ac].Id" />
+                                                                        <input type="text" style="display: none;" name="NewTechPoz[@a].Childs[@ac].DisplayName" value="@data[a].Childs[ac].DisplayName" />
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="d-flex justify-content-center">
+                                                                            <button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this); sortInputsForCreate();">
+                                                                                <i class="fa fa-trash"></i>
+                                                                            </button>
+                                                                        </div>
+                                                                    </td>
                                                                 </tr>
                                                             }
                                                             for (int ap = 0; ap < data[a].Childs[ac].Childs.Count; ap++)
-                                                            {
-                                                                <tr class="nested" data-level="2"> 
-                                                                    <td> 
-                                                                        <span class="ml-5">@data[a].Childs[ac].Childs[ap].DisplayName</span> 
-                                                                        <input type="text" style="display: none;" name="NewTechPoz[@a].Childs[@ac].Childs[@ap].Id" value="@data[a].Childs[ac].Childs[ap].Id" /> 
-                                                                        <input type="text" style="display: none;" name="NewTechPoz[@a].Childs[@ac].Childs[@ap].DisplayName" value="@data[a].Childs[ac].Childs[ap].DisplayName" /> 
-                                                                    </td> 
-                                                                    <td> 
-                                                                        <div class="d-flex justify-content-center"> 
-                                                                            <button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this); sortInputsForCreate();"> 
-                                                                                <i class="fa fa-trash"></i> 
-                                                                            </button> 
-                                                                        </div> 
-                                                                    </td> 
+                                                                                {
+                                                                <tr class="nested" data-level="2">
+                                                                    <td>
+                                                                        <span class="ml-5">@data[a].Childs[ac].Childs[ap].DisplayName</span>
+                                                                        <input type="text" style="display: none;" name="NewTechPoz[@a].Childs[@ac].Childs[@ap].Id" value="@data[a].Childs[ac].Childs[ap].Id" />
+                                                                        <input type="text" style="display: none;" name="NewTechPoz[@a].Childs[@ac].Childs[@ap].DisplayName" value="@data[a].Childs[ac].Childs[ap].DisplayName" />
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="d-flex justify-content-center">
+                                                                            <button type="button" class="btn btn-danger ml-1" onclick="RemoveNode(this); sortInputsForCreate();">
+                                                                                <i class="fa fa-trash"></i>
+                                                                            </button>
+                                                                        </div>
+                                                                    </td>
                                                                 </tr>
                                                             }
                                                         }
@@ -395,7 +416,7 @@
                                                 }
                                             }
                                             else
-                                            {
+                                                                                {
                                                 <tr><td colspan="2"> Нет данных.</td></tr>
                                             }
                                         }
@@ -444,33 +465,33 @@
                                         <tbody>
                                             @foreach (Deffect item in Model.Deffects)
                                             {
-                                            <tr>
-                                                <td>
-                                                    <span>@item.AName</span>
-                                                </td>
-                                                <td>
-                                                    <span>@item.ACName</span>
-                                                </td>
+                                                <tr>
+                                                    <td>
+                                                        <span>@item.AName</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>@item.ACName</span>
+                                                    </td>
 
-                                                <td>
-                                                    <span>@item.APVName</span>
-                                                </td>
+                                                    <td>
+                                                        <span>@item.APVName</span>
+                                                    </td>
 
-                                                <td>
-                                                    <span>@item.Value</span>
-                                                </td>
+                                                    <td>
+                                                        <span>@item.Value</span>
+                                                    </td>
 
-                                                <td>
-                                                    <span>@item.UserName</span>
-                                                </td>
+                                                    <td>
+                                                        <span>@item.UserName</span>
+                                                    </td>
 
-                                                <td>
-                                                    <span>@item.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</span>
-                                                </td>
-                                                <td>
-                                                    <span>@item.Comment</span>
-                                                </td>
-                                            </tr>
+                                                    <td>
+                                                        <span>@item.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>@item.Comment</span>
+                                                    </td>
+                                                </tr>
                                             }
                                         </tbody>
                                     </table>
@@ -507,29 +528,29 @@
                                         </thead>
                                         <tbody>
                                             @foreach (Attachment item in Model.Attachments)
-                                            {
-                                            <tr>
-                                                <td>
-                                                    <span>@item.IPName</span>
-                                                </td>
+                                                                                {
+                                                <tr>
+                                                    <td>
+                                                        <span>@item.IPName</span>
+                                                    </td>
 
-                                                <td>
-                                                    <span>@item.IPIName</span>
-                                                </td>
+                                                    <td>
+                                                        <span>@item.IPIName</span>
+                                                    </td>
 
-                                                <td>
-                                                    <span>@item.APName</span>
-                                                </td>
+                                                    <td>
+                                                        <span>@item.APName</span>
+                                                    </td>
 
-                                                <td>
-                                                    <span>@item.CreationTime.ToString("yyyy.MM.dd HH:mm:ss")</span>
-                                                </td>
+                                                    <td>
+                                                        <span>@item.CreationTime.ToString("yyyy.MM.dd HH:mm:ss")</span>
+                                                    </td>
 
-                                                <td>
-                                                    <span>@item.FileName</span>
-                                                    <a class="btn btn-primary" href="/Home/GetFile?guid=@(item.FileRef.ToString())" rel="nofollow">Скачать</a>
-                                                </td>
-                                            </tr>
+                                                    <td>
+                                                        <span>@item.FileName</span>
+                                                        <a class="btn btn-primary" href="/Home/GetFile?guid=@(item.FileRef.ToString())" rel="nofollow">Скачать</a>
+                                                    </td>
+                                                </tr>
                                             }
                                         </tbody>
                                     </table>

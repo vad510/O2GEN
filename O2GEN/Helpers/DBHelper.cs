@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
+using O2GEN.Enums;
 using O2GEN.Models;
 using System;
 using System.Collections.Generic;
@@ -635,7 +636,7 @@ namespace O2GEN.Helpers
         }
         private static string GetInspectionProtocols(int SchedContID)
         {
-            return "select IPs.Id, " +
+            return "SELECT IPs.Id, " +
             "IPs.ObjectUID,  " +
             "IPs.Name,  " +
             "CONCAT(IPI.Name, ' - ', AP.DisplayName) AS ItemName, " +
@@ -645,11 +646,43 @@ namespace O2GEN.Helpers
             "ELSE APV.Value END AS ItemValue, " +
             "APV.Comment, " +
             "IPs.NFCReceived, " +
-            "APV.IsPen " +
-            "from InspectionProtocolItems AS IPI " +
-            "inner join InspectionProtocols AS IPs on IPI.InspectionProtocolId = IPs.Id " +
-            "inner join AssetParameterValues AS APV on IPI.AssetParameterValueId = APV.Id " +
-            "inner join AssetParameters AS AP on AP.Id = APV.AssetParameterId " +
+            "APV.IsPen, " +
+            //Покраска текста
+            "CASE APV.AssetParameterTypeId " + //Визуальный
+            $"WHEN " +
+            $"2 " +
+            $"THEN ( " +
+                $"CASE APV.Value WHEN N'0' THEN {(int)TextColor.Green} " +
+                $"WHEN N'1' THEN {(int)TextColor.Yellow} " +
+                $"WHEN N'2' THEN {(int)TextColor.Red} " +
+                $"ELSE {(int)TextColor.Default} END" +
+            $") ELSE (" +
+                "CASE WHEN " +
+                "(" +
+                    "TRY_CONVERT(float, REPLACE(APV.Value,',','.')) " +
+                    "between TRY_CONVERT(float, REPLACE(AP.BottomValue1,',','.')) " +
+                    "AND TRY_CONVERT(float, REPLACE(AP.TopValue1,',','.')) " +
+                $") THEN {(int)TextColor.Green} " +
+                $"WHEN " +
+                //Cильное отклонение
+                "(" +
+                    "TRY_CONVERT(float, REPLACE(APV.Value,',','.')) " +
+                    "between TRY_CONVERT(float, REPLACE(AP.BottomValue3,',','.')) " +
+                    "AND TRY_CONVERT(float, REPLACE(AP.TopValue3,',','.')) " +
+                $") THEN {(int)TextColor.Red} " +
+                $"WHEN " +
+                //Отклонение
+                "(" +
+                    "TRY_CONVERT(float, REPLACE(APV.Value,',','.')) " +
+                    "between TRY_CONVERT(float, REPLACE(AP.BottomValue2,',','.')) " +
+                    "AND TRY_CONVERT(float, REPLACE(AP.TopValue2,',','.')) " +
+                $") THEN {(int)TextColor.Yellow} " +
+                $"ELSE {(int)TextColor.Default} END) END " +
+            $"AS TextColor " +
+            "FROM InspectionProtocolItems AS IPI " +
+            "INNER JOIN InspectionProtocols AS IPs on IPI.InspectionProtocolId = IPs.Id " +
+            "INNER JOIN AssetParameterValues AS APV on IPI.AssetParameterValueId = APV.Id " +
+            "INNER JOIN AssetParameters AS AP on AP.Id = APV.AssetParameterId " +
             $"WHERE InspectionDocumentId in (select id from InspectionDocuments where TaskId in (select id from Tasks where SchedulingContainerId = {SchedContID})) AND IPs.IsDeleted <> 1 ";
         }
         #endregion
@@ -2811,7 +2844,8 @@ namespace O2GEN.Helpers
                                     Date = string.IsNullOrEmpty(row["ItemData"].ToString()) ? null : Convert.ToDateTime(row["ItemData"]),
                                     Value = row["ItemValue"].ToString(),
                                     Comment = row["Comment"].ToString(),
-                                    IsPen = bool.Parse(row["IsPen"].ToString())
+                                    IsPen = bool.Parse(row["IsPen"].ToString()),
+                                    TextColor = (TextColor) int.Parse(row["TextColor"].ToString())
                                 });
                             }
                         }

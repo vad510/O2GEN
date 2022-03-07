@@ -1,0 +1,19 @@
+﻿DECLARE @SCId BIGINT
+
+DECLARE SC_cursor CURSOR FOR   
+SELECT SC.Id  
+FROM SchedulingContainers SC  
+WHERE SC.StartTime < DATEADD(DAY, -2, GETDATE())  
+AND SC.SCStatusId = 2
+AND SC.IsDeleted = 0
+
+OPEN SC_cursor  
+FETCH NEXT FROM SC_cursor INTO @SCId  
+WHILE @@FETCH_STATUS = 0  
+BEGIN  
+	EXEC [PRC_DELETE_SC] @SCId, 1;
+    FETCH NEXT FROM SC_cursor INTO @SCId  
+END  
+  
+CLOSE SC_cursor  
+DEALLOCATE SC_cursor  
