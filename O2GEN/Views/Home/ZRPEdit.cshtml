@@ -212,6 +212,16 @@
                                                     Тех.позиция
                                                 </p>
                                             </th>
+                                            <th width="200px">
+                                                <p>
+                                                    Статус
+                                                </p>
+                                            </th>
+                                            <th width="20px">
+                                                <p>
+                                                    QR
+                                                </p>
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody id="tp_table_cont">
@@ -222,10 +232,16 @@
                                                 <tr class="parent" data-level="0">
                                                     <td>
                                                         <span class="caret"><span class="badge badge-info mr-1">@Model.InsProt[i].Items.Count</span>@Model.InsProt[i].Name</span>
-                                                        @if (Model.InsProt[i].IsNFC)
-                                                        {<i class="fa fa-qrcode" title="QR сканирован" style="float:right"></i>}
+                                                        
                                                         <input type="hidden" name="InsProt[@i].Id" value="@Model.InsProt[i].Id" />
                                                         <input type="hidden" name="InsProt[@i].Name" value="@Model.InsProt[i].Name" />
+                                                    </td>
+                                                    <td>
+                                                        <span>@Model.InsProt[i].StateName</span>
+                                                    </td>
+                                                    <td>
+                                                        @if (Model.InsProt[i].IsNFC)
+                                                        {<i class="fa fa-qrcode" title="QR сканирован" style="float:right"></i>}
                                                     </td>
                                                 </tr>
                                                 if (Model.InsProt[i].Items.Count > 0)

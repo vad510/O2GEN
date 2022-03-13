@@ -13,5 +13,7 @@ namespace O2GEN.Models
         public string Name { get; set; }
         public bool IsNFC { get; set; }
         public List<InspectionProtocolItem> Items { get; set; } = new List<InspectionProtocolItem>();
+        public long? StateId { get; set; }
+        public string StateName { get; set; }
     }
 }

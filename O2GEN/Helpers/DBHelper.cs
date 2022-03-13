@@ -678,12 +678,17 @@ namespace O2GEN.Helpers
                     "AND TRY_CONVERT(float, REPLACE(AP.TopValue2,',','.')) " +
                 $") THEN {(int)TextColor.Yellow} " +
                 $"ELSE {(int)TextColor.Default} END) END " +
-            $"AS TextColor " +
+            $"AS TextColor, " +
+            $"AState.Id AS StateId, " +
+            $"AState.DisplayName AS StateName " +
             "FROM InspectionProtocolItems AS IPI " +
             "INNER JOIN InspectionProtocols AS IPs on IPI.InspectionProtocolId = IPs.Id " +
             "INNER JOIN AssetParameterValues AS APV on IPI.AssetParameterValueId = APV.Id " +
             "INNER JOIN AssetParameters AS AP on AP.Id = APV.AssetParameterId " +
-            $"WHERE InspectionDocumentId in (select id from InspectionDocuments where TaskId in (select id from Tasks where SchedulingContainerId = {SchedContID})) AND IPs.IsDeleted <> 1 ";
+            "LEFT JOIN Assets AS A on A.Id = IPs.AssetId " +
+            "LEFT JOIN AssetStates AS AState on AState.Id = A.AssetStateId " +
+            $"WHERE InspectionDocumentId in (select id from InspectionDocuments where TaskId in (select id from Tasks where SchedulingContainerId = {SchedContID})) AND IPs.IsDeleted <> 1 " +
+            $"ORDER BY AState.Id, IPs.Name ";
         }
         #endregion
 
@@ -2362,6 +2367,19 @@ namespace O2GEN.Helpers
                 "LEFT JOIN PersonPositions PPos ON PPos.Id = P.PersonPositionId " +
                 $"where Crend.Name = N'{data.UserName}' AND HASHBYTES('SHA2_256',DECRYPTBYPASSPHRASE(N'{ENCR}', Crend.PWD))  = HASHBYTES('SHA2_256',N'{data.Password}') AND Crend.IsDeleted <> 1; ";
         }
+
+        public static string SignInLog()
+        {
+            return @"INSERT INTO EngineerLoginLog
+           ([EngineerId]
+           ,[Stamp]
+           ,[Platform])
+     VALUES
+           (@EngineerId,
+           @Stamp,
+           @Platform)";
+        }
+
         #endregion
 
 
@@ -2834,7 +2852,9 @@ namespace O2GEN.Helpers
                                         Id = int.Parse(row["Id"].ToString()),
                                         ObjectUID = string.IsNullOrEmpty(row["ObjectUID"].ToString()) ? null : new Guid(row["ObjectUID"].ToString()),
                                         Name = row["Name"].ToString(),
-                                        IsNFC = bool.Parse(row["NFCReceived"].ToString())
+                                        IsNFC = bool.Parse(row["NFCReceived"].ToString()),
+                                        StateId = string.IsNullOrEmpty(row["StateId"].ToString()) ? null : long.Parse(row["StateId"].ToString()),
+                                        StateName = row["StateName"].ToString()
                                     };
                                     output.Add(Tmp);
                                 }
@@ -5526,6 +5546,17 @@ namespace O2GEN.Helpers
                 logger?.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
             }
             return output;
+        }
+
+        public static void SignInLog(Credentials data, ILogger logger)
+        {
+            List<SqlParameter> parameters = new()
+            {
+                new SqlParameter("@EngineerId", SqlDbType.BigInt) { Value = data.Id },
+                new SqlParameter("@Stamp", SqlDbType.DateTime) { Value = DateTime.Now },
+                new SqlParameter("@Platform", SqlDbType.TinyInt) { Value = 0 }
+            };
+            ExecuteNonQuery(SignInLog(), logger, parameters);
         }
         #endregion
 

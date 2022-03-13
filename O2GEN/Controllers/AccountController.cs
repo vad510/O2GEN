@@ -46,6 +46,7 @@ namespace O2GEN.Controllers
                 reslt.JWToken = JwtTokenExtension.GenerateJwtToken(data);
                 CookieHelper.ClearAllCookies(Request.Cookies.Keys, Response);
                 HttpContext.Session.SetString("token", reslt.JWToken);
+                DBHelper.SignInLog(data, _logger);
                 return new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
             }
             return View(data);
