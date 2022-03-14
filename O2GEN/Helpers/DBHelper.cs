@@ -680,7 +680,7 @@ namespace O2GEN.Helpers
                 $"ELSE {(int)TextColor.Default} END) END " +
             $"AS TextColor, " +
             $"AState.Id AS StateId, " +
-            $"AState.DisplayName AS StateName " +
+            $"ISNULL(AState.DisplayName, N'Не указан') AS StateName " +
             "FROM InspectionProtocolItems AS IPI " +
             "INNER JOIN InspectionProtocols AS IPs on IPI.InspectionProtocolId = IPs.Id " +
             "INNER JOIN AssetParameterValues AS APV on IPI.AssetParameterValueId = APV.Id " +
