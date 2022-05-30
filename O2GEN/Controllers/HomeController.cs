@@ -254,7 +254,7 @@ namespace O2GEN.Controllers
             DateTime From2 = DateTime.Parse(Model.From2);
             DateTime To2 = DateTime.Parse(Model.To2);
 
-            ViewBag.Data = new AssetsReportMerge(Helpers.DBHelper.GetDepartments(((Credentials)HttpContext.Items["User"]).DeptId, logger: _logger), Helpers.DBHelper.GetVA(From1, To1, _logger), Helpers.DBHelper.GetVA(From2, To2, _logger));
+            ViewBag.Data = new AssetsReportMerge(Helpers.DBHelper.GetChildDepartments(((Credentials)HttpContext.Items["User"]).DeptId, logger: _logger), Helpers.DBHelper.GetVA(From1, To1, _logger), Helpers.DBHelper.GetVA(From2, To2, _logger));
 
             Response.Cookies.Append("RepVAFrom1", Model.From1);
             Response.Cookies.Append("RepVATo1", Model.To1);
@@ -316,7 +316,7 @@ namespace O2GEN.Controllers
             DateTime From2 = DateTime.Parse(Model.From2);
             DateTime To2 = DateTime.Parse(Model.To2);
 
-            ViewBag.Data = new AssetsReportMerge(Helpers.DBHelper.GetDepartments(((Credentials)HttpContext.Items["User"]).DeptId, logger: _logger), Helpers.DBHelper.GetNA(From1, To1, _logger), Helpers.DBHelper.GetNA(From2, To2, _logger));
+            ViewBag.Data = new AssetsReportMerge(Helpers.DBHelper.GetChildDepartments(((Credentials)HttpContext.Items["User"]).DeptId, logger: _logger), Helpers.DBHelper.GetNA(From1, To1, _logger), Helpers.DBHelper.GetNA(From2, To2, _logger));
 
             Response.Cookies.Append("RepNAFrom1", Model.From1);
             Response.Cookies.Append("RepNATo1", Model.To1);
@@ -503,7 +503,16 @@ namespace O2GEN.Controllers
         {
             DateTime From = DateTime.Parse(Model.From);
             DateTime To = DateTime.Parse(Model.To);
-            ViewBag.Data = Helpers.DBHelper.GetStatistics(From, To, Model.DepartmentId, _logger);
+            //Если это РТЭЦ2 для него особый отчет.
+            #warning переделать на динамическое определение.
+            if(Model.DepartmentId == 2 ||
+                Model.DepartmentId == 3 ||
+                Model.DepartmentId == 4 ||
+                Model.DepartmentId == 5)
+            {
+                ViewBag.Data = Helpers.DBHelper.GetStatisticsRTEC2(From, To, Model.DepartmentId, _logger);
+            }
+            else ViewBag.Data = Helpers.DBHelper.GetStatistics(From, To, Model.DepartmentId, _logger);
 
             Response.Cookies.Append("statfrom", Model.From);
             Response.Cookies.Append("statto", Model.To);

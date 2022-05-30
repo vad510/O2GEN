@@ -33,7 +33,7 @@ namespace O2GEN.Helpers
         #region Тексты запросов
 
         #region Обходы
-        private static string GetZRP(DateTime From, DateTime To, int[] statuses, string DisplayName, long? DeptId, long UserDept)
+        private static string GetZRP(int[] statuses, long? DeptId, long UserDept)
         {
             string statusSQL = "";
             if(statuses!= null)
@@ -48,7 +48,6 @@ namespace O2GEN.Helpers
             }
 
             return "" +
-                $"declare @__start_2 datetime2(7)='{From.ToString("yyyyMMdd HH:mm:ss")}', @__finish_1 datetime2(7)='{To.ToString("yyyyMMdd HH:mm:ss")}'; " +
                 "SELECT " +
                 "[e].[Id], " +
                 "[e].[CloseTime], " +
@@ -109,7 +108,7 @@ namespace O2GEN.Helpers
                 "    WHERE([e10].[IsDeleted] <> 1) AND([e10].[TenantId] = CAST(1 AS bigint)) " +
                 ") AS[t10] ON[t9].[ResourceId] = [t10].[Id] " +
                 $"INNER JOIN TBFN_GET_DEPARTMENTS({UserDept}) dps ON dps.Id = e.DepartmentId " +
-                $"WHERE {(string.IsNullOrEmpty(DisplayName) ? "" : $"([e].[Id] LIKE N'%{DisplayName}%' OR Eng.DisplayName LIKE N'%{DisplayName}%') AND ")} {(statuses!= null && statuses.Length > 0 ? $"[e].[SCStatusId] in ({statusSQL}) AND " : "")}  (([e].[IsDeleted] <> 1) AND([e].[TenantId] = CAST(1 AS bigint))) AND(([t7].[DepartmentId] IS NOT NULL {(DeptId != null ? $"AND[t7].[DepartmentId] = {DeptId}" : "")} ) AND(CASE " +
+                $"WHERE (@DisplayName IS NULL OR [e].[Id] LIKE N'%' + @DisplayName + N'%' OR Eng.DisplayName LIKE N'%' + @DisplayName + N'%' OR [t8].[Name] LIKE N'%' + @DisplayName + N'%') AND {(statuses!= null && statuses.Length > 0 ? $"[e].[SCStatusId] in ({statusSQL}) AND " : "")}  (([e].[IsDeleted] <> 1) AND([e].[TenantId] = CAST(1 AS bigint))) AND(([t7].[DepartmentId] IS NOT NULL {(DeptId != null ? $"AND[t7].[DepartmentId] = {DeptId}" : "")} ) AND(CASE " +
                 "WHEN EXISTS( " +
                 "   SELECT 1 " +
                 "   FROM[Assignments] AS[e9] " +
@@ -118,17 +117,17 @@ namespace O2GEN.Helpers
                 "        WHEN EXISTS( " +
                 "            SELECT 1 " +
                 "            FROM[Assignments] AS[e10] " +
-                "            WHERE((([e10].[IsDeleted] <> 1) AND([e10].[TenantId] = CAST(1 AS bigint))) AND(([e10].[Start] < @__finish_1) AND([e10].[Finish] > @__start_2))) AND([e].[Id] = [e10].[SchedulingContainerId])) " +
+                "            WHERE((([e10].[IsDeleted] <> 1) AND([e10].[TenantId] = CAST(1 AS bigint))) AND(([e10].[Start] < @DTo) AND([e10].[Finish] > @DFrom))) AND([e].[Id] = [e10].[SchedulingContainerId])) " +
                 "        THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) " +
                 "    END ELSE CASE " +
-                "        WHEN([t7].[AppointmentStart] < @__finish_1) AND([t7].[AppointmentFinish] > @__start_2) " +
+                "        WHEN([t7].[AppointmentStart] < @DTo) AND([t7].[AppointmentFinish] > @DFrom) " +
                 "        THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) " +
                 "    END " +
                 "END = 1)) " +
                 "ORDER BY[t7].[AppointmentStart] DESC";
         }
 
-        private static string GetZRP(int ID)
+        private static string GetZRP()
         {
             return "" +
                 "SELECT [e].[Id], [e].[ObjectUID], [e].[StartTime], [e].[CloseTime], [e].[DepartmentId], [e].[SCTypeId], [e].[SCStatusId], [SR].[RequirementResourceId], [IDoc].[Name] " +
@@ -136,7 +135,7 @@ namespace O2GEN.Helpers
                 "LEFT JOIN [SchedulingRequirements] AS[SR] ON [SR].[IsDeleted] <> 1 AND [e].[RequirementId] = [SR].[Id] " +
                 "LEFT JOIN [Tasks] AS [T] ON [T].[IsDeleted] <> 1 AND [e].[Id] = [T].[SchedulingContainerId] " +
                 "LEFT JOIN [InspectionDocuments] AS [IDoc] ON [IDoc].[IsDeleted] <> 1 AND [T].[Id] = [IDoc].[TaskId] " +
-                $"WHERE [e].[Id] = {ID} AND [e].[IsDeleted] <> 1 AND [e].[TenantId] = CAST(1 AS bigint) ";
+                $"WHERE [e].[Id] = @Id AND [e].[IsDeleted] <> 1 AND [e].[TenantId] = CAST(1 AS bigint) ";
         }
 
         /// <summary>
@@ -563,21 +562,21 @@ namespace O2GEN.Helpers
         /// <param name="ID"></param>
         /// <param name="UserName"></param>
         /// <returns></returns>
-        private static string DeleteInspectionProtocol(int ID, long EngId)
+        private static string DeleteInspectionProtocol()
         {
             return "DECLARE @IPRev bigint; " +
                 "set @IPRev = (isnull((SELECT max(revision) id FROM InspectionProtocols ),0)+1); " +
 
                 "UPDATE InspectionProtocols SET " +
-                $"DeletedByUser = {EngId}, " +
+                $"DeletedByUser = @EngId, " +
                 "DeletionTime = getdate(), " +
                 "Revision = @IPRev, " +
                 "IsDeleted = 1 " +
-                $"WHERE ID = {ID}; " +
+                $"WHERE ID = @ID; " +
 
                 $"UPDATE PPEntityCollections SET Revision = @IPRev WHERE ID = {(int)RevEntry.InspectionProtocol};";
         }
-        private static string DeleteZRP(int ID, long EngId)
+        private static string DeleteZRP()
         {
 
 
@@ -593,39 +592,39 @@ namespace O2GEN.Helpers
             "SET @ARev = (isnull((SELECT max(revision) id FROM Assignments), 0) + 1); " +
 
             "UPDATE SchedulingRequirements SET " +
-            $"DeletedByUser = {EngId}, " +
+            "DeletedByUser = @EngId, " +
             "DeletionTime = getdate(), " +
             "IsDeleted = 1," +
             "Revision = @SRRev " +
-            $"WHERE ID in (SELECT RequirementId FROM SchedulingContainers WHERE ID = {ID}); " +
+            "WHERE ID in (SELECT RequirementId FROM SchedulingContainers WHERE ID = @ID); " +
 
             "UPDATE SchedulingContainers SET " +
-            $"DeletedByUser = {EngId}, " +
+            $"DeletedByUser = @EngId, " +
             "DeletionTime = getdate(), " +
             "IsDeleted = 1," +
             "Revision = @SCRev " +
-            $"WHERE ID = {ID}; " +
+            "WHERE ID = @ID; " +
 
             "UPDATE Tasks SET " +
-            $"DeletedByUser = {EngId}, " +
+            "DeletedByUser = @EngId, " +
             "DeletionTime = getdate(), " +
             "IsDeleted = 1," +
             "Revision = @TRev " +
-            $"WHERE SchedulingContainerId = {ID}; " +
+            "WHERE SchedulingContainerId = {ID}; " +
 
             "UPDATE Assignments SET " +
-            $"DeletedByUser = {EngId}, " +
+            "DeletedByUser = @EngId, " +
             "DeletionTime = getdate(), " +
             "IsDeleted = 1," +
             "Revision = @ARev " +
-            $"WHERE SchedulingContainerId = {ID}; " +
+            "WHERE SchedulingContainerId = {ID}; " +
 
             "UPDATE InspectionDocuments SET " +
-            $"DeletedByUser = {EngId}, " +
+            "DeletedByUser = @EngId, " +
             "DeletionTime = getdate(), " +
             "IsDeleted = 1," +
             "Revision = @IDRev " +
-            $"WHERE TaskId in (SELECT Id FROM Tasks WHERE SchedulingContainerId = {ID}); " +
+            "WHERE TaskId in (SELECT Id FROM Tasks WHERE SchedulingContainerId = @ID); " +
 
 
             $"UPDATE PPEntityCollections SET Revision = @SRRev WHERE ID = {(int)RevEntry.SchedulingRequirement}; " +
@@ -634,7 +633,7 @@ namespace O2GEN.Helpers
             $"UPDATE PPEntityCollections SET Revision = @IDRev WHERE ID = {(int)RevEntry.InspectionDocument}; " +
             $"UPDATE PPEntityCollections SET Revision = @ARev WHERE ID = {(int)RevEntry.Assignment}; ";
         }
-        private static string GetInspectionProtocols(int SchedContID)
+        private static string GetInspectionProtocols()
         {
             return "SELECT IPs.Id, " +
             "IPs.ObjectUID,  " +
@@ -649,14 +648,14 @@ namespace O2GEN.Helpers
             "APV.IsPen, " +
             //Покраска текста
             "CASE APV.AssetParameterTypeId " + //Визуальный
-            $"WHEN " +
-            $"2 " +
-            $"THEN ( " +
+            "WHEN " +
+            "2 " +
+            "THEN ( " +
                 $"CASE APV.Value WHEN N'0' THEN {(int)TextColor.Green} " +
                 $"WHEN N'1' THEN {(int)TextColor.Yellow} " +
                 $"WHEN N'2' THEN {(int)TextColor.Red} " +
                 $"ELSE {(int)TextColor.Default} END" +
-            $") ELSE (" +
+            ") ELSE (" +
                 "CASE WHEN " +
                 "(" +
                     "TRY_CONVERT(float, REPLACE(APV.Value,',','.')) " +
@@ -678,21 +677,21 @@ namespace O2GEN.Helpers
                     "AND TRY_CONVERT(float, REPLACE(AP.TopValue2,',','.')) " +
                 $") THEN {(int)TextColor.Yellow} " +
                 $"ELSE {(int)TextColor.Default} END) END " +
-            $"AS TextColor, " +
-            $"AState.Id AS StateId, " +
-            $"ISNULL(AState.DisplayName, N'Не указан') AS StateName " +
+            "AS TextColor, " +
+            "IPState.Id AS StateId, " +
+            "ISNULL(IPState.DisplayName, N'Не указан') AS StateName " +
             "FROM InspectionProtocolItems AS IPI " +
             "INNER JOIN InspectionProtocols AS IPs on IPI.InspectionProtocolId = IPs.Id " +
             "INNER JOIN AssetParameterValues AS APV on IPI.AssetParameterValueId = APV.Id " +
             "INNER JOIN AssetParameters AS AP on AP.Id = APV.AssetParameterId " +
             "LEFT JOIN Assets AS A on A.Id = IPs.AssetId " +
-            "LEFT JOIN AssetStates AS AState on AState.Id = A.AssetStateId " +
-            $"WHERE InspectionDocumentId in (select id from InspectionDocuments where TaskId in (select id from Tasks where SchedulingContainerId = {SchedContID})) AND IPs.IsDeleted <> 1 " +
-            $"ORDER BY AState.Id, IPs.Name ";
+            "LEFT JOIN InspectionProtocolStatuses AS IPState on IPState.Id = IPs.InspectionProtocolStatusId " +
+            "WHERE InspectionDocumentId in (select id from InspectionDocuments where TaskId in (select id from Tasks where SchedulingContainerId = @SchedContID)) AND IPs.IsDeleted <> 1 " +
+            "ORDER BY IPState.Id, IPs.Name ";
         }
         #endregion
 
-        #region Статусы
+        #region Статусы SC
         /// <summary>
         /// Статусы
         /// </summary>
@@ -703,9 +702,9 @@ namespace O2GEN.Helpers
         }
         #endregion
 
-        #region Статусы
+        #region Типы SC
         /// <summary>
-        /// Календари
+        /// Типы
         /// </summary>
         /// <returns></returns>
         private static string SelectSCTypes()
@@ -719,6 +718,7 @@ namespace O2GEN.Helpers
         /// Календари
         /// </summary>
         /// <returns></returns>
+        [Obsolete]
         private static string SelectCalendars()
         {
             return "SELECT id, Title, ObjectUID FROM PPCalendars where IsDeleted <> 1 AND TenantId = CAST(1 AS bigint)";
@@ -758,17 +758,17 @@ namespace O2GEN.Helpers
         /// Контроли
         /// </summary>
         /// <returns></returns>
-        private static string SelectControls(long ID = -1, long? AssetParameterTypeId = null, string DisplayName = "", long? DeptId = null)
+        private static string SelectControls()
         {
             return "SELECT AP.Id, AP.DisplayName, AP.ObjectUID, AP.BottomValue1, AP.TopValue1, AP.BottomValue2, AP.TopValue2, AP.BottomValue3, AP.TopValue3, APT.Id AS AssetParameterTypeId, APT.Name AS ValueTypeName, AP.Description, AP.DepartmentId, AP.CreationTime, ISNULL(AP.ModificationTime, AP.CreationTime) AS ModificationTime, ISNULL(D.DisplayName, N'Не указано') AS DepartmentName " +
                 "FROM AssetParameters AS AP " +
                 "INNER JOIN AssetParameterTypes AS APT ON AP.AssetParameterTypeId = APT.Id " +
                 "LEFT JOIN Departments D ON D.Id = AP.DepartmentId " + 
-                "WHERE(AP.IsDeleted <> 1) AND(AP.TenantId = CAST(1 AS bigint)) " +
-                $"{(ID == -1 ? "" : "AND AP.Id = " + ID)} " +
-                $"{(AssetParameterTypeId == null ? "" : "AND AP.AssetParameterTypeId = " + AssetParameterTypeId)} " +
-                $"{(string.IsNullOrEmpty(DisplayName)? "" : $"AND AP.DisplayName like N'%{DisplayName}%' ")} " +
-                $"{(DeptId!= null? $"AND AP.DepartmentId = {DeptId} ": "")}" +
+                "WHERE(AP.IsDeleted <> 1) AND(AP.TenantId = CAST(1 AS bigint)) AND " +
+                "(@ID IS NULL OR AP.Id = @ID) AND " +
+                "(@AssetParameterTypeId IS NULL OR AP.AssetParameterTypeId = @AssetParameterTypeId) AND " +
+                "(@DisplayName IS NULL OR AP.DisplayName like N'%' + @DisplayName + N'%') AND " +
+                "(@DeptId IS NULL OR AP.DepartmentId = @DeptId) " +
                 "ORDER BY AP.DisplayName";
         }
         /// <summary>
@@ -2483,6 +2483,52 @@ namespace O2GEN.Helpers
         {
             return "SELECT Name, Value FROM TBFN_GET_STATISTICS(@DeptId, @FromD, @ToD) ORDER BY Name";
         }
+        /// <summary>
+        /// Берет для отчета только завершенные
+        /// </summary>
+        /// <returns></returns>
+        private static string GetStatisticsRTEC2()
+        {
+            return @"
+                DECLARE @t TABLE 
+                (
+                DepId int,
+                DepName NVARCHAR(MAX),
+                ResName NVARCHAR(MAX),
+                ResCount int,
+                DepCount int
+                );
+                INSERT INTO @t
+                SELECT 
+                D.Id, 
+                D.DisplayName DepName, 
+                R.DisplayName ResName,
+                (SELECT COUNT(SC.Id) FROM SchedulingRequirements SR 
+                LEFT JOIN SchedulingContainers SC ON SC.RequirementId = SR.Id
+                WHERE R.Id = SR.RequirementResourceId
+                AND SR.AppointmentStart >= @FromD 
+                AND SR.AppointmentFinish <= @ToD 
+                AND SC.SCStatusId = 3) AS ResCount,
+                0 AS DepCount
+                FROM
+                Departments D
+                LEFT JOIN Resources R ON R.DepartmentId = D.Id
+                WHERE 
+                D.Id IN (SELECT Id FROM TBFN_GET_DEPARTMENTS(@DeptId))  
+                AND D.IsDeleted <> 1
+                AND (R.IsDeleted <> 1 OR  R.IsDeleted IS NULL)
+
+                GROUP BY D.Id, D.DisplayName, R.Id, R.DisplayName
+                ORDER BY DepName, ResName
+
+
+                UPDATE t SET t.DepCount = (SELECT SUM(ResCount) FROM @t WHERE DepId IN (SELECT Id FROM TBFN_GET_DEPARTMENTS(t.DepId)))
+                FROM @T t
+
+                SELECT * FROM @t ORDER BY DepName, ResName
+                ";
+            return "SELECT Name, Value FROM TBFN_GET_STATISTICS(@DeptId, @FromD, @ToD) ORDER BY Name";
+        }
         #endregion
 
         #region Дефекты максимо
@@ -2565,10 +2611,14 @@ namespace O2GEN.Helpers
                 using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
-                    using (var command = new SqlCommand(GetZRP(From, To, statuses, DisplayName, DeptId, UserDept), connection))
+                    using (var command = new SqlCommand(GetZRP(statuses, DeptId, UserDept), connection))
                     {
                         command.CommandType = CommandType.Text;
                         command.Parameters.Clear();
+                        command.Parameters.Add(new SqlParameter() { ParameterName = "@DFrom", SqlDbType = SqlDbType.DateTime, Value = From });
+                        command.Parameters.Add(new SqlParameter() { ParameterName = "@DTo", SqlDbType = SqlDbType.DateTime, Value = To });
+                        command.Parameters.Add(new SqlParameter() { ParameterName = "@DisplayName", SqlDbType = SqlDbType.NVarChar, Value = String.IsNullOrEmpty(DisplayName) ? DBNull.Value : DisplayName });
+
                         using (var dataReader = command.ExecuteReader())
                         {
                             foreach (var row in dataReader.Select(row => row))
@@ -2624,10 +2674,12 @@ namespace O2GEN.Helpers
                 using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
-                    using (var command = new SqlCommand(GetZRP(ID), connection))
+                    using (var command = new SqlCommand(GetZRP(), connection))
                     {
                         command.CommandType = CommandType.Text;
                         command.Parameters.Clear();
+                        command.Parameters.Add(new SqlParameter() { ParameterName = "@Id", SqlDbType = SqlDbType.BigInt, Value = ID });
+
                         using (var dataReader = command.ExecuteReader())
                         {
                             foreach (var row in dataReader.Select(row => row))
@@ -2814,11 +2866,14 @@ namespace O2GEN.Helpers
             }
 
         }
-        public static void DeleteZRP(int ID, long EngId, ILogger logger)
+        public static void DeleteZRP(long ID, long EngId, ILogger logger)
         {
-            ExecuteNonQuery(DeleteZRP(ID, EngId), logger);
+            List<SqlParameter> param = new List<SqlParameter>();
+            param.Add(new SqlParameter() { ParameterName = "@ID", SqlDbType = SqlDbType.BigInt, Value = ID });
+            param.Add(new SqlParameter() { ParameterName = "@EngId", SqlDbType = SqlDbType.BigInt, Value = EngId });
+            ExecuteNonQuery(DeleteZRP(), logger,param);
         }
-        public static List<InspectionProtocol> GetInspectionProtocols(int ShedContID, long EngId, ILogger logger)
+        public static List<InspectionProtocol> GetInspectionProtocols(long ShedContID, long EngId, ILogger logger)
         {
             string con = GetConnectionString();
 
@@ -2835,11 +2890,13 @@ namespace O2GEN.Helpers
                 using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
-                    using (var command = new SqlCommand(GetInspectionProtocols(ShedContID), connection))
+                    using (var command = new SqlCommand(GetInspectionProtocols(), connection))
                     {
                         InspectionProtocol Tmp = null;
                         command.CommandType = CommandType.Text;
                         command.Parameters.Clear();
+                        command.Parameters.Add(new SqlParameter() { ParameterName = "@SchedContID", SqlDbType = SqlDbType.BigInt, Value = ShedContID });
+
                         using (var dataReader = command.ExecuteReader())
                         {
                             foreach (var row in dataReader.Select(row => row))
@@ -2878,9 +2935,12 @@ namespace O2GEN.Helpers
             }
             return output;
         }
-        public static void DeleteInspectionProtocol(int InspectionProtocolID, long EngId, ILogger logger)
+        public static void DeleteInspectionProtocol(long InspectionProtocolID, long EngId, ILogger logger)
         {
-            ExecuteNonQuery(DeleteInspectionProtocol(InspectionProtocolID, EngId), logger);
+            List<SqlParameter> param = new List<SqlParameter>();
+            param.Add(new SqlParameter() { ParameterName = "@ID", SqlDbType = SqlDbType.BigInt, Value = InspectionProtocolID });
+            param.Add(new SqlParameter() { ParameterName = "@EngId", SqlDbType = SqlDbType.BigInt, Value = EngId });
+            ExecuteNonQuery(DeleteInspectionProtocol(), logger, param);
         }
         #endregion
 
@@ -2890,6 +2950,7 @@ namespace O2GEN.Helpers
         /// </summary>
         /// <param name="logger"></param>
         /// <returns></returns>
+        [Obsolete]
         public static List<Calendar> GetCalendars(ILogger logger = null)
         {
             string con = GetConnectionString();
@@ -3142,10 +3203,14 @@ namespace O2GEN.Helpers
                 using (var connection = new SqlConnection(con))
                 {
                     connection.Open();
-                    using (var command = new SqlCommand(SelectControls(AssetParameterTypeId: AssetParameterTypeId, DisplayName: DisplayName, DeptId: DeptId), connection))
+                    using (var command = new SqlCommand(SelectControls(), connection))
                     {
                         command.CommandType = CommandType.Text;
                         command.Parameters.Clear();
+                        command.Parameters.Add(new SqlParameter() { SqlDbType = SqlDbType.BigInt, ParameterName = "@ID", Value = DBNull.Value });
+                        command.Parameters.Add(new SqlParameter() { SqlDbType = SqlDbType.BigInt, ParameterName = "@AssetParameterTypeId", Value = (object)AssetParameterTypeId?? DBNull.Value });
+                        command.Parameters.Add(new SqlParameter() { SqlDbType = SqlDbType.NVarChar, ParameterName = "@DisplayName", Value = String.IsNullOrEmpty(DisplayName)? DBNull.Value : DisplayName });
+                        command.Parameters.Add(new SqlParameter() { SqlDbType = SqlDbType.BigInt, ParameterName = "@DeptId", Value = (object)DeptId ?? DBNull.Value });
                         using (var dataReader = command.ExecuteReader())
                         {
                             foreach (var row in dataReader.Select(row => row))
@@ -3190,10 +3255,14 @@ namespace O2GEN.Helpers
                 using (var connection = new SqlConnection(GetConnectionString()))
                 {
                     connection.Open();
-                    using (var command = new SqlCommand(SelectControls(ID), connection))
+                    using (var command = new SqlCommand(SelectControls(), connection))
                     {
                         command.CommandType = CommandType.Text;
                         command.Parameters.Clear();
+                        command.Parameters.Add(new SqlParameter() { SqlDbType = SqlDbType.BigInt, ParameterName = "@ID", Value = ID });
+                        command.Parameters.Add(new SqlParameter() { SqlDbType = SqlDbType.BigInt, ParameterName = "@AssetParameterTypeId", Value = DBNull.Value });
+                        command.Parameters.Add(new SqlParameter() { SqlDbType = SqlDbType.NVarChar, ParameterName = "@DisplayName", Value = DBNull.Value });
+                        command.Parameters.Add(new SqlParameter() { SqlDbType = SqlDbType.BigInt, ParameterName = "@DeptId", Value = DBNull.Value });
                         using (var dataReader = command.ExecuteReader())
                         {
                             foreach (var row in dataReader.Select(row => row))
@@ -5731,6 +5800,55 @@ namespace O2GEN.Helpers
                                     MetricName = row["Name"].ToString(),
                                     MetricValue = row["Value"].ToString()
                                 });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, $"Ошибка на запросе данных {new StackTrace().GetFrame(1).GetMethod().Name}");
+            }
+            return output;
+        }
+        public static List<string[]> GetStatisticsRTEC2(DateTime Fromd, DateTime  Tod, long? DeptId, ILogger logger = null)
+        {
+            string con = GetConnectionString();
+
+            if (string.IsNullOrEmpty(con))
+            {
+                logger?.LogDebug("connection string is null or empty");
+                return null;
+            }
+
+            List<string[]> output = new List<string[]>();
+            try
+            {
+                using (var connection = new SqlConnection(con))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(GetStatisticsRTEC2(), connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.Parameters.Clear();
+                        command.Parameters.Add(new SqlParameter() { ParameterName = "@DeptId", SqlDbType = SqlDbType.BigInt, Value = DeptId == null? 0: DeptId });
+                        command.Parameters.Add(new SqlParameter() { ParameterName = "@FromD", SqlDbType = SqlDbType.DateTime, Value = Fromd });
+                        command.Parameters.Add(new SqlParameter() { ParameterName = "@ToD", SqlDbType = SqlDbType.DateTime, Value = Tod });
+                        string dep = "";
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            foreach (var row in dataReader.Select(row => row))
+                            {
+                                string[] sr = null;
+                                if (dep != row["DepName"].ToString())
+                                {
+                                    output.Add(new string[10]);
+                                    sr = new string[] { row["DepName"].ToString(), "", "", "", "", "", "", "", row["DepCount"].ToString(), "" };
+                                    output.Add(sr);
+                                    dep = row["DepName"].ToString();
+                                }
+                                sr = new string[] { row["ResName"].ToString(), "", "", "", "", "", "", "", row["ResCount"].ToString(), "" };
+                                output.Add(sr);
                             }
                         }
                     }

@@ -45,6 +45,8 @@
 
     <div class="margin-between-above">
         <table class="table table-bordered table-hover">
+            @if (ViewBag.Data == null || ViewBag.Data is List<Statistics>)
+            {
             <thead>
                 <tr>
                     <th>
@@ -64,20 +66,158 @@
                     return;
                 else foreach (Statistics item in ViewBag.Data)
                     {
-    <tr>
-        <td>
-            <p>
-                @item.MetricName
-            </p>
-        </td>
-        <td>
-            <p>
-                @item.MetricValue
-            </p>
-        </td>
-    </tr>
-}
+                        <tr>
+                            <td>
+                                <p>
+                                    @item.MetricName
+                                </p>
+                            </td>
+                            <td>
+                                <p>
+                                    @item.MetricValue
+                                </p>
+                            </td>
+                        </tr>
+                    }
             </tbody>
+            }
+            else
+            {
+                <thead>
+                    <tr>
+                        <th>
+                            <p>
+                            </p>
+                        </th>
+                        <th colspan="3">
+                            <p>
+                                Количество обходов (смена дневная)
+                            </p>
+                        </th>
+                        <th colspan="3">
+                            <p>
+                                Количество обходов (смена ночная)
+                            </p>
+                        </th>
+                        <th colspan="3">
+                            <p>
+                                Общее количество обходов на предпреятии
+                            </p>
+                        </th>
+                    </tr>
+            </thead>
+                <tbody>
+
+                    <tr>
+                        <th>
+                            <p>
+                                Наименование подразделения
+                            </p>
+                        </th>
+                        <th>
+                            <p>
+                                План
+                            </p>
+                        </th>
+                        <th>
+                            <p>
+                                Факт
+                            </p>
+                        </th>
+                        <th>
+                            <p>
+                                Разница
+                            </p>
+                        </th>
+                        <th>
+                            <p>
+                                План
+                            </p>
+                        </th>
+                        <th>
+                            <p>
+                                Факт
+                            </p>
+                        </th>
+                        <th>
+                            <p>
+                                Разница
+                            </p>
+                        </th>
+                        <th>
+                            <p>
+                                План
+                            </p>
+                        </th>
+                        <th>
+                            <p>
+                                Факт
+                            </p>
+                        </th>
+                        <th>
+                            <p>
+                                Разница
+                            </p>
+                        </th>
+                    </tr>
+
+                    @for (int i = 0; i < ViewBag.Data.Count; i++)
+                    {
+                        <tr>
+                            <th>
+                                <p>
+                                    @ViewBag.Data[i][0]
+                                </p>
+                            </th>
+                            <th>
+                                <p>
+                                    @ViewBag.Data[i][1]
+                                </p>
+                            </th>
+                            <th>
+                                <p>
+                                    @ViewBag.Data[i][2]
+                                </p>
+                            </th>
+                            <th>
+                                <p>
+                                    @ViewBag.Data[i][3]
+                                </p>
+                            </th>
+                            <th>
+                                <p>
+                                    @ViewBag.Data[i][4]
+                                </p>
+                            </th>
+                            <th>
+                                <p>
+                                    @ViewBag.Data[i][5]
+                                </p>
+                            </th>
+                            <th>
+                                <p>
+                                    @ViewBag.Data[i][6]
+                                </p>
+                            </th>
+                            <th>
+                                <p>
+                                    @ViewBag.Data[i][7]
+                                </p>
+                            </th>
+                            <th>
+                                <p>
+                                    @ViewBag.Data[i][8]
+                                </p>
+                            </th>
+                            <th>
+                                <p>
+                                    @ViewBag.Data[i][9]
+                                </p>
+                            </th>
+                        </tr>
+                    }
+                </tbody>
+            }
         </table>
     </div>
     <script type="text/javascript">
