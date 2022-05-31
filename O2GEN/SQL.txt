@@ -276,3 +276,10 @@ ALTER TABLE SchedulingContainers ADD DefectCount int not null default 0
 
 UPDATE MaximoReporterSettings SET NAME = N'LastSCRevisionMaximo' WHERE ID = 2
 INSERT INTO MaximoReporterSettings (NAME, Value) Values (N'LastSCRevisionDefect', N'99999')
+
+
+
+
+--Добавляем количество планируемых обходов
+ALTER TABLE Resources ADD PlanDay INT NOT NULL DEFAULT 0;
+ALTER TABLE Resources ADD PlanNight INT NOT NULL DEFAULT 0;

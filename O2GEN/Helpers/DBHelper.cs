@@ -2489,14 +2489,29 @@ namespace O2GEN.Helpers
         /// <returns></returns>
         private static string GetStatisticsRTEC2()
         {
+            #warning в ручную убраны несколько  должностей, начальники  и еще ктото. переделать на флаг
             return @"
                 DECLARE @t TABLE 
                 (
                 DepId int,
                 DepName NVARCHAR(MAX),
                 ResName NVARCHAR(MAX),
+
+                ResCountDay int,
+                ResCountNight int,
                 ResCount int,
-                DepCount int
+
+                DepCountDay int,
+                DepCountNight int,
+                DepCount int, 
+
+                ResPlanDay int,
+                ResPlanNight int,
+                ResPlan int,
+
+                DepPlanDay int,
+                DepPlanNight int,
+                DepPlan int
                 );
                 INSERT INTO @t
                 SELECT 
@@ -2508,26 +2523,70 @@ namespace O2GEN.Helpers
                 WHERE R.Id = SR.RequirementResourceId
                 AND SR.AppointmentStart >= @FromD 
                 AND SR.AppointmentFinish <= @ToD 
+				AND DATEPART(HOUR, SR.AppointmentStart) >= 8
+				AND DATEPART(HOUR, SR.AppointmentStart) < 20
+                AND SC.SCStatusId = 3) AS ResCountDay,
+
+                (SELECT COUNT(SC.Id) FROM SchedulingRequirements SR 
+                LEFT JOIN SchedulingContainers SC ON SC.RequirementId = SR.Id
+                WHERE R.Id = SR.RequirementResourceId
+                AND SR.AppointmentStart >= @FromD 
+                AND SR.AppointmentFinish <= @ToD 
+				AND (DATEPART(HOUR, SR.AppointmentStart) < 8
+				OR DATEPART(HOUR, SR.AppointmentStart) >= 20)
+                AND SC.SCStatusId = 3) AS ResCountNight,
+
+                (SELECT COUNT(SC.Id) FROM SchedulingRequirements SR 
+                LEFT JOIN SchedulingContainers SC ON SC.RequirementId = SR.Id
+                WHERE R.Id = SR.RequirementResourceId
+                AND SR.AppointmentStart >= @FromD 
+                AND SR.AppointmentFinish <= @ToD 
                 AND SC.SCStatusId = 3) AS ResCount,
-                0 AS DepCount
+
+                0 AS DepCountDay,
+                0 AS DepCountNight,
+                0 AS DepCount,
+
+                R.PlanDay AS ResPlanDay,
+                R.PlanNight AS ResPlanNight,
+                R.PlanDay + R.PlanNight AS ResPlan,
+
+                0 AS DepPlanDay,
+                0 AS DepPlanNight,
+                0 AS DepPlan 
+                
                 FROM
                 Departments D
-                LEFT JOIN Resources R ON R.DepartmentId = D.Id
+                LEFT JOIN Resources R ON R.DepartmentId = D.Id AND R.Id NOT IN (86,90,91)
                 WHERE 
                 D.Id IN (SELECT Id FROM TBFN_GET_DEPARTMENTS(@DeptId))  
                 AND D.IsDeleted <> 1
                 AND (R.IsDeleted <> 1 OR  R.IsDeleted IS NULL)
 
-                GROUP BY D.Id, D.DisplayName, R.Id, R.DisplayName
+                GROUP BY D.Id, D.DisplayName, R.Id, R.DisplayName, R.PlanDay, R.PlanNight 
                 ORDER BY DepName, ResName
 
 
-                UPDATE t SET t.DepCount = (SELECT SUM(ResCount) FROM @t WHERE DepId IN (SELECT Id FROM TBFN_GET_DEPARTMENTS(t.DepId)))
+                UPDATE t SET 
+				t.DepCountDay = (SELECT SUM(ResCountDay) FROM @t WHERE DepId IN (SELECT Id FROM TBFN_GET_DEPARTMENTS(t.DepId))),
+				t.DepCountNight = (SELECT SUM(ResCountNight) FROM @t WHERE DepId IN (SELECT Id FROM TBFN_GET_DEPARTMENTS(t.DepId))),
+				t.DepCount = (SELECT SUM(ResCount) FROM @t WHERE DepId IN (SELECT Id FROM TBFN_GET_DEPARTMENTS(t.DepId))),
+				t.DepPlanDay = (SELECT SUM(ResPlanDay) FROM @t WHERE DepId IN (SELECT Id FROM TBFN_GET_DEPARTMENTS(t.DepId))),
+				t.DepPlanNight = (SELECT SUM(ResPlanNight) FROM @t WHERE DepId IN (SELECT Id FROM TBFN_GET_DEPARTMENTS(t.DepId))),
+				t.DepPlan = (SELECT SUM(ResPlan) FROM @t WHERE DepId IN (SELECT Id FROM TBFN_GET_DEPARTMENTS(t.DepId)))
                 FROM @T t
+                
+                
 
-                SELECT * FROM @t ORDER BY DepName, ResName
+                SELECT *, 
+                DepCountDay - DepPlanDay AS DepDiffDay, 
+                DepCountNight - DepPlanNight AS DepDiffNight, 
+                DepCount - DepPlan AS DepDiff, 
+                ResCountDay - ResPlanDay AS ResDiffDay, 
+                ResCountNight - ResPlanNight AS ResDiffNight, 
+                ResCount - ResPlan AS ResDiff 
+                FROM @t ORDER BY DepName, ResName
                 ";
-            return "SELECT Name, Value FROM TBFN_GET_STATISTICS(@DeptId, @FromD, @ToD) ORDER BY Name";
         }
         #endregion
 
@@ -5839,16 +5898,44 @@ namespace O2GEN.Helpers
                         {
                             foreach (var row in dataReader.Select(row => row))
                             {
+
                                 string[] sr = null;
                                 if (dep != row["DepName"].ToString())
                                 {
                                     output.Add(new string[10]);
-                                    sr = new string[] { row["DepName"].ToString(), "", "", "", "", "", "", "", row["DepCount"].ToString(), "" };
+                                    sr = new string[] 
+                                    { 
+                                        row["DepName"].ToString(), 
+                                        row["DepPlanDay"].ToString(), 
+                                        row["DepCountDay"].ToString(), 
+                                        row["DepDiffDay"].ToString(),
+                                        row["DepPlanNight"].ToString(),
+                                        row["DepCountNight"].ToString(),
+                                        row["DepDiffNight"].ToString(),
+                                        row["DepPlan"].ToString(),
+                                        row["DepCount"].ToString(),
+                                        row["DepDiff"].ToString()
+                                    };
                                     output.Add(sr);
                                     dep = row["DepName"].ToString();
                                 }
-                                sr = new string[] { row["ResName"].ToString(), "", "", "", "", "", "", "", row["ResCount"].ToString(), "" };
-                                output.Add(sr);
+                                if (!string.IsNullOrEmpty(row["ResName"].ToString()))
+                                {
+                                    sr = new string[] 
+                                    {
+                                        row["ResName"].ToString(),
+                                        row["ResPlanDay"].ToString(),
+                                        row["ResCountDay"].ToString(),
+                                        row["ResDiffDay"].ToString(),
+                                        row["ResPlanNight"].ToString(),
+                                        row["ResCountNight"].ToString(),
+                                        row["ResDiffNight"].ToString(),
+                                        row["ResPlan"].ToString(),
+                                        row["ResCount"].ToString(),
+                                        row["ResDiff"].ToString()
+                                    };
+                                    output.Add(sr);
+                                }
                             }
                         }
                     }

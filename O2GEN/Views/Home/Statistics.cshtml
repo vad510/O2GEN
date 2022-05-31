@@ -6,8 +6,8 @@
     <div class="row-container-left bg-blue" id="pageToolbar" style="position:sticky">
         <form action="Statistics" method="post">
 
-            <input asp-for="From" style="display:none" />
-            <input asp-for="To" style="display:none" />
+            @*<input asp-for="From" style="display:none" />
+            <input asp-for="To" style="display:none" />*@
             <div class="d-flex flex-wrap m-2">
                 <div class="mb-2 mr-2">
                     <button class="btn btn-light" type="button" onclick="SetTodayForTDTs($('#From'), $('#To'))">

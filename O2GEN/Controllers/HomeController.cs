@@ -486,7 +486,17 @@ namespace O2GEN.Controllers
             FROMData = From.ToString("yyyy-MM-ddTHH:mm");
             TOData = To.ToString("yyyy-MM-ddTHH:mm");
 
-            ViewBag.Data = Helpers.DBHelper.GetStatistics(From, To, (Did == 0 ? null : Did), _logger);
+            //Если это РТЭЦ2 для него особый отчет.
+            #warning переделать на динамическое определение.
+            if (Did == 2 ||
+                Did == 3 ||
+                Did == 4 ||
+                Did == 5)
+            {
+                ViewBag.Data = Helpers.DBHelper.GetStatisticsRTEC2(From, To, Did, _logger);
+            }
+            else
+                ViewBag.Data = Helpers.DBHelper.GetStatistics(From, To, (Did == 0 ? null : Did), _logger);
             Response.Cookies.Append("statfrom", FROMData);
             Response.Cookies.Append("statto", TOData);
             Response.Cookies.Append("statdid", string.IsNullOrEmpty(DepartmentIdData) ? "" : DepartmentIdData);
